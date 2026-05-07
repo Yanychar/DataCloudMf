@@ -1,0 +1,83 @@
+[
+  {
+    "key": "client",
+    "label": "Client",
+    "endpoint": "/clients",
+    "cron": "*/15 * * * *",
+    "mode": "full",
+    "enabled": true,
+    "externalIdField": "client",
+    "sourceUpdatedAtField": "latestSaveDate",
+    "pageSize": 100,
+    "notes": "Central person entity in Acute. Source identifier is the client URI, for example /clients/123. The listed GET endpoint does not expose a modified-after filter in the current spec."
+  },
+  {
+    "key": "organisation",
+    "label": "Organisation",
+    "endpoint": "/organisations",
+    "cron": "0 * * * *",
+    "mode": "full",
+    "enabled": true,
+    "externalIdField": "orgId",
+    "sourceUpdatedAtField": "latestSaveDate",
+    "pageSize": 100,
+    "notes": "Company master entity for TTH organisation clients. The listed GET endpoint does not expose a modified-after filter in the current spec."
+  },
+  {
+    "key": "employer",
+    "label": "Employer",
+    "endpoint": "/employers",
+    "cron": "0 * * * *",
+    "mode": "full",
+    "enabled": true,
+    "externalIdField": "employer",
+    "pageSize": 100,
+    "notes": "Source bridge between Client and Organisation. Employer.clientId refers to the id part inside Client.client. The listed GET endpoint does not expose a modified-after filter in the current spec."
+  },
+  {
+    "key": "invoice",
+    "label": "Invoice",
+    "endpoint": "/invoices",
+    "cron": "*/30 * * * *",
+    "mode": "incremental",
+    "enabled": true,
+    "externalIdField": "invoiceId",
+    "sourceUpdatedAtField": "modifiedDate",
+    "incrementalQueryParam": "modifiedAfter",
+    "staticParams": {
+      "dateType": "invoiceDate"
+    },
+    "pageSize": 100,
+    "notes": "MF-issued outbound sales invoice. Payer is identified by payerClientId or payerOrgId. The endpoint supports incremental filtering with modifiedAfter."
+  },
+  {
+    "key": "invoiceEvent",
+    "label": "InvoiceEvent",
+    "endpoint": "/invoices",
+    "cron": "*/30 * * * *",
+    "mode": "incremental",
+    "enabled": true,
+    "staticParams": {
+      "showEvents": true,
+      "dateType": "invoiceDate"
+    },
+    "recordPath": "events",
+    "recordContextParentFields": ["invoiceNo", "payerClientId", "payerOrgId", "personnelId", "unitId", "legalUnit"],
+    "externalIdField": "eventPayerId",
+    "sourceUpdatedAtField": "created",
+    "incrementalQueryParam": "modifiedAfter",
+    "pageSize": 100,
+    "notes": "Preferred analytical billed service line entity sourced from Invoice.events[]. The invoice endpoint must be called with showEvents=true."
+  },
+  {
+    "key": "personnel",
+    "label": "Personnel",
+    "endpoint": "/personnel",
+    "cron": "0 */4 * * *",
+    "mode": "full",
+    "enabled": true,
+    "externalIdField": "personnelId",
+    "pageSize": 100,
+    "notes": "MF staff and professionals, not patients and not employer employees. The listed GET endpoint does not expose a modified-after filter in the current spec."
+  }
+]

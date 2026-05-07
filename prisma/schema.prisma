@@ -1,0 +1,57 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum SyncMode {
+  full
+  incremental
+}
+
+enum SyncRunStatus {
+  success
+  failed
+}
+
+model RepositoryRecord {
+  id              String   @id @default(cuid())
+  entityType      String
+  externalId      String
+  payload         Json
+  sourceUpdatedAt DateTime?
+  checksum        String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@unique([entityType, externalId])
+  @@index([entityType, sourceUpdatedAt])
+}
+
+model EntitySyncState {
+  entityKey            String   @id
+  lastRunStartedAt     DateTime?
+  lastRunCompletedAt   DateTime?
+  lastSuccessfulSyncAt DateTime?
+  lastSyncMode         SyncMode?
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+}
+
+model SyncRun {
+  id            String        @id @default(cuid())
+  entityKey     String
+  status        SyncRunStatus
+  mode          SyncMode
+  fetchedCount  Int           @default(0)
+  upsertedCount Int           @default(0)
+  startedAt     DateTime
+  finishedAt    DateTime?
+  message       String?       @db.Text
+  createdAt     DateTime      @default(now())
+
+  @@index([entityKey, startedAt])
+}

@@ -1,0 +1,37 @@
+erDiagram
+    RepositoryRecord {
+        string id PK
+        string entityType
+        string externalId
+        json payload
+        datetime sourceUpdatedAt
+        string checksum
+        datetime createdAt
+        datetime updatedAt
+    }
+
+    EntitySyncState {
+        string entityKey PK
+        datetime lastRunStartedAt
+        datetime lastRunCompletedAt
+        datetime lastSuccessfulSyncAt
+        string lastSyncMode
+        datetime createdAt
+        datetime updatedAt
+    }
+
+    SyncRun {
+        string id PK
+        string entityKey
+        string status
+        string mode
+        int fetchedCount
+        int upsertedCount
+        datetime startedAt
+        datetime finishedAt
+        string message
+        datetime createdAt
+    }
+
+    EntitySyncState ||..o{ SyncRun : "tracks runs for entityKey"
+    EntitySyncState ||..o{ RepositoryRecord : "logical entity key grouping"

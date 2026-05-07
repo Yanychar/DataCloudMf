@@ -1,0 +1,109 @@
+erDiagram
+    DimClient {
+        string clientKey PK
+        string sourceClientUri
+        string sourceClientNumericId
+        string firstName
+        string lastName
+        string clientType
+        date birthDate
+        string gender
+        string municipalityCode
+        string sourceStatus
+        datetime sourceLatestSaveDate
+    }
+
+    DimOrganisation {
+        string organisationKey PK
+        string sourceOrgId
+        string orgName
+        string orgShortName
+        string businessId
+        string orgClientType
+        string serviceStatus
+        datetime sourceLatestSaveDate
+    }
+
+    BridgeEmployment {
+        string employmentKey PK
+        string clientKey FK
+        string organisationKey FK
+        string sourceEmployerId
+        boolean mainEmployer
+        date startDate
+        date endDate
+        string department
+        string profDescr
+    }
+
+    DimPersonnel {
+        string personnelKey PK
+        string sourcePersonnelId
+        string firstName
+        string lastName
+        string specialityCode
+        string specialityDescr
+        string personnelCategory
+        boolean activated
+    }
+
+    DimPayer {
+        string payerKey PK
+        string payerType
+        string sourceClientUri
+        string sourceOrgId
+        string payerName
+    }
+
+    DimUnit {
+        string unitKey PK
+        string sourceUnitId
+        string legalUnit
+        string unitName
+    }
+
+    FactInvoice {
+        string invoiceFactKey PK
+        string sourceInvoiceId
+        string invoiceNumber
+        string payerKey FK
+        string personnelKey FK
+        string unitKey FK
+        date invoiceDate
+        date dueDate
+        datetime modifiedDate
+        decimal totalAmount
+        decimal totalVat
+        string invoiceStatus
+        string channel
+    }
+
+    FactInvoiceEvent {
+        string invoiceEventFactKey PK
+        string sourceEventPayerId
+        string invoiceFactKey FK
+        string clientKey FK
+        string organisationKey FK
+        string payerKey FK
+        string personnelKey FK
+        string unitKey FK
+        string itemId
+        string itemName
+        decimal price
+        decimal amountShare
+        string vatClass
+        datetime createdAtSource
+        string approvalStatus
+    }
+
+    DimClient ||--o{ BridgeEmployment : "has employment rows"
+    DimOrganisation ||--o{ BridgeEmployment : "has employee relations"
+    DimPayer ||--o{ FactInvoice : "is billed on invoice"
+    DimPersonnel ||--o{ FactInvoice : "responsible personnel"
+    DimUnit ||--o{ FactInvoice : "issued by unit"
+    FactInvoice ||--o{ FactInvoiceEvent : "contains billed lines"
+    DimClient ||--o{ FactInvoiceEvent : "billed client"
+    DimOrganisation ||--o{ FactInvoiceEvent : "related organisation"
+    DimPayer ||--o{ FactInvoiceEvent : "payer on billed line"
+    DimPersonnel ||--o{ FactInvoiceEvent : "performing personnel"
+    DimUnit ||--o{ FactInvoiceEvent : "real or billing unit"
