@@ -1,0 +1,277 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Medfin Data Cloud Admin</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar">
+        <div class="brand">
+          <div class="brand-kicker">Admin UI</div>
+          <h1>Medfin Data Cloud</h1>
+          <p>Client explorer, sync monitoring, and Stage 1 report lab.</p>
+        </div>
+
+        <nav class="nav">
+          <button class="nav-link active" data-section="overview">Overview</button>
+          <button class="nav-link" data-section="clients">Client Explorer</button>
+          <button class="nav-link" data-section="reports">Client Report Lab</button>
+          <a class="nav-link docs-link" href="/docs" target="_blank" rel="noreferrer">Swagger Docs</a>
+        </nav>
+
+        <div class="sidebar-note">
+          <strong>Stage 1 note</strong>
+          <p>
+            Report execution currently uses the local fallback result pipeline until a real AI provider is wired in.
+          </p>
+        </div>
+      </aside>
+
+      <main class="content">
+        <header class="page-header">
+          <div>
+            <div class="eyebrow">Client-only reporting MVP</div>
+            <h2 id="page-title">Overview</h2>
+          </div>
+          <div class="page-actions">
+            <button id="run-client-sync-button" class="primary-button">Run Client Sync</button>
+            <button id="refresh-all-button" class="secondary-button">Refresh Data</button>
+          </div>
+        </header>
+
+        <section id="status-banner" class="status-banner hidden"></section>
+
+        <section id="section-overview" class="page-section active">
+          <div class="card-grid three-up">
+            <article class="metric-card">
+              <div class="card-label">Client Cursor</div>
+              <div class="metric-value" id="overview-last-successful">n/a</div>
+              <div class="metric-subtext">Last successful sync checkpoint</div>
+            </article>
+            <article class="metric-card">
+              <div class="card-label">Last Sync Status</div>
+              <div class="metric-value" id="overview-last-run-status">n/a</div>
+              <div class="metric-subtext">Latest SyncRun result for Client</div>
+            </article>
+            <article class="metric-card accent-card">
+              <div class="card-label">Client Count Preview</div>
+              <div class="metric-value" id="overview-client-count">n/a</div>
+              <div class="metric-subtext">Current repository count without filters</div>
+            </article>
+          </div>
+
+          <div class="split-layout">
+            <article class="panel">
+              <div class="panel-header">
+                <div>
+                  <div class="panel-kicker">Operational status</div>
+                  <h3>Sync Overview</h3>
+                </div>
+              </div>
+              <div id="sync-overview-content" class="detail-stack"></div>
+            </article>
+
+            <article class="panel">
+              <div class="panel-header">
+                <div>
+                  <div class="panel-kicker">Recent activity</div>
+                  <h3>Latest Client Sync Runs</h3>
+                </div>
+              </div>
+              <p class="panel-note">Latest 10 `SyncRun` records. The newest row is shown first.</p>
+              <div id="sync-runs-content" class="table-wrapper"></div>
+            </article>
+          </div>
+        </section>
+
+        <section id="section-clients" class="page-section">
+          <article class="panel">
+            <div class="panel-header">
+              <div>
+                <div class="panel-kicker">Repository query</div>
+                <h3>Client Explorer Filters</h3>
+              </div>
+            </div>
+
+            <form id="client-filter-form" class="filter-form">
+              <label>
+                <span>birthDateFrom</span>
+                <input type="date" name="birthDateFrom" />
+              </label>
+              <label>
+                <span>birthDateTo</span>
+                <input type="date" name="birthDateTo" />
+              </label>
+              <label>
+                <span>ageFrom</span>
+                <input type="number" name="ageFrom" min="0" max="120" />
+              </label>
+              <label>
+                <span>ageTo</span>
+                <input type="number" name="ageTo" min="0" max="120" />
+              </label>
+              <label>
+                <span>gender</span>
+                <input type="text" name="gender" placeholder="Male / Female" />
+              </label>
+              <label>
+                <span>clientType</span>
+                <input type="text" name="clientType" placeholder="PersonalCustomer" />
+              </label>
+              <label>
+                <span>city</span>
+                <input type="text" name="city" placeholder="Helsinki" />
+              </label>
+              <label>
+                <span>search</span>
+                <input type="text" name="search" placeholder="client URI, city, type..." />
+              </label>
+              <label>
+                <span>limit</span>
+                <input type="number" name="limit" min="1" max="1000" value="100" />
+              </label>
+              <div class="form-actions">
+                <button type="submit" class="primary-button">Load Clients</button>
+                <button type="button" id="client-filter-reset" class="secondary-button">Reset</button>
+              </div>
+            </form>
+          </article>
+
+          <div class="card-grid two-up">
+            <article class="metric-card">
+              <div class="card-label">Matching Clients</div>
+              <div class="metric-value" id="client-count-result">n/a</div>
+              <div class="metric-subtext">Count endpoint result</div>
+            </article>
+            <article class="metric-card">
+              <div class="card-label">Loaded Rows</div>
+              <div class="metric-value" id="client-loaded-rows">n/a</div>
+              <div class="metric-subtext">Rows currently rendered below</div>
+            </article>
+          </div>
+
+          <article class="panel">
+            <div class="panel-header">
+              <div>
+                <div class="panel-kicker">Repository view</div>
+                <h3>Clients</h3>
+              </div>
+            </div>
+            <p class="panel-note">Raw repository records normalized for `Client` browsing only. No editing is enabled here.</p>
+            <div id="client-table-content" class="table-wrapper"></div>
+          </article>
+
+          <article class="panel">
+            <div class="panel-header">
+              <div>
+                <div class="panel-kicker">Import contract</div>
+                <h3>Imported Client Field Catalog</h3>
+              </div>
+            </div>
+            <p class="panel-note">This field list comes from entity config and is intended to be reused as future AI metadata.</p>
+            <div id="client-metadata-content" class="table-wrapper"></div>
+          </article>
+        </section>
+
+        <section id="section-reports" class="page-section">
+          <div class="split-layout reports-layout">
+            <article class="panel">
+              <div class="panel-header">
+                <div>
+                  <div class="panel-kicker">Admin-only Stage 1</div>
+                  <h3>Client Report Lab</h3>
+                </div>
+              </div>
+
+              <form id="report-form" class="report-form">
+                <label class="full-width">
+                  <span>Prompt</span>
+                  <textarea
+                    name="prompt"
+                    rows="7"
+                    placeholder="Summarize the filtered client population. Show totals by clientType and gender, plus a short table grouped by city or age profile."
+                  ></textarea>
+                </label>
+
+                <div class="inline-grid">
+                  <label>
+                    <span>birthDateFrom</span>
+                    <input type="date" name="birthDateFrom" />
+                  </label>
+                  <label>
+                    <span>birthDateTo</span>
+                    <input type="date" name="birthDateTo" />
+                  </label>
+                  <label>
+                    <span>ageFrom</span>
+                    <input type="number" name="ageFrom" min="0" max="120" />
+                  </label>
+                  <label>
+                    <span>ageTo</span>
+                    <input type="number" name="ageTo" min="0" max="120" />
+                  </label>
+                  <label>
+                    <span>gender</span>
+                    <input type="text" name="gender" placeholder="optional" />
+                  </label>
+                  <label>
+                    <span>clientType</span>
+                    <input type="text" name="clientType" placeholder="optional" />
+                  </label>
+                  <label>
+                    <span>city</span>
+                    <input type="text" name="city" placeholder="optional" />
+                  </label>
+                  <label>
+                    <span>search</span>
+                    <input type="text" name="search" placeholder="client URI, city, type..." />
+                  </label>
+                  <label>
+                    <span>limit</span>
+                    <input type="number" name="limit" min="1" max="500" value="200" />
+                  </label>
+                  <label class="checkbox-label">
+                    <input type="checkbox" name="includeRawRows" />
+                    <span>Include raw rows in execution options</span>
+                  </label>
+                </div>
+
+                <div class="form-actions">
+                  <button type="button" id="report-preview-button" class="secondary-button">Preview Input</button>
+                  <button type="submit" class="primary-button">Run Report</button>
+                </div>
+              </form>
+            </article>
+
+            <article class="panel">
+              <div class="panel-header">
+                <div>
+                  <div class="panel-kicker">Execution result</div>
+                  <h3>Latest Report Output</h3>
+                </div>
+              </div>
+              <div id="report-preview-summary" class="detail-stack"></div>
+              <div id="report-result-content" class="detail-stack"></div>
+            </article>
+          </div>
+
+          <article class="panel">
+            <div class="panel-header">
+              <div>
+                <div class="panel-kicker">Execution history</div>
+                <h3>Recent Client Report Executions</h3>
+              </div>
+            </div>
+            <p class="panel-note">Click a row to load the full stored execution.</p>
+            <div id="report-history-content" class="table-wrapper"></div>
+          </article>
+        </section>
+      </main>
+    </div>
+
+    <script src="/app.js" defer></script>
+  </body>
+</html>

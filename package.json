@@ -11,6 +11,7 @@
     "start:dev": "ts-node-dev --respawn --transpile-only src/main.ts",
     "db:up": "docker compose up -d mysql",
     "db:down": "docker compose stop mysql",
+    "reset:test-state": "node scripts/reset-test-state.js",
     "prisma:generate": "prisma generate",
     "prisma:push": "prisma db push",
     "test": "echo \"Tests are not set up yet\""

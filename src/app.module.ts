@@ -6,6 +6,8 @@ import { HealthController } from './modules/health/health.controller';
 import { RepositoryModule } from './modules/repository/repository.module';
 import { PrismaModule } from './modules/prisma/prisma.module';
 import { IngestionModule } from './modules/ingestion/ingestion.module';
+import { ClientAdminModule } from './modules/client-admin/client-admin.module';
+import { ReportingAdminModule } from './modules/reporting-admin/reporting-admin.module';
 
 @Module({
   imports: [
@@ -18,6 +20,8 @@ import { IngestionModule } from './modules/ingestion/ingestion.module';
     RepositoryModule,
     AcuteModule,
     IngestionModule,
+    ClientAdminModule,
+    ReportingAdminModule,
   ],
   controllers: [HealthController],
 })

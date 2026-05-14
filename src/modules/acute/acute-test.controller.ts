@@ -19,9 +19,27 @@ export class AcuteTestController {
   }
 
   @Post('request')
-  @ApiOperation({ summary: 'Send a raw GET request to Acute for testing' })
-  request(@Body() dto: AcuteRequestDto) {
-    return this.acuteClientService.request(dto.path, dto.params);
+  @ApiOperation({ summary: 'Send a raw Acute request for testing' })
+  request(
+    @Body() dto: AcuteRequestDto,
+    @Query('dryRun') dryRun?: string,
+  ) {
+    if (dryRun === 'true') {
+      return this.acuteClientService.buildRequestPreviewWithOptions({
+        path: dto.path,
+        method: dto.method,
+        params: dto.params,
+        body: dto.body,
+        timeoutMs: dto.timeoutMs,
+      });
+    }
+
+    return this.acuteClientService.request(dto.path, dto.params, {
+      method: dto.method,
+      body: dto.body,
+      timeoutMs: dto.timeoutMs,
+      treatItemNotFoundAsEmpty: dto.treatItemNotFoundAsEmpty,
+    });
   }
 
   @Post('entity/:entityKey/fetch')
@@ -29,8 +47,17 @@ export class AcuteTestController {
   fetchConfiguredEntity(
     @Param('entityKey') entityKey: string,
     @Query('since') since?: string,
+    @Query('dryRun') dryRun?: string,
   ) {
     const config = this.acuteConfigService.getEntityConfigOrThrow(entityKey);
+
+    if (dryRun === 'true') {
+      return this.acuteClientService.buildEntityRequestPreview(
+        config,
+        since ? new Date(since) : undefined,
+      );
+    }
+
     return this.acuteClientService.fetchEntity(config, since ? new Date(since) : undefined);
   }
 }

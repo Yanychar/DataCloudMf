@@ -1,3 +1,4 @@
+.idea
 node_modules
 dist
 .env
@@ -6,3 +7,4 @@ dist
 coverage
 *.log
 prisma/dev.db
+/.run/

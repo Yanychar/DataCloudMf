@@ -1,4 +1,15 @@
 export type SyncMode = 'full' | 'incremental';
+export type ReadStrategy = 'single' | 'date_window';
+export type ImportedFieldDataType = 'string' | 'number' | 'boolean' | 'date' | 'object' | 'array';
+
+export interface ImportedFieldConfig {
+  key: string;
+  sourcePath?: string;
+  description: string;
+  dataType?: ImportedFieldDataType;
+  filterable?: boolean;
+  includeInAiContext?: boolean;
+}
 
 export interface AcuteEntityConfig {
   key: string;
@@ -14,11 +25,36 @@ export interface AcuteEntityConfig {
   compositeExternalIdFields?: string[];
   recordPath?: string;
   recordContextParentFields?: string[];
-  pageSize?: number;
+  readStrategy?: ReadStrategy;
+  rangeFromParam?: string;
+  rangeToParam?: string;
+  rangeWindowUnit?: 'month' | 'day';
+  rangeWindowSize?: number;
+  rangeRetryWindowSizes?: number[];
+  initialCursor?: string;
+  importedFields?: ImportedFieldConfig[];
   notes?: string;
 }
 
 export interface AcuteFetchResult {
   records: Record<string, unknown>[];
   requestedAt: string;
+}
+
+export interface AcuteRequestPreview {
+  method: 'GET' | 'POST';
+  url: string;
+  fullUrl: string;
+  params: Record<string, unknown>;
+  body?: Record<string, unknown>;
+  timeoutMs: number;
+  headers: {
+    Accept: string;
+    Authorization?: string;
+    'Content-Type'?: string;
+  };
+  auth: {
+    type: 'basic' | 'none';
+    username?: string;
+  };
 }

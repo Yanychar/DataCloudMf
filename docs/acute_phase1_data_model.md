@@ -94,7 +94,7 @@ MF serves:
 - Entity sync configuration lives in `config/entities.config.json`
 - `InvoiceEvent` currently reads from the invoice endpoint and extracts `events[]`
 - Confirmed list endpoints from the Acute spec:
-  - `/clients`
+  - `/clientsList`
   - `/organisations`
   - `/employers`
   - `/invoices`

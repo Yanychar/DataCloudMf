@@ -1,0 +1,14 @@
+### List normalized client records
+GET http://localhost:3000/admin/clients
+
+### List normalized client records with filters
+GET http://localhost:3000/admin/clients?latestSaveFrom=2026-01-01&latestSaveTo=2026-01-31&limit=50
+
+### Count normalized client records
+GET http://localhost:3000/admin/clients/count
+
+### Count normalized client records for current filters
+GET http://localhost:3000/admin/clients/count?latestSaveFrom=2020-01-01&latestSaveTo=2026-01-31
+
+### Get client sync overview
+GET http://localhost:3000/admin/clients/sync-overview

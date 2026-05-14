@@ -42,7 +42,7 @@ Detailed source notes live in [docs/acute_phase1_data_model.md](/home/sevastia/M
 
 Confirmed Acute list endpoints from the current OpenAPI spec:
 
-- `/clients`
+- `/clientsList`
 - `/organisations`
 - `/employers`
 - `/invoices`
@@ -53,9 +53,11 @@ Confirmed Acute list endpoints from the current OpenAPI spec:
 Copy `.env.example` to `.env` and update:
 
 - `DATABASE_URL`
-- `ACUTE_BASE_URL`
-- `ACUTE_API_KEY`
+- `ACUTE_STAGE_BASE_URL`
+- `ACUTE_STAGE_LOGIN`
+- `ACUTE_STAGE_PASSWORD`
 - `DATA_SYNC_ENTITY_CONFIG_PATH`
+- `DATA_SYNC_IMPORTED_FIELDS_CONFIG_PATH`
 
 `config/entities.config.json` is the key project config. Each entity can define:
 
@@ -71,13 +73,14 @@ Copy `.env.example` to `.env` and update:
 - `recordPath`
 - `recordContextParentFields`
 - `enabled`
-- `pageSize`
 
 The current config is preloaded with the six in-scope Acute entities from Phase 1.
 
+Imported field subsets are configured separately in [config/imported-fields.config.json](/home/sevastia/MedfinDataCloud/config/imported-fields.config.json:1). This keeps scheduling/sync behavior separate from source-field selection and AI metadata.
+
 For local IDE usage:
 
-- `.env` is prepared for running the app from WSL or PhpStorm against MySQL on `127.0.0.1:3306`
+- `.env` is prepared for running the app from WSL or WebStorm against MySQL on `127.0.0.1:3310`
 - `.env.docker` is prepared for Docker Compose where the DB host is `mysql`
 
 Important sync-policy note:
@@ -104,9 +107,9 @@ npx prisma db push
 npm run start:dev
 ```
 
-## PhpStorm
+## WebStorm
 
-Shared run configurations are included in `.run/`, and the IDE setup guide is in [docs/phpstorm_setup.md](/home/sevastia/MedfinDataCloud/docs/phpstorm_setup.md:1).
+Shared run configurations are included in `.run/`, and the IDE setup guide is in [docs/webstorm_setup.md](/home/sevastia/MedfinDataCloud/docs/webstorm_setup.md:1).
 
 ## API endpoints
 
@@ -128,6 +131,8 @@ Shared run configurations are included in `.run/`, and the IDE setup guide is in
 - source updated timestamp
 - checksum
 
+For entities that define imported fields in [config/imported-fields.config.json](/home/sevastia/MedfinDataCloud/config/imported-fields.config.json:1), the repository stores only the configured subset of source fields. This is the current privacy-control mechanism and is also intended to become reusable AI metadata later.
+
 For nested entities like `InvoiceEvent`, the payload may also include `_parentContext` values copied from the parent invoice so the raw repository keeps enough source context for later modeling.
 
 `EntitySyncState` stores the last successful sync timestamp per entity.
@@ -144,3 +149,45 @@ Additional modeling documentation:
 - [docs/acute_source_to_repository_mapping.md](/home/sevastia/MedfinDataCloud/docs/acute_source_to_repository_mapping.md:1)
 - [docs/phase2_target_warehouse.md](/home/sevastia/MedfinDataCloud/docs/phase2_target_warehouse.md:1)
 - [docs/phase2_target_warehouse_erd.mmd](/home/sevastia/MedfinDataCloud/docs/phase2_target_warehouse_erd.mmd:1)
+
+Testing helpers:
+
+- [docs/first_client_test.md](/home/sevastia/MedfinDataCloud/docs/first_client_test.md:1)
+- [requests/first_client_test.http](/home/sevastia/MedfinDataCloud/requests/first_client_test.http:1)
+- [requests/client_sync.http](/home/sevastia/MedfinDataCloud/requests/client_sync.http:1)
+- [requests/client_admin.http](/home/sevastia/MedfinDataCloud/requests/client_admin.http:1)
+- [requests/client_reporting_admin.http](/home/sevastia/MedfinDataCloud/requests/client_reporting_admin.http:1)
+
+## Admin UI
+
+An admin-only browser UI is served directly from the Nest app root:
+
+- `http://localhost:3000/`
+
+Current scope:
+
+- sync overview for `Client`
+- client repository browsing and count preview
+- Stage 1 `Client Report Lab`
+- recent report execution history
+
+Current `Client` admin filters are business-oriented:
+
+- `birthDateFrom`
+- `birthDateTo`
+- `ageFrom`
+- `ageTo`
+- `gender`
+- `clientType`
+- `city`
+
+Current `Client` admin/reporting endpoints:
+
+- `GET /admin/clients`
+- `GET /admin/clients/count`
+- `GET /admin/clients/metadata`
+- `GET /admin/clients/sync-overview`
+- `POST /admin/reports/client/preview`
+- `POST /admin/reports/client/run`
+- `GET /admin/reports/client/executions`
+- `GET /admin/reports/client/executions/:id`

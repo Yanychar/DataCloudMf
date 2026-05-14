@@ -1,0 +1,368 @@
+{
+  "client": [
+    {
+      "key": "client",
+      "description": "Source URI identifier of the client in Acute, for example /clients/123.",
+      "dataType": "string",
+      "filterable": false,
+      "includeInAiContext": true
+    },
+    {
+      "key": "birthDate",
+      "description": "Birth date of the client for age and birthday-based analysis.",
+      "dataType": "date",
+      "filterable": true,
+      "includeInAiContext": true
+    },
+    {
+      "key": "gender",
+      "description": "Administrative sex or gender value coming from Acute.",
+      "dataType": "string",
+      "filterable": true,
+      "includeInAiContext": true
+    },
+    {
+      "key": "homeUnit",
+      "description": "Acute home unit URI assigned to the client.",
+      "dataType": "string",
+      "filterable": false,
+      "includeInAiContext": true
+    },
+    {
+      "key": "city",
+      "description": "City value recorded for the client.",
+      "dataType": "string",
+      "filterable": true,
+      "includeInAiContext": true
+    },
+    {
+      "key": "municipality",
+      "description": "Municipality value recorded for the client.",
+      "dataType": "string",
+      "filterable": false,
+      "includeInAiContext": true
+    },
+    {
+      "key": "municipalityCode",
+      "description": "Municipality code recorded for the client.",
+      "dataType": "string",
+      "filterable": false,
+      "includeInAiContext": true
+    },
+    {
+      "key": "countryId",
+      "description": "Country code recorded for the client.",
+      "dataType": "string",
+      "filterable": false,
+      "includeInAiContext": true
+    },
+    {
+      "key": "canNotifyByEmail",
+      "description": "Whether email notifications are allowed for the client.",
+      "dataType": "boolean",
+      "filterable": false,
+      "includeInAiContext": true
+    },
+    {
+      "key": "canNotifyBySMS",
+      "description": "Whether SMS notifications are allowed for the client.",
+      "dataType": "boolean",
+      "filterable": false,
+      "includeInAiContext": true
+    },
+    {
+      "key": "employers",
+      "description": "Acute resource URI for the client's employer relationships.",
+      "dataType": "string",
+      "filterable": false,
+      "includeInAiContext": true
+    },
+    {
+      "key": "creditCheck",
+      "description": "Whether credit check is enabled or required for the client.",
+      "dataType": "boolean",
+      "filterable": false,
+      "includeInAiContext": true
+    },
+    {
+      "key": "creditCheckNotOkNotes",
+      "description": "Source note field about credit check issues.",
+      "dataType": "string",
+      "filterable": false,
+      "includeInAiContext": true
+    },
+    {
+      "key": "kelaCompensation",
+      "description": "Kela compensation flag or value from the source.",
+      "dataType": "boolean",
+      "filterable": false,
+      "includeInAiContext": true
+    },
+    {
+      "key": "lang",
+      "description": "Language code recorded for the client.",
+      "dataType": "string",
+      "filterable": false,
+      "includeInAiContext": true
+    },
+    {
+      "key": "authenticationTypeId",
+      "description": "Authentication type identifier stored in Acute.",
+      "dataType": "number",
+      "filterable": false,
+      "includeInAiContext": true
+    },
+    {
+      "key": "authenticationTypeDescription",
+      "description": "Authentication type description stored in Acute.",
+      "dataType": "string",
+      "filterable": false,
+      "includeInAiContext": true
+    },
+    {
+      "key": "defaultNurse",
+      "description": "Default nurse resource URI assigned to the client.",
+      "dataType": "string",
+      "filterable": false,
+      "includeInAiContext": true
+    },
+    {
+      "key": "defaultDoctor",
+      "description": "Default doctor resource URI assigned to the client.",
+      "dataType": "string",
+      "filterable": false,
+      "includeInAiContext": true
+    },
+    {
+      "key": "kelaCardCheckStatus",
+      "description": "Kela card check status code.",
+      "dataType": "number",
+      "filterable": false,
+      "includeInAiContext": true
+    },
+    {
+      "key": "kelaCardCheckDate",
+      "description": "Timestamp of the latest Kela card check.",
+      "dataType": "date",
+      "filterable": false,
+      "includeInAiContext": true
+    },
+    {
+      "key": "invoiceDeliveryMethod",
+      "description": "Invoice delivery method setting recorded for the client.",
+      "dataType": "string",
+      "filterable": false,
+      "includeInAiContext": true
+    },
+    {
+      "key": "updateInfoText",
+      "description": "Source update information text from Acute.",
+      "dataType": "string",
+      "filterable": false,
+      "includeInAiContext": true
+    },
+    {
+      "key": "reservationInfo",
+      "description": "Reservation-related source information text.",
+      "dataType": "string",
+      "filterable": false,
+      "includeInAiContext": true
+    },
+    {
+      "key": "maritalStatusType",
+      "description": "Marital status type code from the source.",
+      "dataType": "string",
+      "filterable": false,
+      "includeInAiContext": true
+    },
+    {
+      "key": "maritalStatusText",
+      "description": "Marital status text from the source.",
+      "dataType": "string",
+      "filterable": false,
+      "includeInAiContext": true
+    },
+    {
+      "key": "deathDate",
+      "description": "Death date recorded for the client, when present.",
+      "dataType": "date",
+      "filterable": false,
+      "includeInAiContext": true
+    },
+    {
+      "key": "deathRegisteredDate",
+      "description": "Date when death information was registered in the source.",
+      "dataType": "date",
+      "filterable": false,
+      "includeInAiContext": true
+    },
+    {
+      "key": "studentNumber",
+      "description": "Student number recorded in the source, when present.",
+      "dataType": "string",
+      "filterable": false,
+      "includeInAiContext": true
+    },
+    {
+      "key": "clientType",
+      "description": "Business category of the client, for example PersonalCustomer.",
+      "dataType": "string",
+      "filterable": true,
+      "includeInAiContext": true
+    },
+    {
+      "key": "endDate",
+      "description": "End date of the client relationship in Acute, when present.",
+      "dataType": "date",
+      "filterable": false,
+      "includeInAiContext": true
+    },
+    {
+      "key": "latestSaveDate",
+      "description": "Latest source save date in Acute used for sync tracking and technical audit.",
+      "dataType": "date",
+      "filterable": false,
+      "includeInAiContext": true
+    },
+    {
+      "key": "latestSavePersonnelId",
+      "description": "Identifier of the personnel user who last saved the client in Acute.",
+      "dataType": "number",
+      "filterable": false,
+      "includeInAiContext": true
+    },
+    {
+      "key": "latestSaveRestUserId",
+      "description": "Identifier of the REST/API user that last saved the client in Acute.",
+      "dataType": "number",
+      "filterable": false,
+      "includeInAiContext": true
+    },
+    {
+      "key": "contactPerson1OtherGuardianClientId",
+      "sourcePath": "contactPerson1.otherGuardianClientId",
+      "description": "Related other-guardian client identifier from contact person 1, without personal contact details.",
+      "dataType": "number",
+      "filterable": false,
+      "includeInAiContext": true
+    },
+    {
+      "key": "contactPerson1IsPrimary",
+      "sourcePath": "contactPerson1.isPrimary",
+      "description": "Whether contact person 1 is marked as primary.",
+      "dataType": "boolean",
+      "filterable": false,
+      "includeInAiContext": true
+    },
+    {
+      "key": "contactPerson1IsRelative",
+      "sourcePath": "contactPerson1.isRelative",
+      "description": "Whether contact person 1 is marked as a relative.",
+      "dataType": "boolean",
+      "filterable": false,
+      "includeInAiContext": true
+    },
+    {
+      "key": "contactPerson1IsOtherGuardian",
+      "sourcePath": "contactPerson1.isOtherGuardian",
+      "description": "Whether contact person 1 is marked as other guardian.",
+      "dataType": "boolean",
+      "filterable": false,
+      "includeInAiContext": true
+    },
+    {
+      "key": "contactPerson2IsPrimary",
+      "sourcePath": "contactPerson2.isPrimary",
+      "description": "Whether contact person 2 is marked as primary.",
+      "dataType": "boolean",
+      "filterable": false,
+      "includeInAiContext": true
+    },
+    {
+      "key": "contactPerson2IsRelative",
+      "sourcePath": "contactPerson2.isRelative",
+      "description": "Whether contact person 2 is marked as a relative.",
+      "dataType": "boolean",
+      "filterable": false,
+      "includeInAiContext": true
+    },
+    {
+      "key": "contactPerson2IsOtherGuardian",
+      "sourcePath": "contactPerson2.isOtherGuardian",
+      "description": "Whether contact person 2 is marked as other guardian.",
+      "dataType": "boolean",
+      "filterable": false,
+      "includeInAiContext": true
+    },
+    {
+      "key": "defaultEventPayerType",
+      "description": "Default payer type configured for the client.",
+      "dataType": "string",
+      "filterable": false,
+      "includeInAiContext": true
+    },
+    {
+      "key": "defaultEventPayerOrgId",
+      "description": "Default payer organisation identifier configured for the client.",
+      "dataType": "number",
+      "filterable": false,
+      "includeInAiContext": true
+    },
+    {
+      "key": "defaultEventPayerPaymentCommitmentId",
+      "description": "Default payment commitment identifier configured for the client.",
+      "dataType": "number",
+      "filterable": false,
+      "includeInAiContext": true
+    },
+    {
+      "key": "disallowAddressReleaseStartDate",
+      "description": "Start date of address-release restriction, when present.",
+      "dataType": "date",
+      "filterable": false,
+      "includeInAiContext": true
+    },
+    {
+      "key": "disallowAddressReleaseEndDate",
+      "description": "End date of address-release restriction, when present.",
+      "dataType": "date",
+      "filterable": false,
+      "includeInAiContext": true
+    },
+    {
+      "key": "motherTongueLangCode",
+      "description": "Mother tongue language code recorded in the source.",
+      "dataType": "string",
+      "filterable": false,
+      "includeInAiContext": true
+    },
+    {
+      "key": "notes",
+      "description": "General notes field from the source system.",
+      "dataType": "string",
+      "filterable": false,
+      "includeInAiContext": true
+    },
+    {
+      "key": "earmarkIds",
+      "description": "Array of earmark identifiers assigned to the client.",
+      "dataType": "array",
+      "filterable": false,
+      "includeInAiContext": true
+    },
+    {
+      "key": "insurance",
+      "description": "Insurance information array from the source.",
+      "dataType": "array",
+      "filterable": false,
+      "includeInAiContext": true
+    },
+    {
+      "key": "externalIdStrings",
+      "description": "External identifier strings array from the source.",
+      "dataType": "array",
+      "filterable": false,
+      "includeInAiContext": true
+    }
+  ]
+}

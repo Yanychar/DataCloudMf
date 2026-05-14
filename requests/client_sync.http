@@ -1,0 +1,5 @@
+### Trigger real client sync
+POST http://localhost:3000/ingestion/sync/client
+
+### List configured ingestion entities
+GET http://localhost:3000/ingestion/entities

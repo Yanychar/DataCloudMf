@@ -1,0 +1,58 @@
+### Health check
+GET http://localhost:3000/health
+
+### Acute client config ping
+GET http://localhost:3000/acute-test/ping
+
+### Raw Acute request to /clientsList
+GET http://localhost:3000/acute-test/request
+Content-Type: application/json
+
+{
+  "path": "/clientsList"
+}
+
+### Dry run POST /clientsList with extended timeout
+POST http://localhost:3000/acute-test/request?dryRun=true
+Content-Type: application/json
+
+{
+  "method": "GET",
+  "path": "/clientsList",
+  "params": {"latestSaveFrom":"2026-01-01T00:00:00", "latestSaveTo":"2026-01-02T00:00:00"},
+  "body": {},
+  "timeoutMs": 60000
+}
+
+### POST /clientsList with extended timeout
+POST http://localhost:3000/acute-test/request
+Content-Type: application/json
+
+{
+  "method": "GET",
+  "path": "/clientsList",
+  "params": {"latestSaveFrom":"2026-06-30T21:00:00", "latestSaveTo":"2026-07-31T21:00:00"},
+  "body": {},
+  "timeoutMs": 60000
+}
+
+### GET /clientsList and treat ITEM_NOT_FOUND:Client as empty result
+POST http://localhost:3000/acute-test/request
+Content-Type: application/json
+
+{
+  "method": "GET",
+  "path": "/clientsList",
+  "params": {"latestSaveFrom":"2026-06-30T21:00:00", "latestSaveTo":"2026-07-31T21:00:00"},
+  "timeoutMs": 60000,
+  "treatItemNotFoundAsEmpty": "Client"
+}
+
+### Dry run configured entity fetch for client
+POST http://localhost:3000/acute-test/entity/client/fetch?dryRun=true
+
+### Configured entity fetch for client
+POST http://localhost:3000/acute-test/entity/client/fetch
+
+### Optional end-to-end sync for client
+POST http://localhost:3000/ingestion/sync/client

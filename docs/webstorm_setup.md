@@ -1,6 +1,6 @@
-# PhpStorm Setup
+# WebStorm Setup
 
-This project is prepared to work well from PhpStorm with the source code living in WSL and MySQL running in Docker.
+This project is prepared to work well from WebStorm with the source code living in WSL and MySQL running in Docker.
 
 ## Open the project
 
@@ -23,8 +23,8 @@ The project also includes `.nvmrc` with `v22.12.0`.
 Use these files depending on how you run the app:
 
 - `.env`
-  - for PhpStorm and direct WSL execution
-  - uses `127.0.0.1:3306` for MySQL
+  - for WebStorm and direct WSL execution
+  - uses `127.0.0.1:3310` for MySQL
 - `.env.docker`
   - for Docker Compose
   - uses `mysql:3306` as the database host
@@ -38,13 +38,13 @@ The repository includes shared JetBrains run configs in `.run/`:
 - `Prisma Generate`
 - `Prisma Push`
 
-After selecting the WSL Node interpreter, these run configs should work inside PhpStorm.
+After selecting the WSL Node interpreter, these run configs should work inside WebStorm.
 
-## Suggested PhpStorm services setup
+## Suggested WebStorm services setup
 
 1. Start the database only:
    - `docker compose up -d mysql`
-2. In PhpStorm run:
+2. In WebStorm run:
    - `Prisma Generate`
    - `Prisma Push`
    - `Start Dev Server`
@@ -57,21 +57,21 @@ Recommended Prisma plugin settings:
 
 - schema file: `prisma/schema.prisma`
 
-If PhpStorm asks for environment variables, the app uses `.env` by default.
+If WebStorm asks for environment variables, the app uses `.env` by default.
 
 ## HTTP and Swagger
 
-When the app is running from PhpStorm:
+When the app is running from WebStorm:
 
 - API base URL: `http://localhost:3000`
 - Swagger UI: `http://localhost:3000/docs`
 
-## Database connection in PhpStorm
+## Database connection in JetBrains Database tools
 
-If you want a PhpStorm database connection, use:
+If you want a database connection, use:
 
 - Host: `127.0.0.1`
-- Port: `3306`
+- Port: `3310`
 - Database: `datacloud`
 - User: `datacloud`
 - Password: `datacloud`
@@ -80,5 +80,5 @@ If you want a PhpStorm database connection, use:
 
 Docker is not currently available inside this WSL distro, so the intended workflow is:
 
-- edit and run NestJS from PhpStorm in WSL
+- edit and run NestJS from WebStorm in WSL
 - run MySQL through Docker Desktop with WSL integration or from Windows Docker

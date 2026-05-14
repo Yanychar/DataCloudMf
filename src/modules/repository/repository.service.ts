@@ -27,18 +27,36 @@ export class RepositoryService {
     });
   }
 
-  async markRunCompleted(entityKey: string, mode: SyncMode) {
+  async markSyncProgress(entityKey: string, mode: SyncMode, lastSuccessfulSyncAt: Date) {
     return this.prisma.entitySyncState.upsert({
       where: { entityKey },
       create: {
         entityKey,
-        lastRunCompletedAt: new Date(),
-        lastSuccessfulSyncAt: new Date(),
+        lastSuccessfulSyncAt,
         lastSyncMode: mode,
       },
       update: {
-        lastRunCompletedAt: new Date(),
-        lastSuccessfulSyncAt: new Date(),
+        lastSuccessfulSyncAt,
+        lastSyncMode: mode,
+      },
+    });
+  }
+
+  async markRunCompleted(entityKey: string, mode: SyncMode, lastSuccessfulSyncAt?: Date) {
+    const completedAt = new Date();
+    const syncCursor = lastSuccessfulSyncAt ?? completedAt;
+
+    return this.prisma.entitySyncState.upsert({
+      where: { entityKey },
+      create: {
+        entityKey,
+        lastRunCompletedAt: completedAt,
+        lastSuccessfulSyncAt: syncCursor,
+        lastSyncMode: mode,
+      },
+      update: {
+        lastRunCompletedAt: completedAt,
+        lastSuccessfulSyncAt: syncCursor,
         lastSyncMode: mode,
       },
     });
@@ -51,7 +69,19 @@ export class RepositoryService {
         mode,
         status: 'success',
         startedAt: new Date(),
-      },
+        syncContext: {
+          strategy: 'single',
+        } as Prisma.InputJsonValue,
+      } as Prisma.SyncRunCreateInput,
+    });
+  }
+
+  async updateRunContext(runId: string, syncContext: Record<string, unknown>) {
+    return this.prisma.syncRun.update({
+      where: { id: runId },
+      data: {
+        syncContext: syncContext as Prisma.InputJsonValue,
+      } as Prisma.SyncRunUpdateInput,
     });
   }
 
@@ -61,6 +91,7 @@ export class RepositoryService {
     fetchedCount: number,
     upsertedCount: number,
     message?: string,
+    syncContext?: Record<string, unknown>,
   ) {
     return this.prisma.syncRun.update({
       where: { id: runId },
@@ -70,7 +101,8 @@ export class RepositoryService {
         upsertedCount,
         message,
         finishedAt: new Date(),
-      },
+        syncContext: syncContext as Prisma.InputJsonValue | undefined,
+      } as Prisma.SyncRunUpdateInput,
     });
   }
 
@@ -87,7 +119,8 @@ export class RepositoryService {
       }
 
       const sourceUpdatedAt = this.extractDate(record, entityConfig.sourceUpdatedAtField);
-      const checksum = createHash('sha256').update(JSON.stringify(record)).digest('hex');
+      const sanitizedRecord = this.sanitizeRecord(record, entityConfig);
+      const checksum = createHash('sha256').update(JSON.stringify(sanitizedRecord)).digest('hex');
 
       await this.prisma.repositoryRecord.upsert({
         where: {
@@ -99,12 +132,12 @@ export class RepositoryService {
         create: {
           entityType: entityConfig.key,
           externalId,
-          payload: record as Prisma.InputJsonValue,
+          payload: sanitizedRecord as Prisma.InputJsonValue,
           sourceUpdatedAt,
           checksum,
         },
         update: {
-          payload: record as Prisma.InputJsonValue,
+          payload: sanitizedRecord as Prisma.InputJsonValue,
           sourceUpdatedAt,
           checksum,
         },
@@ -114,6 +147,28 @@ export class RepositoryService {
     }
 
     return upsertedCount;
+  }
+
+  private sanitizeRecord(
+    record: Record<string, unknown>,
+    entityConfig: AcuteEntityConfig,
+  ): Record<string, unknown> {
+    if (!entityConfig.importedFields?.length) {
+      return record;
+    }
+
+    const sanitized: Record<string, unknown> = {};
+
+    for (const field of entityConfig.importedFields) {
+      const sourcePath = field.sourcePath ?? field.key;
+      const value = this.getValueByPath(record, sourcePath);
+
+      if (typeof value !== 'undefined') {
+        sanitized[field.key] = value;
+      }
+    }
+
+    return sanitized;
   }
 
   private extractExternalId(
@@ -161,5 +216,18 @@ export class RepositoryService {
 
     const date = new Date(value);
     return Number.isNaN(date.getTime()) ? undefined : date;
+  }
+
+  private getValueByPath(
+    record: Record<string, unknown>,
+    path: string,
+  ): unknown {
+    return path.split('.').reduce<unknown>((current, segment) => {
+      if (typeof current === 'object' && current !== null && !Array.isArray(current)) {
+        return (current as Record<string, unknown>)[segment];
+      }
+
+      return undefined;
+    }, record);
   }
 }

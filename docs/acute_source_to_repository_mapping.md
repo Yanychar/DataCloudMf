@@ -37,7 +37,7 @@ Common repository fields:
 
 Source:
 
-- endpoint: `/clients`
+- endpoint: `/clientsList`
 - source model: `Client`
 
 Repository mapping:

@@ -1,0 +1,32 @@
+### Preview Client report input
+POST http://localhost:3000/admin/reports/client/preview
+Content-Type: application/json
+
+{
+  "filters": {
+    "latestSaveFrom": "2020-01-01",
+    "latestSaveTo": "2020-01-31"
+  }
+}
+
+### Run Stage 1 Client report
+POST http://localhost:3000/admin/reports/client/run
+Content-Type: application/json
+
+{
+  "prompt": "Summarize clients changed in the selected period. Show totals by clientType and a short table of recent clients.",
+  "filters": {
+    "latestSaveFrom": "2026-01-01",
+    "latestSaveTo": "2026-01-31"
+  },
+  "options": {
+    "limit": 200,
+    "includeRawRows": false
+  }
+}
+
+### List recent Client report executions
+GET http://localhost:3000/admin/reports/client/executions
+
+### Get one Client report execution by id
+GET http://localhost:3000/admin/reports/client/executions/REPLACE_WITH_EXECUTION_ID

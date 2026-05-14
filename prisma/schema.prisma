@@ -17,6 +17,16 @@ enum SyncRunStatus {
   failed
 }
 
+enum ReportExecutionStatus {
+  running
+  success
+  failed
+}
+
+enum ReportExecutionMode {
+  ai_direct
+}
+
 model RepositoryRecord {
   id              String   @id @default(cuid())
   entityType      String
@@ -51,7 +61,27 @@ model SyncRun {
   startedAt     DateTime
   finishedAt    DateTime?
   message       String?       @db.Text
+  syncContext   Json?
   createdAt     DateTime      @default(now())
 
   @@index([entityKey, startedAt])
+}
+
+model ReportExecution {
+  id            String                @id @default(cuid())
+  entityKey     String
+  mode          ReportExecutionMode
+  prompt        String                @db.Text
+  filters       Json?
+  options       Json?
+  inputRowCount Int                   @default(0)
+  inputSample   Json?
+  status        ReportExecutionStatus
+  result        Json?
+  errorMessage  String?               @db.Text
+  createdAt     DateTime              @default(now())
+  finishedAt    DateTime?
+
+  @@index([entityKey, createdAt])
+  @@index([status, createdAt])
 }
