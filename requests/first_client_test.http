@@ -31,7 +31,9 @@ Content-Type: application/json
 {
   "method": "GET",
   "path": "/clientsList",
-  "params": {"latestSaveFrom":"2026-06-30T21:00:00", "latestSaveTo":"2026-07-31T21:00:00"},
+  "params": {
+    "latestSaveFrom":"2026-05-1T21:00:00",
+    "latestSaveTo":"2026-07-31T21:00:00"},
   "body": {},
   "timeoutMs": 60000
 }

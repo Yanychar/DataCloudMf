@@ -1,5 +1,6 @@
-import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query, Res } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { Response } from 'express';
 import { AcuteClientService } from './acute-client.service';
 import { AcuteConfigService } from './acute-config.service';
 import { AcuteRequestDto } from './dto/acute-request.dto';
@@ -23,6 +24,7 @@ export class AcuteTestController {
   request(
     @Body() dto: AcuteRequestDto,
     @Query('dryRun') dryRun?: string,
+    @Res({ passthrough: true }) response?: Response,
   ) {
     if (dryRun === 'true') {
       return this.acuteClientService.buildRequestPreviewWithOptions({
@@ -33,6 +35,8 @@ export class AcuteTestController {
         timeoutMs: dto.timeoutMs,
       });
     }
+
+    response?.setHeader('Content-Disposition', this.buildContentDisposition(dto.path));
 
     return this.acuteClientService.request(dto.path, dto.params, {
       method: dto.method,
@@ -48,6 +52,7 @@ export class AcuteTestController {
     @Param('entityKey') entityKey: string,
     @Query('since') since?: string,
     @Query('dryRun') dryRun?: string,
+    @Res({ passthrough: true }) response?: Response,
   ) {
     const config = this.acuteConfigService.getEntityConfigOrThrow(entityKey);
 
@@ -58,6 +63,31 @@ export class AcuteTestController {
       );
     }
 
+    response?.setHeader('Content-Disposition', this.buildContentDisposition(entityKey));
+
     return this.acuteClientService.fetchEntity(config, since ? new Date(since) : undefined);
+  }
+
+  private buildContentDisposition(source: string): string {
+    const timestamp = this.formatTimestamp(new Date());
+    const entityName = this.sanitizeSourceName(source);
+
+    return `attachment; filename="${timestamp}_${entityName}.json"`;
+  }
+
+  private formatTimestamp(value: Date): string {
+    return value.toISOString().replace(/:/g, '-').replace(/\.\d{3}Z$/, 'Z');
+  }
+
+  private sanitizeSourceName(source: string): string {
+    const normalized = source
+      .trim()
+      .replace(/^\/+/, '')
+      .replace(/[/?&=]+/g, '_')
+      .replace(/[^a-zA-Z0-9_-]+/g, '_')
+      .replace(/_+/g, '_')
+      .replace(/^_+|_+$/g, '');
+
+    return normalized || 'acute_response';
   }
 }

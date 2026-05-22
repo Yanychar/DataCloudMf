@@ -69,6 +69,11 @@ export class AcuteConfigService {
         cron: item.cron ?? this.getDefaultCron(),
         mode: item.mode === 'full' ? 'full' : this.getDefaultMode(),
         enabled: item.enabled ?? true,
+        scheduled: item.scheduled ?? true,
+        sourceOwnedBy: item.sourceOwnedBy,
+        derivedEntityKeys: Array.isArray(item.derivedEntityKeys)
+          ? item.derivedEntityKeys.filter((value): value is string => typeof value === 'string')
+          : undefined,
         staticParams:
           item.staticParams && typeof item.staticParams === 'object'
             ? (item.staticParams as Record<string, string | number | boolean>)

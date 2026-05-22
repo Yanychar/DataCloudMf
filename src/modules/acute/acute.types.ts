@@ -22,9 +22,12 @@ export interface AcuteEntityConfig {
   key: string;
   label: string;
   endpoint: string;
-  cron: string;
+  cron?: string;
   mode: SyncMode;
   enabled: boolean;
+  scheduled?: boolean;
+  sourceOwnedBy?: string;
+  derivedEntityKeys?: string[];
   staticParams?: Record<string, string | number | boolean>;
   sourceUpdatedAtField?: string;
   incrementalQueryParam?: string;
