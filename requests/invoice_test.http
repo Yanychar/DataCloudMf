@@ -1,0 +1,85 @@
+### Health check
+GET http://localhost:3000/health
+
+### Acute client config ping
+GET http://localhost:3000/acute-test/ping
+
+### Dry run raw Acute request to /invoices for one 30-day window
+POST http://localhost:3000/acute-test/request?dryRun=true
+Content-Type: application/json
+
+{
+  "method": "GET",
+  "path": "/invoices",
+  "params": {
+    "dateType": "invoiceDate",
+    "startDate": "2024-04-01",
+    "endDate": "2024-05-01"
+  },
+  "timeoutMs": 60000
+}
+
+### Raw Acute request to /invoices for one 30-day window
+POST http://localhost:3000/acute-test/request
+Content-Type: application/json
+
+{
+  "method": "GET",
+  "path": "/invoices",
+  "params": {
+    "dateType": "invoiceDate",
+    "startDate": "2024-04-01",
+    "endDate": "2024-05-01"
+  },
+  "timeoutMs": 60000
+}
+
+### Dry run raw Acute request to /invoices including events
+POST http://localhost:3000/acute-test/request?dryRun=true
+Content-Type: application/json
+
+{
+  "method": "GET",
+  "path": "/invoices",
+  "params": {
+    "dateType": "invoiceDate",
+    "showEvents": true,
+    "startDate": "2024-04-01",
+    "endDate": "2024-05-01"
+  },
+  "timeoutMs": 60000
+}
+
+### Raw Acute request to /invoices including events
+POST http://localhost:3000/acute-test/request
+Content-Type: application/json
+
+{
+  "method": "GET",
+  "path": "/invoices",
+  "params": {
+    "dateType": "invoiceDate",
+    "showEvents": true,
+    "startDate": "2024-04-01",
+    "endDate": "2024-05-01"
+  },
+  "timeoutMs": 60000
+}
+
+### Dry run configured entity fetch for invoice
+POST http://localhost:3000/acute-test/entity/invoice/fetch?dryRun=true
+
+### Configured entity fetch for invoice
+POST http://localhost:3000/acute-test/entity/invoice/fetch
+
+### Dry run configured entity fetch for invoiceEvent
+POST http://localhost:3000/acute-test/entity/invoiceEvent/fetch?dryRun=true
+
+### Configured entity fetch for invoiceEvent
+POST http://localhost:3000/acute-test/entity/invoiceEvent/fetch
+
+### Trigger real invoice sync
+POST http://localhost:3000/ingestion/sync/invoice
+
+### Trigger real invoiceEvent sync
+POST http://localhost:3000/ingestion/sync/invoiceEvent

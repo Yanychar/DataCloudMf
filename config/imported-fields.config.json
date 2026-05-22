@@ -1,368 +1,2499 @@
 {
-  "client": [
-    {
-      "key": "client",
-      "description": "Source URI identifier of the client in Acute, for example /clients/123.",
-      "dataType": "string",
-      "filterable": false,
-      "includeInAiContext": true
-    },
-    {
-      "key": "birthDate",
-      "description": "Birth date of the client for age and birthday-based analysis.",
-      "dataType": "date",
-      "filterable": true,
-      "includeInAiContext": true
-    },
-    {
-      "key": "gender",
-      "description": "Administrative sex or gender value coming from Acute.",
-      "dataType": "string",
-      "filterable": true,
-      "includeInAiContext": true
-    },
-    {
-      "key": "homeUnit",
-      "description": "Acute home unit URI assigned to the client.",
-      "dataType": "string",
-      "filterable": false,
-      "includeInAiContext": true
-    },
-    {
-      "key": "city",
-      "description": "City value recorded for the client.",
-      "dataType": "string",
-      "filterable": true,
-      "includeInAiContext": true
-    },
-    {
-      "key": "municipality",
-      "description": "Municipality value recorded for the client.",
-      "dataType": "string",
-      "filterable": false,
-      "includeInAiContext": true
-    },
-    {
-      "key": "municipalityCode",
-      "description": "Municipality code recorded for the client.",
-      "dataType": "string",
-      "filterable": false,
-      "includeInAiContext": true
-    },
-    {
-      "key": "countryId",
-      "description": "Country code recorded for the client.",
-      "dataType": "string",
-      "filterable": false,
-      "includeInAiContext": true
-    },
-    {
-      "key": "canNotifyByEmail",
-      "description": "Whether email notifications are allowed for the client.",
-      "dataType": "boolean",
-      "filterable": false,
-      "includeInAiContext": true
-    },
-    {
-      "key": "canNotifyBySMS",
-      "description": "Whether SMS notifications are allowed for the client.",
-      "dataType": "boolean",
-      "filterable": false,
-      "includeInAiContext": true
-    },
-    {
-      "key": "employers",
-      "description": "Acute resource URI for the client's employer relationships.",
-      "dataType": "string",
-      "filterable": false,
-      "includeInAiContext": true
-    },
-    {
-      "key": "creditCheck",
-      "description": "Whether credit check is enabled or required for the client.",
-      "dataType": "boolean",
-      "filterable": false,
-      "includeInAiContext": true
-    },
-    {
-      "key": "creditCheckNotOkNotes",
-      "description": "Source note field about credit check issues.",
-      "dataType": "string",
-      "filterable": false,
-      "includeInAiContext": true
-    },
-    {
-      "key": "kelaCompensation",
-      "description": "Kela compensation flag or value from the source.",
-      "dataType": "boolean",
-      "filterable": false,
-      "includeInAiContext": true
-    },
-    {
-      "key": "lang",
-      "description": "Language code recorded for the client.",
-      "dataType": "string",
-      "filterable": false,
-      "includeInAiContext": true
-    },
-    {
-      "key": "authenticationTypeId",
-      "description": "Authentication type identifier stored in Acute.",
-      "dataType": "number",
-      "filterable": false,
-      "includeInAiContext": true
-    },
-    {
-      "key": "authenticationTypeDescription",
-      "description": "Authentication type description stored in Acute.",
-      "dataType": "string",
-      "filterable": false,
-      "includeInAiContext": true
-    },
-    {
-      "key": "defaultNurse",
-      "description": "Default nurse resource URI assigned to the client.",
-      "dataType": "string",
-      "filterable": false,
-      "includeInAiContext": true
-    },
-    {
-      "key": "defaultDoctor",
-      "description": "Default doctor resource URI assigned to the client.",
-      "dataType": "string",
-      "filterable": false,
-      "includeInAiContext": true
-    },
-    {
-      "key": "kelaCardCheckStatus",
-      "description": "Kela card check status code.",
-      "dataType": "number",
-      "filterable": false,
-      "includeInAiContext": true
-    },
-    {
-      "key": "kelaCardCheckDate",
-      "description": "Timestamp of the latest Kela card check.",
-      "dataType": "date",
-      "filterable": false,
-      "includeInAiContext": true
-    },
-    {
-      "key": "invoiceDeliveryMethod",
-      "description": "Invoice delivery method setting recorded for the client.",
-      "dataType": "string",
-      "filterable": false,
-      "includeInAiContext": true
-    },
-    {
-      "key": "updateInfoText",
-      "description": "Source update information text from Acute.",
-      "dataType": "string",
-      "filterable": false,
-      "includeInAiContext": true
-    },
-    {
-      "key": "reservationInfo",
-      "description": "Reservation-related source information text.",
-      "dataType": "string",
-      "filterable": false,
-      "includeInAiContext": true
-    },
-    {
-      "key": "maritalStatusType",
-      "description": "Marital status type code from the source.",
-      "dataType": "string",
-      "filterable": false,
-      "includeInAiContext": true
-    },
-    {
-      "key": "maritalStatusText",
-      "description": "Marital status text from the source.",
-      "dataType": "string",
-      "filterable": false,
-      "includeInAiContext": true
-    },
-    {
-      "key": "deathDate",
-      "description": "Death date recorded for the client, when present.",
-      "dataType": "date",
-      "filterable": false,
-      "includeInAiContext": true
-    },
-    {
-      "key": "deathRegisteredDate",
-      "description": "Date when death information was registered in the source.",
-      "dataType": "date",
-      "filterable": false,
-      "includeInAiContext": true
-    },
-    {
-      "key": "studentNumber",
-      "description": "Student number recorded in the source, when present.",
-      "dataType": "string",
-      "filterable": false,
-      "includeInAiContext": true
-    },
-    {
-      "key": "clientType",
-      "description": "Business category of the client, for example PersonalCustomer.",
-      "dataType": "string",
-      "filterable": true,
-      "includeInAiContext": true
-    },
-    {
-      "key": "endDate",
-      "description": "End date of the client relationship in Acute, when present.",
-      "dataType": "date",
-      "filterable": false,
-      "includeInAiContext": true
-    },
-    {
-      "key": "latestSaveDate",
-      "description": "Latest source save date in Acute used for sync tracking and technical audit.",
-      "dataType": "date",
-      "filterable": false,
-      "includeInAiContext": true
-    },
-    {
-      "key": "latestSavePersonnelId",
-      "description": "Identifier of the personnel user who last saved the client in Acute.",
-      "dataType": "number",
-      "filterable": false,
-      "includeInAiContext": true
-    },
-    {
-      "key": "latestSaveRestUserId",
-      "description": "Identifier of the REST/API user that last saved the client in Acute.",
-      "dataType": "number",
-      "filterable": false,
-      "includeInAiContext": true
-    },
-    {
-      "key": "contactPerson1OtherGuardianClientId",
-      "sourcePath": "contactPerson1.otherGuardianClientId",
-      "description": "Related other-guardian client identifier from contact person 1, without personal contact details.",
-      "dataType": "number",
-      "filterable": false,
-      "includeInAiContext": true
-    },
-    {
-      "key": "contactPerson1IsPrimary",
-      "sourcePath": "contactPerson1.isPrimary",
-      "description": "Whether contact person 1 is marked as primary.",
-      "dataType": "boolean",
-      "filterable": false,
-      "includeInAiContext": true
-    },
-    {
-      "key": "contactPerson1IsRelative",
-      "sourcePath": "contactPerson1.isRelative",
-      "description": "Whether contact person 1 is marked as a relative.",
-      "dataType": "boolean",
-      "filterable": false,
-      "includeInAiContext": true
-    },
-    {
-      "key": "contactPerson1IsOtherGuardian",
-      "sourcePath": "contactPerson1.isOtherGuardian",
-      "description": "Whether contact person 1 is marked as other guardian.",
-      "dataType": "boolean",
-      "filterable": false,
-      "includeInAiContext": true
-    },
-    {
-      "key": "contactPerson2IsPrimary",
-      "sourcePath": "contactPerson2.isPrimary",
-      "description": "Whether contact person 2 is marked as primary.",
-      "dataType": "boolean",
-      "filterable": false,
-      "includeInAiContext": true
-    },
-    {
-      "key": "contactPerson2IsRelative",
-      "sourcePath": "contactPerson2.isRelative",
-      "description": "Whether contact person 2 is marked as a relative.",
-      "dataType": "boolean",
-      "filterable": false,
-      "includeInAiContext": true
-    },
-    {
-      "key": "contactPerson2IsOtherGuardian",
-      "sourcePath": "contactPerson2.isOtherGuardian",
-      "description": "Whether contact person 2 is marked as other guardian.",
-      "dataType": "boolean",
-      "filterable": false,
-      "includeInAiContext": true
-    },
-    {
-      "key": "defaultEventPayerType",
-      "description": "Default payer type configured for the client.",
-      "dataType": "string",
-      "filterable": false,
-      "includeInAiContext": true
-    },
-    {
-      "key": "defaultEventPayerOrgId",
-      "description": "Default payer organisation identifier configured for the client.",
-      "dataType": "number",
-      "filterable": false,
-      "includeInAiContext": true
-    },
-    {
-      "key": "defaultEventPayerPaymentCommitmentId",
-      "description": "Default payment commitment identifier configured for the client.",
-      "dataType": "number",
-      "filterable": false,
-      "includeInAiContext": true
-    },
-    {
-      "key": "disallowAddressReleaseStartDate",
-      "description": "Start date of address-release restriction, when present.",
-      "dataType": "date",
-      "filterable": false,
-      "includeInAiContext": true
-    },
-    {
-      "key": "disallowAddressReleaseEndDate",
-      "description": "End date of address-release restriction, when present.",
-      "dataType": "date",
-      "filterable": false,
-      "includeInAiContext": true
-    },
-    {
-      "key": "motherTongueLangCode",
-      "description": "Mother tongue language code recorded in the source.",
-      "dataType": "string",
-      "filterable": false,
-      "includeInAiContext": true
-    },
-    {
-      "key": "notes",
-      "description": "General notes field from the source system.",
-      "dataType": "string",
-      "filterable": false,
-      "includeInAiContext": true
-    },
-    {
-      "key": "earmarkIds",
-      "description": "Array of earmark identifiers assigned to the client.",
-      "dataType": "array",
-      "filterable": false,
-      "includeInAiContext": true
-    },
-    {
-      "key": "insurance",
-      "description": "Insurance information array from the source.",
-      "dataType": "array",
-      "filterable": false,
-      "includeInAiContext": true
-    },
-    {
-      "key": "externalIdStrings",
-      "description": "External identifier strings array from the source.",
-      "dataType": "array",
-      "filterable": false,
-      "includeInAiContext": true
-    }
-  ]
+  "client": {
+    "targetTable": "stg_client",
+    "fields": [
+      {
+        "key": "client",
+        "description": "Source URI identifier of the client in Acute, for example /clients/123.",
+        "dataType": "string",
+        "isColumn": true,
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "birthDate",
+        "description": "Birth date of the client for age and birthday-based analysis.",
+        "dataType": "date",
+        "isColumn": true,
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "gender",
+        "description": "Administrative sex or gender value coming from Acute.",
+        "dataType": "string",
+        "isColumn": true,
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "homeUnit",
+        "description": "Acute home unit URI assigned to the client.",
+        "dataType": "string",
+        "isColumn": true,
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "city",
+        "description": "City value recorded for the client.",
+        "dataType": "string",
+        "isColumn": true,
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "municipality",
+        "description": "Municipality value recorded for the client.",
+        "dataType": "string",
+        "isColumn": true,
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "municipalityCode",
+        "description": "Municipality code recorded for the client.",
+        "dataType": "string",
+        "isColumn": true,
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "countryId",
+        "description": "Country code recorded for the client.",
+        "dataType": "string",
+        "isColumn": true,
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "canNotifyByEmail",
+        "description": "Whether email notifications are allowed for the client.",
+        "dataType": "boolean",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "canNotifyBySMS",
+        "description": "Whether SMS notifications are allowed for the client.",
+        "dataType": "boolean",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "employers",
+        "description": "Acute resource URI for the client's employer relationships.",
+        "dataType": "string",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "creditCheck",
+        "description": "Whether credit check is enabled or required for the client.",
+        "dataType": "boolean",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "creditCheckNotOkNotes",
+        "description": "Source note field about credit check issues.",
+        "dataType": "string",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "kelaCompensation",
+        "description": "Kela compensation flag or value from the source.",
+        "dataType": "boolean",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "lang",
+        "description": "Language code recorded for the client.",
+        "dataType": "string",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "authenticationTypeId",
+        "description": "Authentication type identifier stored in Acute.",
+        "dataType": "number",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "authenticationTypeDescription",
+        "description": "Authentication type description stored in Acute.",
+        "dataType": "string",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "defaultNurse",
+        "description": "Default nurse resource URI assigned to the client.",
+        "dataType": "string",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "defaultDoctor",
+        "description": "Default doctor resource URI assigned to the client.",
+        "dataType": "string",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "kelaCardCheckStatus",
+        "description": "Kela card check status code.",
+        "dataType": "number",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "kelaCardCheckDate",
+        "description": "Timestamp of the latest Kela card check.",
+        "dataType": "date",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "invoiceDeliveryMethod",
+        "description": "Invoice delivery method setting recorded for the client.",
+        "dataType": "string",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "updateInfoText",
+        "description": "Source update information text from Acute.",
+        "dataType": "string",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "reservationInfo",
+        "description": "Reservation-related source information text.",
+        "dataType": "string",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "maritalStatusType",
+        "description": "Marital status type code from the source.",
+        "dataType": "string",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "maritalStatusText",
+        "description": "Marital status text from the source.",
+        "dataType": "string",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "deathDate",
+        "description": "Death date recorded for the client, when present.",
+        "dataType": "date",
+        "isColumn": true,
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "deathRegisteredDate",
+        "description": "Date when death information was registered in the source.",
+        "dataType": "date",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "studentNumber",
+        "description": "Student number recorded in the source, when present.",
+        "dataType": "string",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "clientType",
+        "description": "Business category of the client, for example PersonalCustomer.",
+        "dataType": "string",
+        "isColumn": true,
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "endDate",
+        "description": "End date of the client relationship in Acute, when present.",
+        "dataType": "date",
+        "isColumn": true,
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "latestSaveDate",
+        "description": "Latest source save date in Acute used for sync tracking and technical audit.",
+        "dataType": "date",
+        "isColumn": true,
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "latestSavePersonnelId",
+        "description": "Identifier of the personnel user who last saved the client in Acute.",
+        "dataType": "number",
+        "isColumn": true,
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "latestSaveRestUserId",
+        "description": "Identifier of the REST/API user that last saved the client in Acute.",
+        "dataType": "number",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "contactPerson1OtherGuardianClientId",
+        "sourcePath": "contactPerson1.otherGuardianClientId",
+        "description": "Related other-guardian client identifier from contact person 1, without personal contact details.",
+        "dataType": "number",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "contactPerson1IsPrimary",
+        "sourcePath": "contactPerson1.isPrimary",
+        "description": "Whether contact person 1 is marked as primary.",
+        "dataType": "boolean",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "contactPerson1IsRelative",
+        "sourcePath": "contactPerson1.isRelative",
+        "description": "Whether contact person 1 is marked as a relative.",
+        "dataType": "boolean",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "contactPerson1IsOtherGuardian",
+        "sourcePath": "contactPerson1.isOtherGuardian",
+        "description": "Whether contact person 1 is marked as other guardian.",
+        "dataType": "boolean",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "contactPerson2IsPrimary",
+        "sourcePath": "contactPerson2.isPrimary",
+        "description": "Whether contact person 2 is marked as primary.",
+        "dataType": "boolean",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "contactPerson2IsRelative",
+        "sourcePath": "contactPerson2.isRelative",
+        "description": "Whether contact person 2 is marked as a relative.",
+        "dataType": "boolean",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "contactPerson2IsOtherGuardian",
+        "sourcePath": "contactPerson2.isOtherGuardian",
+        "description": "Whether contact person 2 is marked as other guardian.",
+        "dataType": "boolean",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "defaultEventPayerType",
+        "description": "Default payer type configured for the client.",
+        "dataType": "string",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "defaultEventPayerOrgId",
+        "description": "Default payer organisation identifier configured for the client.",
+        "dataType": "number",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "defaultEventPayerPaymentCommitmentId",
+        "description": "Default payment commitment identifier configured for the client.",
+        "dataType": "number",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "disallowAddressReleaseStartDate",
+        "description": "Start date of address-release restriction, when present.",
+        "dataType": "date",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "disallowAddressReleaseEndDate",
+        "description": "End date of address-release restriction, when present.",
+        "dataType": "date",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "motherTongueLangCode",
+        "description": "Mother tongue language code recorded in the source.",
+        "dataType": "string",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "notes",
+        "description": "General notes field from the source system.",
+        "dataType": "string",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "earmarkIds",
+        "description": "Array of earmark identifiers assigned to the client.",
+        "dataType": "array",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "insurance",
+        "description": "Insurance information array from the source.",
+        "dataType": "array",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "externalIdStrings",
+        "description": "External identifier strings array from the source.",
+        "dataType": "array",
+        "filterable": false,
+        "includeInAiContext": true
+      }
+    ]
+  },
+  "organisation": {
+    "targetTable": "stg_organisation",
+    "restrictPayloadToListedFields": false,
+    "fields": [
+      {
+        "key": "orgId",
+        "description": "Primary Acute identifier of the organisation.",
+        "dataType": "number",
+        "isColumn": true,
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "orgType",
+        "description": "Organisation type code from Acute.",
+        "dataType": "number",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "agreementId",
+        "description": "Agreement identifier linked to the organisation in Acute.",
+        "dataType": "number",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "parentOrgId",
+        "description": "Parent organisation identifier in the Acute organisation hierarchy.",
+        "dataType": "number",
+        "isColumn": true,
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "rootOrgId",
+        "description": "Root organisation identifier in the Acute organisation hierarchy.",
+        "dataType": "number",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "servStartDate",
+        "description": "Service relationship start date of the organisation in Acute.",
+        "dataType": "date",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "servEndDate",
+        "description": "Service relationship end date of the organisation in Acute, when present.",
+        "dataType": "date",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "orgName",
+        "description": "Primary organisation name from Acute.",
+        "dataType": "string",
+        "isColumn": true,
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "orgName2",
+        "description": "Secondary organisation name field from Acute, when present.",
+        "dataType": "string",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "orgShortName",
+        "description": "Short organisation name from Acute, when present.",
+        "dataType": "string",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "orgClientStatus",
+        "description": "Client status code of the organisation in Acute.",
+        "dataType": "number",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "extPayerId",
+        "description": "External payer identifier associated with the organisation, when present.",
+        "dataType": "number",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "respDoctorId",
+        "description": "Responsible doctor identifier linked to the organisation, when present.",
+        "dataType": "number",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "respNurseId",
+        "description": "Responsible nurse identifier linked to the organisation, when present.",
+        "dataType": "number",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "managerId",
+        "description": "Manager identifier linked to the organisation, when present.",
+        "dataType": "number",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "streetAddress1",
+        "description": "Primary street address line of the organisation.",
+        "dataType": "string",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "streetAddress2",
+        "description": "Secondary street address line of the organisation, when present.",
+        "dataType": "string",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "streetPostNo",
+        "description": "Street-address post number or postal code of the organisation.",
+        "dataType": "string",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "streetCity",
+        "description": "Street-address city of the organisation.",
+        "dataType": "string",
+        "isColumn": true,
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "streetCounty",
+        "description": "Street-address county of the organisation, when present.",
+        "dataType": "string",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "streetCountry",
+        "description": "Street-address country of the organisation, when present.",
+        "dataType": "string",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "streetCountryCode",
+        "description": "Street-address country code of the organisation, when present.",
+        "dataType": "string",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "streetRegion",
+        "description": "Street-address region of the organisation, when present.",
+        "dataType": "string",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "postAddress1",
+        "description": "Primary postal address line of the organisation, when present.",
+        "dataType": "string",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "postAddress2",
+        "description": "Secondary postal address line of the organisation, when present.",
+        "dataType": "string",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "postPostNo",
+        "description": "Postal address post number or postal code of the organisation.",
+        "dataType": "string",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "postCity",
+        "description": "Postal address city of the organisation.",
+        "dataType": "string",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "postCountryCode",
+        "description": "Postal address country code of the organisation, when present.",
+        "dataType": "string",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "invPayerId",
+        "description": "Invoice payer identifier configured for the organisation, when present.",
+        "dataType": "number",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "invAddress1",
+        "description": "Primary invoice address line of the organisation, when present.",
+        "dataType": "string",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "invPostNo",
+        "description": "Invoice address post number or postal code of the organisation.",
+        "dataType": "string",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "invCity",
+        "description": "Invoice address city of the organisation, when present.",
+        "dataType": "string",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "apxMessageEmail",
+        "description": "Apx message email address configured for the organisation, when present.",
+        "dataType": "string",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "telTel1",
+        "description": "Primary organisation telephone number from Acute.",
+        "dataType": "string",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "telTel2",
+        "description": "Secondary organisation telephone number from Acute, when present.",
+        "dataType": "string",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "telFax",
+        "description": "Organisation fax number from Acute, when present.",
+        "dataType": "string",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "telGsm",
+        "description": "Organisation GSM/mobile contact number from Acute, when present.",
+        "dataType": "string",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "eEmail",
+        "description": "Organisation email address from Acute, when present.",
+        "dataType": "string",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "eWww",
+        "description": "Organisation website URL from Acute, when present.",
+        "dataType": "string",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "busCategoryId",
+        "description": "Business category identifier of the organisation, when present.",
+        "dataType": "number",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "busCategoryCode",
+        "description": "Business category code of the organisation, when present.",
+        "dataType": "string",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "busVat",
+        "description": "VAT or tax-related value of the organisation, when present.",
+        "dataType": "string",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "busLyNumber",
+        "description": "Business LY number of the organisation, when present.",
+        "dataType": "string",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "busRegno",
+        "description": "Business registration number of the organisation, when present.",
+        "dataType": "string",
+        "isColumn": true,
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "respUnitId",
+        "description": "Responsible unit identifier associated with the organisation, when present.",
+        "dataType": "number",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "givenClientNbr",
+        "description": "Given client number of the organisation in Acute, when present.",
+        "dataType": "string",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "latestSaveDate",
+        "description": "Latest save date of the organisation record in Acute, used for technical audit when present.",
+        "dataType": "date",
+        "isColumn": true,
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "latestSavePersonnelId",
+        "description": "Identifier of the personnel user who last saved the organisation in Acute, when present.",
+        "dataType": "number",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "accSpecialAddress",
+        "description": "Acute organisation field accSpecialAddress.",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "agrContClientId",
+        "description": "Acute organisation field agrContClientId.",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "agreedCode",
+        "description": "Acute organisation field agreedCode.",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "agreementDoneDate",
+        "description": "Acute organisation field agreementDoneDate.",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "annualFeeCreatedAutomatically",
+        "description": "Acute organisation field annualFeeCreatedAutomatically.",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "apxAddress1",
+        "description": "Acute organisation field apxAddress1.",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "apxAddress2",
+        "description": "Acute organisation field apxAddress2.",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "apxCity",
+        "description": "Acute organisation field apxCity.",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "apxCountry",
+        "description": "Acute organisation field apxCountry.",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "apxCountryCode",
+        "description": "Acute organisation field apxCountryCode.",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "apxCounty",
+        "description": "Acute organisation field apxCounty.",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "apxPostNo",
+        "description": "Acute organisation field apxPostNo.",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "apxRegion",
+        "description": "Acute organisation field apxRegion.",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "apxState",
+        "description": "Acute organisation field apxState.",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "apxZip",
+        "description": "Acute organisation field apxZip.",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "busCashDiscount",
+        "description": "Acute organisation field busCashDiscount.",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "busClaimPeriod",
+        "description": "Acute organisation field busClaimPeriod.",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "busCreditLimit",
+        "description": "Acute organisation field busCreditLimit.",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "busFiscalEnd",
+        "description": "Acute organisation field busFiscalEnd.",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "busFiscalLength",
+        "description": "Acute organisation field busFiscalLength.",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "busFiscalStart",
+        "description": "Acute organisation field busFiscalStart.",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "busLySpecifier",
+        "description": "Acute organisation field busLySpecifier.",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "busOurInvRef",
+        "description": "Acute organisation field busOurInvRef.",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "busOverdueInterest",
+        "description": "Acute organisation field busOverdueInterest.",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "busPaymentStatus",
+        "description": "Acute organisation field busPaymentStatus.",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "busYourInvRef",
+        "description": "Acute organisation field busYourInvRef.",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "clientShareFlag",
+        "description": "Acute organisation field clientShareFlag.",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "cptCheckDate",
+        "description": "Acute organisation field cptCheckDate.",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "cptCheckedBy",
+        "description": "Acute organisation field cptCheckedBy.",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "cptPersonnelId",
+        "description": "Acute organisation field cptPersonnelId.",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "cptValidDate",
+        "description": "Acute organisation field cptValidDate.",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "diagSpecialityId",
+        "description": "Acute organisation field diagSpecialityId.",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "disInsOorgId",
+        "description": "Acute organisation field disInsOorgId.",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "disInsurance",
+        "description": "Acute organisation field disInsurance.",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "eExtranetPassword",
+        "description": "Acute organisation field eExtranetPassword.",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "eExtranetUsername",
+        "description": "Acute organisation field eExtranetUsername.",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "eInvoiceFormatType",
+        "description": "Acute organisation field eInvoiceFormatType.",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "ediAddress",
+        "description": "Acute organisation field ediAddress.",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "ediCode",
+        "description": "Acute organisation field ediCode.",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "einvoiceAddressType",
+        "description": "Acute organisation field einvoiceAddressType.",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "ekelaOid",
+        "description": "Acute organisation field ekelaOid.",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "financialCategory",
+        "description": "Acute organisation field financialCategory.",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "hideAnswersInEService",
+        "description": "Acute organisation field hideAnswersInEService.",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "hrContClientId",
+        "description": "Acute organisation field hrContClientId.",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "iban",
+        "description": "Acute organisation field iban.",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "insDataTransferHrFlag",
+        "description": "Acute organisation field insDataTransferHrFlag.",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "insDepartFlag",
+        "description": "Acute organisation field insDepartFlag.",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "insFundFlag",
+        "description": "Acute organisation field insFundFlag.",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "insFundNotes",
+        "description": "Acute organisation field insFundNotes.",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "insFundOorgId",
+        "description": "Acute organisation field insFundOorgId.",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "insFundPct",
+        "description": "Acute organisation field insFundPct.",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "insWorkPosFlag",
+        "description": "Acute organisation field insWorkPosFlag.",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "intermediatorCode",
+        "description": "Acute organisation field intermediatorCode.",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "invAddress2",
+        "description": "Acute organisation field invAddress2.",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "invContClientId",
+        "description": "Acute organisation field invContClientId.",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "invCountry",
+        "description": "Acute organisation field invCountry.",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "invCountryCode",
+        "description": "Acute organisation field invCountryCode.",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "invCounty",
+        "description": "Acute organisation field invCounty.",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "invRegion",
+        "description": "Acute organisation field invRegion.",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "invState",
+        "description": "Acute organisation field invState.",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "invZip",
+        "description": "Acute organisation field invZip.",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "invoicingStartDate",
+        "description": "Acute organisation field invoicingStartDate.",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "kelaSummaryAgreementEndDate",
+        "description": "Acute organisation field kelaSummaryAgreementEndDate.",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "kelaSummaryAgreementStartDate",
+        "description": "Acute organisation field kelaSummaryAgreementStartDate.",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "oid",
+        "description": "Acute organisation field oid.",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "oneAmountFlag",
+        "description": "Acute organisation field oneAmountFlag.",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "oneAmountValue",
+        "description": "Acute organisation field oneAmountValue.",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "orgOid",
+        "description": "Acute organisation field orgOid.",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "orgTargetFlag",
+        "description": "Acute organisation field orgTargetFlag.",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "otherTargetFlag",
+        "description": "Acute organisation field otherTargetFlag.",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "paymentCommitmentPayerTypeId",
+        "description": "Acute organisation field paymentCommitmentPayerTypeId.",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "paymentInfoFromOrg",
+        "description": "Acute organisation field paymentInfoFromOrg.",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "paymentTermId",
+        "description": "Acute organisation field paymentTermId.",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "pensInsurance",
+        "description": "Acute organisation field pensInsurance.",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "pensOrgId",
+        "description": "Acute organisation field pensOrgId.",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "pensionInsuranceType",
+        "description": "Acute organisation field pensionInsuranceType.",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "persInsOorgId",
+        "description": "Acute organisation field persInsOorgId.",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "persInsurance",
+        "description": "Acute organisation field persInsurance.",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "postCountry",
+        "description": "Acute organisation field postCountry.",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "postCounty",
+        "description": "Acute organisation field postCounty.",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "postRegion",
+        "description": "Acute organisation field postRegion.",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "postState",
+        "description": "Acute organisation field postState.",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "postZip",
+        "description": "Acute organisation field postZip.",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "publicOrgFlag",
+        "description": "Acute organisation field publicOrgFlag.",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "resProhibit",
+        "description": "Acute organisation field resProhibit.",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "sepProjFlag",
+        "description": "Acute organisation field sepProjFlag.",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "streetState",
+        "description": "Acute organisation field streetState.",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "streetZip",
+        "description": "Acute organisation field streetZip.",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "svCode",
+        "description": "Acute organisation field svCode.",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "toleranceId",
+        "description": "Acute organisation field toleranceId.",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "top10Flag",
+        "description": "Acute organisation field top10Flag.",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "top20Flag",
+        "description": "Acute organisation field top20Flag.",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "transitInvoicingFlag",
+        "description": "Acute organisation field transitInvoicingFlag.",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "unitTargetFlag",
+        "description": "Acute organisation field unitTargetFlag.",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "municipalityCode",
+        "description": "Municipality code of the organisation record, when present.",
+        "dataType": "string",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "orgClientTypeId",
+        "description": "Organisation client type identifier from Acute, when present.",
+        "dataType": "number",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "notes",
+        "description": "General organisation notes from the source, when present.",
+        "dataType": "string",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "reservationNotes",
+        "description": "Reservation notes of the organisation, when present.",
+        "dataType": "string",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "labNotes",
+        "description": "Laboratory-related notes of the organisation, when present.",
+        "dataType": "string",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "imagingNotes",
+        "description": "Imaging-related notes of the organisation, when present.",
+        "dataType": "string",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "receptionNotes",
+        "description": "Reception-related notes of the organisation, when present.",
+        "dataType": "string",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "otherNotes",
+        "description": "Additional organisation notes from Acute, when present.",
+        "dataType": "string",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "categories",
+        "description": "Organisation categories array from Acute, when present.",
+        "dataType": "array",
+        "filterable": false,
+        "includeInAiContext": true
+      }
+    ]
+  },
+  "employer": {
+    "targetTable": "stg_employer",
+    "restrictPayloadToListedFields": false,
+    "fields": [
+      {
+        "key": "employer",
+        "description": "Primary Acute identifier or URI of the employer relationship record, when present.",
+        "dataType": "string",
+        "isColumn": true,
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "name",
+        "description": "Employer organisation name carried on the employer relationship row.",
+        "dataType": "string",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "clientId",
+        "description": "Numeric client identifier that links to the id portion of Client.client.",
+        "dataType": "number",
+        "isColumn": true,
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "orgId",
+        "description": "Organisation identifier that links directly to Organisation.orgId.",
+        "dataType": "number",
+        "isColumn": true,
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "bossId",
+        "description": "Boss or supervisor client identifier linked to the employer relationship, when present.",
+        "dataType": "number",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "clientRoleId",
+        "description": "Client role identifier on the employer relationship, when present.",
+        "dataType": "number",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "externalId",
+        "description": "External identifier of the employer relationship, when present.",
+        "dataType": "string",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "agreement",
+        "description": "Agreement name or level text stored on the employer relationship.",
+        "dataType": "string",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "respUnit",
+        "description": "Responsible unit URI of the employer relationship.",
+        "dataType": "string",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "respNurse",
+        "description": "Responsible nurse reference of the employer relationship, when present.",
+        "dataType": "string",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "respNurseId",
+        "description": "Responsible nurse identifier of the employer relationship, when present.",
+        "dataType": "number",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "respDoctor",
+        "description": "Responsible doctor reference of the employer relationship, when present.",
+        "dataType": "string",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "startDate",
+        "description": "Start date of the employment or occupational-health relationship.",
+        "dataType": "date",
+        "isColumn": true,
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "endDate",
+        "description": "End date of the employment or occupational-health relationship, when present.",
+        "dataType": "date",
+        "isColumn": true,
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "mainEmployer",
+        "description": "Whether this employer relationship is marked as the main employer.",
+        "dataType": "boolean",
+        "isColumn": true,
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "profDescr",
+        "description": "Profession description recorded for the employer relationship, when present.",
+        "dataType": "string",
+        "isColumn": true,
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "appointmentReservationProhibition",
+        "description": "Whether appointment reservation is prohibited for this employer relationship.",
+        "dataType": "boolean",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "agreementLevel",
+        "description": "Numeric agreement level of the employer relationship.",
+        "dataType": "number",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "agreementLevelText",
+        "description": "Textual agreement level of the employer relationship.",
+        "dataType": "string",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "orgRespUnit",
+        "description": "Organisation responsible unit URI of the employer relationship.",
+        "dataType": "string",
+        "filterable": true,
+        "includeInAiContext": true
+      }
+    ]
+  },
+  "personnel": {
+    "targetTable": "stg_personnel",
+    "restrictPayloadToListedFields": false,
+    "fields": [
+      {
+        "key": "personnelId",
+        "description": "Primary Acute identifier of the personnel record.",
+        "dataType": "number",
+        "isColumn": true,
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "firstName",
+        "description": "Personnel first name, when present.",
+        "dataType": "string",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "lastName",
+        "description": "Personnel last name, when present.",
+        "dataType": "string",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "idString",
+        "description": "Personnel identifier string from Acute, when present.",
+        "dataType": "string",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "phone",
+        "description": "Personnel phone number from Acute, when present.",
+        "dataType": "string",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "workPhone",
+        "description": "Personnel work phone number from Acute, when present.",
+        "dataType": "string",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "homePhone",
+        "description": "Personnel home phone number from Acute, when present.",
+        "dataType": "string",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "svCode",
+        "description": "SV code of the personnel record, when present.",
+        "dataType": "string",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "professionRegisterId",
+        "description": "Profession register identifier of the personnel, when present.",
+        "dataType": "string",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "professionTitleCode",
+        "description": "Profession title code of the personnel, when present.",
+        "dataType": "string",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "professionTitleName",
+        "description": "Profession title name of the personnel, when present.",
+        "dataType": "string",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "specialityId",
+        "description": "Speciality identifier of the personnel, when present.",
+        "dataType": "string",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "specialityCode",
+        "description": "Speciality code of the personnel, when present.",
+        "dataType": "string",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "specialityDescr",
+        "description": "Speciality description of the personnel, when present.",
+        "dataType": "string",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "statsProfessionCode",
+        "description": "Statistics profession code of the personnel, when present.",
+        "dataType": "string",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "statsProfessionName",
+        "description": "Statistics profession name of the personnel, when present.",
+        "dataType": "string",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "professions",
+        "description": "Array of profession assignments of the personnel record.",
+        "dataType": "array",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "activated",
+        "description": "Whether the personnel record is activated in Acute.",
+        "dataType": "boolean",
+        "isColumn": true,
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "deleted",
+        "description": "Whether the personnel record is marked deleted in Acute.",
+        "dataType": "boolean",
+        "isColumn": true,
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "requiresApproval",
+        "description": "Whether the personnel record requires approval in Acute.",
+        "dataType": "boolean",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "approvalDate",
+        "description": "Approval date of the personnel record, when present.",
+        "dataType": "date",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "approvalPersonnelId",
+        "description": "Identifier of the approving personnel record, when present.",
+        "dataType": "number",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "personnelState",
+        "description": "Personnel state from Acute, for example Active, Passive, Virtual, or Administrator.",
+        "dataType": "string",
+        "isColumn": true,
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "personnelCategory",
+        "description": "Personnel category from Acute, for example Internal or External.",
+        "dataType": "string",
+        "isColumn": true,
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "email",
+        "description": "Personnel email address from Acute, when present.",
+        "dataType": "string",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "streetAddress1",
+        "description": "Primary street address line of the personnel record, when present.",
+        "dataType": "string",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "streetAddress2",
+        "description": "Secondary street address line of the personnel record, when present.",
+        "dataType": "string",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "streetPostNo",
+        "description": "Street-address post number of the personnel record, when present.",
+        "dataType": "string",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "streetCity",
+        "description": "Street-address city of the personnel record, when present.",
+        "dataType": "string",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "streetCountry",
+        "description": "Street-address country of the personnel record, when present.",
+        "dataType": "string",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "notes",
+        "description": "General notes of the personnel record, when present.",
+        "dataType": "string",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "defaultUnitId",
+        "description": "Default unit identifier of the personnel record, when present.",
+        "dataType": "number",
+        "isColumn": true,
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "unitIds",
+        "description": "Array of unit identifiers assigned to the personnel record.",
+        "dataType": "array",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "flags",
+        "description": "Flags array of the personnel record in Acute.",
+        "dataType": "array",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "userProfiles",
+        "description": "User profile information of the personnel record, when present.",
+        "dataType": "object",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "externalOrgId",
+        "description": "Primary external organisation identifier linked to the personnel record, when present.",
+        "dataType": "number",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "externalOrg",
+        "description": "Primary external organisation reference linked to the personnel record, when present.",
+        "dataType": "object",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "externalOrgIds",
+        "description": "Array of external organisation identifiers linked to the personnel record.",
+        "dataType": "array",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "externalOrgs",
+        "description": "Array or object collection of external organisations linked to the personnel record, when present.",
+        "dataType": "object",
+        "filterable": false,
+        "includeInAiContext": true
+      }
+    ]
+  },
+  "invoice": {
+    "targetTable": "stg_invoice",
+    "restrictPayloadToListedFields": false,
+    "fields": [
+      {
+        "key": "invoice",
+        "description": "Invoice resource URI from Acute.",
+        "dataType": "string",
+        "isColumn": true,
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "invoiceId",
+        "description": "Primary invoice identifier from Acute.",
+        "dataType": "number",
+        "isColumn": true,
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "personnelId",
+        "description": "Personnel identifier associated with the invoice.",
+        "dataType": "number",
+        "isColumn": true,
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "invoiceDate",
+        "description": "Invoice date from Acute.",
+        "dataType": "date",
+        "isColumn": true,
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "modifiedDate",
+        "description": "Latest modification timestamp of the invoice in Acute.",
+        "dataType": "date",
+        "isColumn": true,
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "invoiceNbr",
+        "description": "Human-readable invoice number from Acute.",
+        "dataType": "number",
+        "isColumn": true,
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "cashDeskId",
+        "description": "Cash desk identifier associated with the invoice, when present.",
+        "dataType": "number",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "notes",
+        "description": "General notes field of the invoice, when present.",
+        "dataType": "string",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "unitId",
+        "description": "Operational unit identifier of the invoice.",
+        "dataType": "number",
+        "isColumn": true,
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "ourRefNbr",
+        "description": "Our reference number of the invoice, when present.",
+        "dataType": "string",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "payerName",
+        "description": "Payer name shown on the invoice.",
+        "dataType": "string",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "payerClientId",
+        "description": "Client identifier of the payer when the payer is a person.",
+        "dataType": "number",
+        "isColumn": true,
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "payerOrgId",
+        "description": "Organisation identifier of the payer when the payer is a company.",
+        "dataType": "number",
+        "isColumn": true,
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "cashRounding",
+        "description": "Cash rounding amount of the invoice, when present.",
+        "dataType": "string",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "totalAmount",
+        "description": "Total invoice amount.",
+        "dataType": "string",
+        "isColumn": true,
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "totalVat",
+        "description": "Total VAT amount of the invoice.",
+        "dataType": "string",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "vatDetails",
+        "description": "VAT details array of the invoice.",
+        "dataType": "array",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "invoiceStatusId",
+        "description": "Invoice status identifier from Acute.",
+        "dataType": "number",
+        "isColumn": true,
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "invoiceStatusDescr",
+        "description": "Invoice status description from Acute.",
+        "dataType": "string",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "dueDate",
+        "description": "Invoice due date.",
+        "dataType": "date",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "paymentTerm",
+        "description": "Payment term description of the invoice.",
+        "dataType": "string",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "legalUnit",
+        "description": "Legal unit reference of the invoice.",
+        "dataType": "string",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "payerAddress",
+        "description": "Payer address shown on the invoice, when present.",
+        "dataType": "string",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "payerPostcode",
+        "description": "Payer postcode shown on the invoice, when present.",
+        "dataType": "string",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "payerCity",
+        "description": "Payer city shown on the invoice, when present.",
+        "dataType": "string",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "payerIdString",
+        "description": "Payer identifier string shown on the invoice, when present.",
+        "dataType": "string",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "payerLyNumber",
+        "description": "Payer business number shown on the invoice, when present.",
+        "dataType": "string",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "events",
+        "description": "Nested invoice event array included when showEvents=true.",
+        "dataType": "array",
+        "filterable": false,
+        "includeInAiContext": false
+      },
+      {
+        "key": "channel",
+        "description": "Invoice channel code, when present.",
+        "dataType": "string",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "channelDescription",
+        "description": "Invoice channel description, when present.",
+        "dataType": "string",
+        "filterable": true,
+        "includeInAiContext": true
+      }
+    ]
+  },
+  "invoiceEvent": {
+    "targetTable": "stg_invoice_event",
+    "restrictPayloadToListedFields": false,
+    "fields": [
+      {
+        "key": "eventPayerId",
+        "description": "Primary invoice event identifier from Acute.",
+        "dataType": "number",
+        "isColumn": true,
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "authorPersonnelId",
+        "description": "Authoring personnel identifier of the invoice event.",
+        "dataType": "number",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "authorPersonnelProfName",
+        "description": "Authoring personnel profession name of the invoice event, when present.",
+        "dataType": "string",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "created",
+        "description": "Creation timestamp of the invoice event.",
+        "dataType": "date",
+        "isColumn": true,
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "eventId",
+        "description": "Underlying event identifier from Acute.",
+        "dataType": "number",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "payerOrgId",
+        "description": "Organisation payer identifier of the invoice event, when present.",
+        "dataType": "number",
+        "isColumn": true,
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "clientId",
+        "description": "Client identifier associated with the invoice event.",
+        "dataType": "number",
+        "isColumn": true,
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "amountShare",
+        "description": "Amount share of the invoice event.",
+        "dataType": "string",
+        "isColumn": true,
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "unitId",
+        "description": "Unit identifier of the invoice event.",
+        "dataType": "number",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "unitName",
+        "description": "Unit name of the invoice event, when present.",
+        "dataType": "string",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "invoiceId",
+        "description": "Parent invoice identifier of the invoice event.",
+        "dataType": "number",
+        "isColumn": true,
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "invoiceNbr",
+        "description": "Parent invoice number of the invoice event.",
+        "dataType": "number",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "paidFlag",
+        "description": "Whether the invoice event is marked paid.",
+        "dataType": "boolean",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "paymentCommitmentId",
+        "description": "Payment commitment identifier of the invoice event, when present.",
+        "dataType": "number",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "paymentCommitmentDescr",
+        "description": "Payment commitment description of the invoice event, when present.",
+        "dataType": "string",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "clientPaymentShareFlag",
+        "description": "Whether the event amount is a client payment share.",
+        "dataType": "boolean",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "originalClientId",
+        "description": "Original client identifier of the invoice event, when present.",
+        "dataType": "number",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "approvalStatusId",
+        "description": "Approval status identifier of the invoice event.",
+        "dataType": "number",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "approvalStatusDescr",
+        "description": "Approval status description of the invoice event.",
+        "dataType": "string",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "belongsTo",
+        "description": "Acute invoice event field belongsTo.",
+        "dataType": "number",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "eventStatus",
+        "description": "Invoice event status code from Acute.",
+        "dataType": "number",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "sessionId",
+        "description": "Session identifier linked to the invoice event, when present.",
+        "dataType": "number",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "eventGroupId",
+        "description": "Event group identifier of the invoice event.",
+        "dataType": "number",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "eventGroupName",
+        "description": "Event group name of the invoice event.",
+        "dataType": "string",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "eventCategoryMembers",
+        "description": "Event category members array of the invoice event.",
+        "dataType": "array",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "itemId",
+        "description": "Item identifier billed on the invoice event.",
+        "dataType": "number",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "itemName",
+        "description": "Item name billed on the invoice event.",
+        "dataType": "string",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "orgId",
+        "description": "Organisation identifier linked to the invoice event, when present.",
+        "dataType": "number",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "orgName",
+        "description": "Organisation name linked to the invoice event, when present.",
+        "dataType": "string",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "kelaStatus",
+        "description": "Kela status code of the invoice event.",
+        "dataType": "number",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "kelaStatusDescr",
+        "description": "Kela status description of the invoice event.",
+        "dataType": "string",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "kelaCode",
+        "description": "Kela code of the invoice event, when present.",
+        "dataType": "string",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "kelaSubvention",
+        "description": "Kela subvention amount of the invoice event.",
+        "dataType": "string",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "priceListPrice",
+        "description": "Price list price of the invoice event.",
+        "dataType": "string",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "defaultPrice",
+        "description": "Default price of the invoice event.",
+        "dataType": "string",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "editedDefaultPrice",
+        "description": "Edited default price of the invoice event, when present.",
+        "dataType": "string",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "timeFactor",
+        "description": "Time factor of the invoice event.",
+        "dataType": "string",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "nightFactor",
+        "description": "Night factor of the invoice event.",
+        "dataType": "string",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "amountFactor",
+        "description": "Amount factor of the invoice event.",
+        "dataType": "string",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "fractionFactor",
+        "description": "Fraction factor of the invoice event.",
+        "dataType": "string",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "lectureFactor",
+        "description": "Lecture factor of the invoice event.",
+        "dataType": "string",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "discountPct",
+        "description": "Discount percentage of the invoice event.",
+        "dataType": "string",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "discountAmount",
+        "description": "Discount amount of the invoice event.",
+        "dataType": "string",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "price",
+        "description": "Final price of the invoice event.",
+        "dataType": "string",
+        "isColumn": true,
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "vatClass",
+        "description": "VAT class of the invoice event.",
+        "dataType": "number",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "vatClassDescr",
+        "description": "VAT class description of the invoice event.",
+        "dataType": "string",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "vatAccountCode",
+        "description": "VAT account code of the invoice event, when present.",
+        "dataType": "string",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "account",
+        "description": "Account reference of the invoice event, when present.",
+        "dataType": "string",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "notes",
+        "description": "General notes of the invoice event, when present.",
+        "dataType": "string",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "invMethod",
+        "description": "Invoice method of the invoice event, when present.",
+        "dataType": "string",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "readyDate",
+        "description": "Ready date of the invoice event, when present.",
+        "dataType": "date",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "status4Date",
+        "description": "Acute invoice event field status4Date.",
+        "dataType": "date",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "personnel",
+        "description": "Personnel identifier directly attached to the invoice event.",
+        "dataType": "number",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "personnelName",
+        "description": "Personnel name attached to the invoice event, when present.",
+        "dataType": "string",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "realUnitId",
+        "description": "Real unit identifier of the invoice event, when present.",
+        "dataType": "number",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "realUnitName",
+        "description": "Real unit name of the invoice event, when present.",
+        "dataType": "string",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "agreementId",
+        "description": "Agreement identifier of the invoice event, when present.",
+        "dataType": "number",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "kelaDetId",
+        "description": "Kela detail identifier of the invoice event, when present.",
+        "dataType": "number",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "kelaTimeRaisedFlag",
+        "description": "Acute invoice event field kelaTimeRaisedFlag.",
+        "dataType": "boolean",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "kelaTimeRaisedSubvention",
+        "description": "Acute invoice event field kelaTimeRaisedSubvention.",
+        "dataType": "string",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "kelaSpecDocRaisedFlag",
+        "description": "Acute invoice event field kelaSpecDocRaisedFlag.",
+        "dataType": "boolean",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "kelaSpecDocRaisedSubvention",
+        "description": "Acute invoice event field kelaSpecDocRaisedSubvention.",
+        "dataType": "string",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "kelaHomeRaisedFlag",
+        "description": "Acute invoice event field kelaHomeRaisedFlag.",
+        "dataType": "boolean",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "kelaHomeRaisedSubvention",
+        "description": "Acute invoice event field kelaHomeRaisedSubvention.",
+        "dataType": "string",
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "kelaSubventionFlag",
+        "description": "Whether Kela subvention applies to the invoice event.",
+        "dataType": "boolean",
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "kelaSubventionInfo",
+        "description": "Kela subvention info array of the invoice event.",
+        "dataType": "array",
+        "filterable": false,
+        "includeInAiContext": true
+      }
+    ]
+  }
 }

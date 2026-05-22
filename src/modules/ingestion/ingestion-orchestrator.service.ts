@@ -19,6 +19,17 @@ export class IngestionOrchestratorService {
   async syncEntity(entityKey: string) {
     const entityConfig = this.acuteConfigService.getEntityConfigOrThrow(entityKey);
     const mode = entityConfig.mode as SyncMode;
+    const hasActiveRun = await this.repositoryService.hasActiveRun(entityKey);
+
+    if (hasActiveRun) {
+      return {
+        entityKey,
+        mode,
+        skipped: true,
+        reason: 'already_running',
+      };
+    }
+
     const existingState = await this.repositoryService.getEntityState(entityKey);
 
     await this.repositoryService.markRunStarted(entityKey);
@@ -82,6 +93,10 @@ export class IngestionOrchestratorService {
 
   getEntityConfigs() {
     return this.acuteConfigService.getEntityConfigs();
+  }
+
+  async recoverAbandonedRuns(): Promise<number> {
+    return this.repositoryService.recoverAbandonedRuns();
   }
 
   private async syncSingleRequestEntity(
@@ -338,7 +353,14 @@ export class IngestionOrchestratorService {
     throw new Error(`Unsupported rangeWindowUnit for entity "${entityConfig.key}"`);
   }
 
-  private formatSyncDate(value: Date): string {
+  private formatSyncDate(
+    value: Date,
+    entityConfig: ReturnType<AcuteConfigService['getEntityConfigOrThrow']>,
+  ): string {
+    if (entityConfig.rangeDateFormat === 'date') {
+      return value.toISOString().slice(0, 10);
+    }
+
     return value.toISOString().slice(0, 19);
   }
 
@@ -390,8 +412,8 @@ export class IngestionOrchestratorService {
           entityConfig,
           mode === 'incremental' ? lastSuccessfulSyncAt : undefined,
           {
-            [rangeFromParam]: this.formatSyncDate(windowFrom),
-            [rangeToParam]: this.formatSyncDate(windowTo),
+            [rangeFromParam]: this.formatSyncDate(windowFrom, entityConfig),
+            [rangeToParam]: this.formatSyncDate(windowTo, entityConfig),
           },
         );
 

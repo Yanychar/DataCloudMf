@@ -15,6 +15,15 @@ export class IngestionSchedulerService implements OnModuleInit {
   ) {}
 
   onModuleInit(): void {
+    void this.initializeScheduler();
+  }
+
+  private async initializeScheduler(): Promise<void> {
+    const recoveredRuns = await this.ingestionOrchestratorService.recoverAbandonedRuns();
+    if (recoveredRuns > 0) {
+      this.logger.warn(`Recovered ${recoveredRuns} unfinished sync run(s) after process restart.`);
+    }
+
     if (!this.acuteConfigService.getDataSyncEnabled()) {
       this.logger.warn('Periodic sync is disabled by config.');
       return;
@@ -27,7 +36,13 @@ export class IngestionSchedulerService implements OnModuleInit {
 
       const job = new CronJob(entityConfig.cron, async () => {
         this.logger.log(`Triggered sync for entity ${entityConfig.key}`);
-        await this.ingestionOrchestratorService.syncEntity(entityConfig.key);
+        try {
+          await this.ingestionOrchestratorService.syncEntity(entityConfig.key);
+        } catch (error) {
+          this.logger.error(
+            `Scheduled sync failed for entity ${entityConfig.key}: ${(error as Error).message}`,
+          );
+        }
       });
 
       this.schedulerRegistry.addCronJob(entityConfig.key, job);

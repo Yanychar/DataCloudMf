@@ -2,12 +2,15 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { ClientReadService } from '../client-admin/client-read.service';
 import { RunClientReportDto } from './dto/run-client-report.dto';
+import { ClientReportResult } from './reporting-admin.types';
+import { OpenAiReportingService } from './openai-reporting.service';
 
 @Injectable()
 export class ReportingAdminService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly clientReadService: ClientReadService,
+    private readonly openAiReportingService: OpenAiReportingService,
   ) {}
 
   async runClientReport(dto: RunClientReportDto) {
@@ -28,6 +31,7 @@ export class ReportingAdminService {
     });
 
     try {
+      const metadata = this.clientReadService.getClientMetadata();
       const clients = await this.clientReadService.listClients({
         birthDateFrom: this.getString(dto.filters?.birthDateFrom),
         birthDateTo: this.getString(dto.filters?.birthDateTo),
@@ -40,7 +44,14 @@ export class ReportingAdminService {
         limit,
       });
 
-      const result = this.buildStage1FallbackResult(dto.prompt, clients);
+      const result = this.openAiReportingService.isConfigured()
+        ? await this.openAiReportingService.generateClientReport({
+            prompt: dto.prompt,
+            filters: (dto.filters ?? {}) as Record<string, unknown>,
+            metadata: metadata.importedFields,
+            rows: clients,
+          })
+        : this.buildStage1FallbackResult(dto.prompt, clients);
       const inputSample = clients.slice(0, 20);
 
       const updatedExecution = await this.prisma.reportExecution.update({
@@ -115,6 +126,8 @@ export class ReportingAdminService {
     return {
       entityKey: 'client',
       rowCount,
+      aiConfigured: this.openAiReportingService.isConfigured(),
+      model: this.openAiReportingService.getConfiguredModel(),
       filters: {
         birthDateFrom,
         birthDateTo,
@@ -129,7 +142,10 @@ export class ReportingAdminService {
     };
   }
 
-  private buildStage1FallbackResult(prompt: string, clients: Awaited<ReturnType<ClientReadService['listClients']>>) {
+  private buildStage1FallbackResult(
+    prompt: string,
+    clients: Awaited<ReturnType<ClientReadService['listClients']>>,
+  ): ClientReportResult {
     const byClientType = clients.reduce<Record<string, number>>((accumulator, client) => {
       const key = client.clientType ?? 'Unknown';
       accumulator[key] = (accumulator[key] ?? 0) + 1;
@@ -145,9 +161,11 @@ export class ReportingAdminService {
     return {
       generator: 'local_fallback',
       note:
-        'AI provider is not configured in this backend slice yet. This fallback result is meant to validate the Stage 1 API and UI flow.',
+        'OpenAI reporting is not configured yet, so this local fallback result is being returned.',
       prompt,
       summary: `Prepared a Client report input with ${clients.length} matching records.`,
+      truncated: false,
+      rowCount: clients.length,
       sections: [
         {
           type: 'metric_list',
@@ -172,6 +190,9 @@ export class ReportingAdminService {
             client.latestSaveDate ?? '',
           ]),
         },
+      ],
+      notes: [
+        'Set OPENAI_API_KEY to enable direct-AI reporting.',
       ],
     };
   }

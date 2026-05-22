@@ -24,4 +24,8 @@ async function bootstrap() {
   await app.listen(port, '0.0.0.0');
 }
 
-void bootstrap();
+void bootstrap().catch((error: unknown) => {
+  // Keep bootstrap failures visible instead of exiting silently.
+  console.error('Nest bootstrap failed:', error);
+  process.exit(1);
+});

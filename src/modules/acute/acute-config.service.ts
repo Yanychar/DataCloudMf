@@ -2,7 +2,12 @@ import { existsSync, readFileSync } from 'fs';
 import { resolve } from 'path';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { AcuteEntityConfig, ImportedFieldConfig, ReadStrategy } from './acute.types';
+import {
+  AcuteEntityConfig,
+  ImportedEntityConfig,
+  ImportedFieldConfig,
+  ReadStrategy,
+} from './acute.types';
 
 @Injectable()
 export class AcuteConfigService {
@@ -78,6 +83,7 @@ export class AcuteConfigService {
         rangeFromParam: item.rangeFromParam,
         rangeToParam: item.rangeToParam,
         rangeWindowUnit: item.rangeWindowUnit,
+        rangeDateFormat: item.rangeDateFormat === 'date' ? 'date' : 'datetime',
         rangeWindowSize: item.rangeWindowSize,
         rangeRetryWindowSizes: Array.isArray(item.rangeRetryWindowSizes)
           ? item.rangeRetryWindowSizes.filter((value): value is number => typeof value === 'number')
@@ -105,27 +111,43 @@ export class AcuteConfigService {
     return value === 'date_window' ? 'date_window' : 'single';
   }
 
-  private normalizeImportedFields(value: unknown): ImportedFieldConfig[] | undefined {
-    if (!Array.isArray(value)) {
+  private normalizeImportedFields(value: unknown): ImportedEntityConfig | undefined {
+    if (typeof value !== 'object' || value === null || Array.isArray(value)) {
       return undefined;
     }
 
-    const normalized = value
+    const record = value as Record<string, unknown>;
+    const targetTable = typeof record.targetTable === 'string' ? record.targetTable : '';
+    const restrictPayloadToListedFields = record.restrictPayloadToListedFields !== false;
+    const fieldsValue = record.fields;
+
+    if (!Array.isArray(fieldsValue) || !targetTable) {
+      return undefined;
+    }
+
+    const normalized = fieldsValue
       .filter((item): item is Record<string, unknown> => typeof item === 'object' && item !== null)
       .map((item) => ({
         key: typeof item.key === 'string' ? item.key : '',
         sourcePath: typeof item.sourcePath === 'string' ? item.sourcePath : undefined,
         description: typeof item.description === 'string' ? item.description : '',
         dataType: this.normalizeImportedFieldDataType(item.dataType),
+        isColumn: item.isColumn === true,
         filterable: item.filterable === true,
         includeInAiContext: item.includeInAiContext !== false,
       }))
       .filter((item) => item.key && item.description);
 
-    return normalized.length ? normalized : undefined;
+    return normalized.length
+      ? {
+          targetTable,
+          restrictPayloadToListedFields,
+          fields: normalized,
+        }
+      : undefined;
   }
 
-  private getImportedFieldsByEntity(): Record<string, ImportedFieldConfig[] | undefined> {
+  private getImportedFieldsByEntity(): Record<string, ImportedEntityConfig | undefined> {
     const configPath = resolve(
       process.cwd(),
       this.configService.get<string>(

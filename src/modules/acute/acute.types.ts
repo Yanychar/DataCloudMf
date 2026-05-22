@@ -7,8 +7,15 @@ export interface ImportedFieldConfig {
   sourcePath?: string;
   description: string;
   dataType?: ImportedFieldDataType;
+  isColumn?: boolean;
   filterable?: boolean;
   includeInAiContext?: boolean;
+}
+
+export interface ImportedEntityConfig {
+  targetTable: string;
+  restrictPayloadToListedFields?: boolean;
+  fields: ImportedFieldConfig[];
 }
 
 export interface AcuteEntityConfig {
@@ -29,10 +36,11 @@ export interface AcuteEntityConfig {
   rangeFromParam?: string;
   rangeToParam?: string;
   rangeWindowUnit?: 'month' | 'day';
+  rangeDateFormat?: 'datetime' | 'date';
   rangeWindowSize?: number;
   rangeRetryWindowSizes?: number[];
   initialCursor?: string;
-  importedFields?: ImportedFieldConfig[];
+  importedFields?: ImportedEntityConfig;
   notes?: string;
 }
 

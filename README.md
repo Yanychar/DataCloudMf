@@ -58,6 +58,10 @@ Copy `.env.example` to `.env` and update:
 - `ACUTE_STAGE_PASSWORD`
 - `DATA_SYNC_ENTITY_CONFIG_PATH`
 - `DATA_SYNC_IMPORTED_FIELDS_CONFIG_PATH`
+- `OPENAI_API_KEY`
+- `OPENAI_BASE_URL`
+- `OPENAI_REPORT_MODEL`
+- `OPENAI_TIMEOUT_MS`
 
 `config/entities.config.json` is the key project config. Each entity can define:
 
@@ -170,6 +174,11 @@ Current scope:
 - client repository browsing and count preview
 - Stage 1 `Client Report Lab`
 - recent report execution history
+
+Direct-AI Stage 1 reporting:
+
+- when `OPENAI_API_KEY` is configured, `POST /admin/reports/client/run` sends sanitized filtered Client rows plus imported-field metadata to OpenAI and expects structured JSON back
+- when `OPENAI_API_KEY` is not configured, the same endpoint returns the local fallback report result
 
 Current `Client` admin filters are business-oriented:
 

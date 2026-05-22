@@ -368,6 +368,8 @@ function renderReportPreview(preview) {
       <div class="detail-stack">
         <div><strong>Entity:</strong> ${escapeHtml(preview.entityKey)}</div>
         <div><strong>Matching rows:</strong> ${preview.rowCount}</div>
+        <div><strong>AI configured:</strong> ${preview.aiConfigured ? 'yes' : 'no'}</div>
+        <div><strong>Model:</strong> ${escapeHtml(preview.model ?? 'n/a')}</div>
         <div><strong>Filters:</strong></div>
         <div class="code-block">${escapeHtml(JSON.stringify(preview.filters, null, 2))}</div>
         <div><strong>Imported field metadata:</strong></div>

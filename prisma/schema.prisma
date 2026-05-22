@@ -41,6 +41,34 @@ model RepositoryRecord {
   @@index([entityType, sourceUpdatedAt])
 }
 
+model StgClient {
+  id                    String   @id @default(cuid())
+  externalId            String   @unique
+  clientUri             String?
+  birthDate             DateTime?
+  gender                String?
+  homeUnit              String?
+  city                  String?
+  municipality          String?
+  municipalityCode      String?
+  countryId             String?
+  clientType            String?
+  endDate               DateTime?
+  deathDate             DateTime?
+  latestSaveDate        DateTime?
+  latestSavePersonnelId Int?
+  extraData             Json?
+  sourceUpdatedAt       DateTime?
+  checksum              String?
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  @@index([clientType])
+  @@index([municipality])
+  @@index([latestSaveDate])
+  @@map("stg_client")
+}
+
 model EntitySyncState {
   entityKey            String   @id
   lastRunStartedAt     DateTime?

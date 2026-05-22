@@ -1,0 +1,93 @@
+### Health check
+GET http://localhost:3000/health
+
+### Acute client config ping
+GET http://localhost:3000/acute-test/ping
+
+### Dry run raw Acute request to /organisations
+POST http://localhost:3000/acute-test/request?dryRun=true
+Content-Type: application/json
+
+{
+  "method": "GET",
+  "path": "/organisations",
+  "timeoutMs": 60000
+}
+
+### Raw Acute request to /organisations
+POST http://localhost:3000/acute-test/request
+Content-Type: application/json
+
+{
+  "method": "GET",
+  "path": "/organisations",
+  "timeoutMs": 60000
+}
+
+### Dry run configured entity fetch for organisation
+POST http://localhost:3000/acute-test/entity/organisation/fetch?dryRun=true
+
+### Configured entity fetch for organisation
+POST http://localhost:3000/acute-test/entity/organisation/fetch
+
+### Trigger full sync for organisation
+POST http://localhost:3000/ingestion/sync/organisation
+
+### Dry run raw Acute request to /employers
+POST http://localhost:3000/acute-test/request?dryRun=true
+Content-Type: application/json
+
+{
+  "method": "GET",
+  "path": "/employers",
+  "timeoutMs": 60000
+}
+
+### Raw Acute request to /employers
+POST http://localhost:3000/acute-test/request
+Content-Type: application/json
+
+{
+  "method": "GET",
+  "path": "/employers",
+  "timeoutMs": 60000
+}
+
+### Dry run configured entity fetch for employer
+POST http://localhost:3000/acute-test/entity/employer/fetch?dryRun=true
+
+### Configured entity fetch for employer
+POST http://localhost:3000/acute-test/entity/employer/fetch
+
+### Trigger full sync for employer
+POST http://localhost:3000/ingestion/sync/employer
+
+### Dry run raw Acute request to /personnel
+POST http://localhost:3000/acute-test/request?dryRun=true
+Content-Type: application/json
+
+{
+  "method": "GET",
+  "path": "/personnel",
+  "timeoutMs": 60000
+}
+
+### Raw Acute request to /personnel
+POST http://localhost:3000/acute-test/request
+Content-Type: application/json
+
+{
+  "method": "GET",
+  "path": "/personnel",
+  "timeoutMs": 60000
+}
+
+### Dry run configured entity fetch for personnel
+POST http://localhost:3000/acute-test/entity/personnel/fetch?dryRun=true
+
+### Configured entity fetch for personnel
+POST http://localhost:3000/acute-test/entity/personnel/fetch
+
+### Trigger full sync for personnel
+POST http://localhost:3000/ingestion/sync/personnel
+

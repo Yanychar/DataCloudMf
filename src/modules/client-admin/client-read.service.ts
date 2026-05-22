@@ -78,13 +78,18 @@ export class ClientReadService {
     };
   }
 
-  getClientMetadata(): { entityKey: string; importedFields: ClientFieldMetadataView[] } {
+  getClientMetadata(): {
+    entityKey: string;
+    targetTable: string | null;
+    importedFields: ClientFieldMetadataView[];
+  } {
     const config = this.acuteConfigService.getEntityConfigOrThrow('client');
 
     return {
       entityKey: 'client',
+      targetTable: config.importedFields?.targetTable ?? null,
       importedFields:
-        config.importedFields?.map((field) => ({
+        config.importedFields?.fields.map((field) => ({
           key: field.key,
           description: field.description,
           dataType: field.dataType,
