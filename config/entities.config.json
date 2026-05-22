@@ -44,7 +44,8 @@
     "endpoint": "/invoices",
     "cron": "*/30 * * * *",
     "mode": "incremental",
-    "enabled": false,
+    "enabled": true,
+    "derivedEntityKeys": ["invoiceEvent"],
     "externalIdField": "invoiceId",
     "sourceUpdatedAtField": "modifiedDate",
     "readStrategy": "date_window",
@@ -53,20 +54,22 @@
     "rangeWindowUnit": "day",
     "rangeDateFormat": "date",
     "rangeWindowSize": 30,
-    "rangeRetryWindowSizes": [15, 5, 1],,
-    "initialCursor": "2000-01-01T00:00:00",
+    "rangeRetryWindowSizes": [15, 5, 1],
+    "initialCursor": "2020-01-01T00:00:00",
     "staticParams": {
+      "showEvents": true,
       "dateType": "invoiceDate"
     },
-    "notes": "MF-issued outbound sales invoice. Payer is identified by payerClientId or payerOrgId. Reads are executed in 30-day windows using startDate and endDate so the first historical load is explicit instead of relying on Acute default invoice listing behavior."
+    "notes": "MF-issued outbound sales invoice. Payer is identified by payerClientId or payerOrgId. Reads are executed in 30-day windows using startDate and endDate so the first historical load is explicit instead of relying on Acute default invoice listing behavior. The invoice handler also extracts and persists invoiceEvent rows from the same source response."
   },
   {
     "key": "invoiceEvent",
     "label": "InvoiceEvent",
     "endpoint": "/invoices",
-    "cron": "*/30 * * * *",
     "mode": "incremental",
-    "enabled": false,
+    "enabled": true,
+    "scheduled": false,
+    "sourceOwnedBy": "invoice",
     "staticParams": {
       "showEvents": true,
       "dateType": "invoiceDate"
@@ -75,14 +78,6 @@
     "recordContextParentFields": ["invoiceNo", "payerClientId", "payerOrgId", "personnelId", "unitId", "legalUnit"],
     "externalIdField": "eventPayerId",
     "sourceUpdatedAtField": "created",
-    "readStrategy": "date_window",
-    "rangeFromParam": "startDate",
-    "rangeToParam": "endDate",
-    "rangeWindowUnit": "day",
-    "rangeDateFormat": "date",
-    "rangeWindowSize": 30,
-    "rangeRetryWindowSizes": [15, 5, 1],
-    "initialCursor": "2000-01-01T00:00:00",
     "notes": "Preferred analytical billed service line entity sourced from Invoice.events[]. The invoice endpoint must be called with showEvents=true. Reads follow the same explicit 30-day invoice windows as the parent invoice sync."
   },
   {

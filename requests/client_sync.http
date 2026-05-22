@@ -1,8 +1,21 @@
-### Trigger real client sync
+### Trigger full client sync (raw + stage)
 POST http://localhost:3000/ingestion/sync/client
 
-### Trigger real organisation sync
+### Trigger client raw sync only
+POST http://localhost:3000/ingestion/raw/client
+
+### Trigger client stage sync only
+POST http://localhost:3000/ingestion/stage/client
+
+### Trigger full organisation sync (raw + stage)
 POST http://localhost:3000/ingestion/sync/organisation
+
+### Trigger organisation raw sync only
+POST http://localhost:3000/ingestion/raw/organisation
+
+### Trigger organisation stage sync only
+POST http://localhost:3000/ingestion/stage/organisation
+
 
 ### List configured ingestion entities
 GET http://localhost:3000/ingestion/entities

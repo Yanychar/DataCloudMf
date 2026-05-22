@@ -1,6 +1,6 @@
 import { createHash } from 'crypto';
 import { Injectable } from '@nestjs/common';
-import { Prisma, SyncMode } from '@prisma/client';
+import { Prisma, RepositoryRecord, SyncMode } from '@prisma/client';
 import { AcuteEntityConfig, ImportedFieldConfig } from '../acute/acute.types';
 import { PrismaService } from '../prisma/prisma.service';
 
@@ -29,6 +29,10 @@ export class RepositoryService {
     });
 
     return Boolean(activeRun);
+  }
+
+  hasStagingConfig(entityConfig: AcuteEntityConfig): boolean {
+    return Boolean(entityConfig.importedFields?.targetTable);
   }
 
   async recoverAbandonedRuns(): Promise<number> {
@@ -94,16 +98,22 @@ export class RepositoryService {
     });
   }
 
-  async createRun(entityKey: string, mode: SyncMode) {
+  async createRun(
+    entityKey: string,
+    mode: SyncMode,
+    flowType: 'raw' | 'stage',
+    syncContext?: Record<string, unknown>,
+  ) {
     return this.prisma.syncRun.create({
       data: {
         entityKey,
+        flowType,
         mode,
         status: 'success',
         startedAt: new Date(),
-        syncContext: {
+        syncContext: (syncContext ?? {
           strategy: 'single',
-        } as Prisma.InputJsonValue,
+        }) as Prisma.InputJsonValue,
       } as Prisma.SyncRunCreateInput,
     });
   }
@@ -138,7 +148,7 @@ export class RepositoryService {
     });
   }
 
-  async upsertRecords(
+  async upsertRawRecords(
     entityConfig: AcuteEntityConfig,
     records: Record<string, unknown>[],
   ): Promise<number> {
@@ -167,26 +177,119 @@ export class RepositoryService {
           payload: sanitizedRecord as Prisma.InputJsonValue,
           sourceUpdatedAt,
           checksum,
+          stagingNeeded: true,
         },
         update: {
           payload: sanitizedRecord as Prisma.InputJsonValue,
           sourceUpdatedAt,
           checksum,
+          stagingNeeded: true,
+          stageError: null,
         },
       });
-
-      await this.upsertStructuredRecord(
-        entityConfig,
-        externalId,
-        sanitizedRecord,
-        sourceUpdatedAt,
-        checksum,
-      );
 
       upsertedCount += 1;
     }
 
     return upsertedCount;
+  }
+
+  async getPendingStageRecords(
+    entityKey: string,
+    take: number,
+    cursorId?: string,
+  ): Promise<
+    Pick<
+      RepositoryRecord,
+      'id' | 'entityType' | 'externalId' | 'payload' | 'sourceUpdatedAt' | 'checksum' | 'updatedAt'
+    >[]
+  > {
+    return this.prisma.repositoryRecord.findMany({
+      where: {
+        entityType: entityKey,
+        stagingNeeded: true,
+      },
+      orderBy: {
+        id: 'asc',
+      },
+      cursor: cursorId ? { id: cursorId } : undefined,
+      skip: cursorId ? 1 : 0,
+      take,
+      select: {
+        id: true,
+        entityType: true,
+        externalId: true,
+        payload: true,
+        sourceUpdatedAt: true,
+        checksum: true,
+        updatedAt: true,
+      },
+    });
+  }
+
+  async countPendingStageRecords(entityKey: string): Promise<number> {
+    return this.prisma.repositoryRecord.count({
+      where: {
+        entityType: entityKey,
+        stagingNeeded: true,
+      },
+    });
+  }
+
+  async stageRepositoryRecord(
+    entityConfig: AcuteEntityConfig,
+    repositoryRecord: Pick<
+      RepositoryRecord,
+      'id' | 'externalId' | 'payload' | 'sourceUpdatedAt' | 'checksum'
+    >,
+  ): Promise<void> {
+    const payload = repositoryRecord.payload;
+
+    if (typeof payload !== 'object' || payload === null || Array.isArray(payload)) {
+      throw new Error(
+        `RepositoryRecord ${repositoryRecord.externalId} payload is not a JSON object and cannot be staged.`,
+      );
+    }
+
+    const importedFields = entityConfig.importedFields;
+    if (!importedFields) {
+      throw new Error(`Entity "${entityConfig.key}" has no imported-fields staging configuration.`);
+    }
+
+    const stagedRecord = this.projectImportedRecord(
+      payload as Record<string, unknown>,
+      importedFields.fields,
+    );
+
+    await this.upsertStructuredRecord(
+      entityConfig,
+      repositoryRecord.externalId,
+      stagedRecord,
+      repositoryRecord.sourceUpdatedAt ?? undefined,
+      repositoryRecord.checksum ?? createHash('sha256').update(JSON.stringify(payload)).digest('hex'),
+    );
+  }
+
+  async markRepositoryRecordStaged(recordId: string, checksum?: string | null) {
+    return this.prisma.repositoryRecord.update({
+      where: { id: recordId },
+      data: {
+        stagingNeeded: false,
+        lastStagedAt: new Date(),
+        lastStagedChecksum: checksum ?? null,
+        stageError: null,
+      },
+    });
+  }
+
+  async markRepositoryRecordStageFailed(recordId: string, errorMessage: string) {
+    return this.prisma.repositoryRecord.update({
+      where: { id: recordId },
+      data: {
+        stagingNeeded: true,
+        stageError: errorMessage,
+      },
+    });
   }
 
   private sanitizeRecord(
@@ -207,18 +310,25 @@ export class RepositoryService {
       return record;
     }
 
-    const sanitized: Record<string, unknown> = {};
+    return this.projectImportedRecord(record, fields);
+  }
+
+  private projectImportedRecord(
+    record: Record<string, unknown>,
+    fields: ImportedFieldConfig[],
+  ): Record<string, unknown> {
+    const projected: Record<string, unknown> = {};
 
     for (const field of fields) {
       const sourcePath = field.sourcePath ?? field.key;
       const value = this.getValueByPath(record, sourcePath);
 
       if (typeof value !== 'undefined') {
-        sanitized[field.key] = value;
+        projected[field.key] = value;
       }
     }
 
-    return sanitized;
+    return projected;
   }
 
   private async upsertStructuredRecord(
@@ -233,47 +343,29 @@ export class RepositoryService {
       return;
     }
 
-    if (importedConfig.targetTable !== 'stg_client') {
+    const delegateName = this.getPrismaDelegateName(importedConfig.targetTable);
+    const delegate = (this.prisma as unknown as Record<string, { upsert: (args: unknown) => Promise<unknown> }>)[
+      delegateName
+    ];
+
+    if (!delegate) {
       return;
     }
 
     const split = this.splitStructuredRecord(importedConfig.fields, sanitizedRecord);
+    const structuredData = this.buildStructuredRecordData(importedConfig.fields, split.columnData);
 
-    await this.prisma.stgClient.upsert({
+    await delegate.upsert({
       where: { externalId },
       create: {
         externalId,
-        clientUri: this.asNullableString(split.columnData.client),
-        birthDate: this.asNullableDate(split.columnData.birthDate),
-        gender: this.asNullableString(split.columnData.gender),
-        homeUnit: this.asNullableString(split.columnData.homeUnit),
-        city: this.asNullableString(split.columnData.city),
-        municipality: this.asNullableString(split.columnData.municipality),
-        municipalityCode: this.asNullableString(split.columnData.municipalityCode),
-        countryId: this.asNullableString(split.columnData.countryId),
-        clientType: this.asNullableString(split.columnData.clientType),
-        endDate: this.asNullableDate(split.columnData.endDate),
-        deathDate: this.asNullableDate(split.columnData.deathDate),
-        latestSaveDate: this.asNullableDate(split.columnData.latestSaveDate),
-        latestSavePersonnelId: this.asNullableNumber(split.columnData.latestSavePersonnelId),
+        ...structuredData,
         extraData: split.jsonData as Prisma.InputJsonValue,
         sourceUpdatedAt,
         checksum,
       },
       update: {
-        clientUri: this.asNullableString(split.columnData.client),
-        birthDate: this.asNullableDate(split.columnData.birthDate),
-        gender: this.asNullableString(split.columnData.gender),
-        homeUnit: this.asNullableString(split.columnData.homeUnit),
-        city: this.asNullableString(split.columnData.city),
-        municipality: this.asNullableString(split.columnData.municipality),
-        municipalityCode: this.asNullableString(split.columnData.municipalityCode),
-        countryId: this.asNullableString(split.columnData.countryId),
-        clientType: this.asNullableString(split.columnData.clientType),
-        endDate: this.asNullableDate(split.columnData.endDate),
-        deathDate: this.asNullableDate(split.columnData.deathDate),
-        latestSaveDate: this.asNullableDate(split.columnData.latestSaveDate),
-        latestSavePersonnelId: this.asNullableNumber(split.columnData.latestSavePersonnelId),
+        ...structuredData,
         extraData: split.jsonData as Prisma.InputJsonValue,
         sourceUpdatedAt,
         checksum,
@@ -305,6 +397,26 @@ export class RepositoryService {
       columnData,
       jsonData,
     };
+  }
+
+  private buildStructuredRecordData(
+    fields: ImportedFieldConfig[],
+    columnData: Record<string, unknown>,
+  ): Record<string, unknown> {
+    const structuredData: Record<string, unknown> = {};
+
+    for (const field of fields) {
+      if (!field.isColumn) {
+        continue;
+      }
+
+      structuredData[field.key] = this.normalizeStructuredValue(
+        columnData[field.key],
+        field.dataType,
+      );
+    }
+
+    return structuredData;
   }
 
   private extractExternalId(
@@ -367,20 +479,37 @@ export class RepositoryService {
     }, record);
   }
 
-  private asNullableString(value: unknown): string | null {
-    return typeof value === 'string' ? value : null;
-  }
-
-  private asNullableNumber(value: unknown): number | null {
-    return typeof value === 'number' ? value : null;
-  }
-
-  private asNullableDate(value: unknown): Date | null {
-    if (typeof value !== 'string' && typeof value !== 'number') {
+  private normalizeStructuredValue(
+    value: unknown,
+    dataType?: ImportedFieldConfig['dataType'],
+  ): unknown {
+    if (typeof value === 'undefined') {
       return null;
     }
 
-    const date = new Date(value);
-    return Number.isNaN(date.getTime()) ? null : date;
+    switch (dataType) {
+      case 'number':
+        return typeof value === 'number' ? value : null;
+      case 'boolean':
+        return typeof value === 'boolean' ? value : null;
+      case 'date': {
+        if (typeof value !== 'string' && typeof value !== 'number') {
+          return null;
+        }
+
+        const date = new Date(value);
+        return Number.isNaN(date.getTime()) ? null : date;
+      }
+      case 'array':
+      case 'object':
+        return value as Prisma.InputJsonValue;
+      case 'string':
+      default:
+        return typeof value === 'string' ? value : null;
+    }
+  }
+
+  private getPrismaDelegateName(targetTable: string): string {
+    return targetTable.replace(/_([a-z])/g, (_, character: string) => character.toUpperCase());
   }
 }

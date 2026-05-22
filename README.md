@@ -89,9 +89,11 @@ For local IDE usage:
 
 Important sync-policy note:
 
-- `Invoice` and `InvoiceEvent` can use incremental sync through `modifiedAfter`
-- The current spec does not expose the same list-level modified-after filter for `Client`, `Organisation`, `Employer`, or `Personnel`, so they are currently configured as `full`
-- `InvoiceEvent` extraction sends `showEvents=true` to the invoice endpoint
+- Raw Acute ingestion is controlled by [config/entities.config.json](/home/sevastia/MedfinDataCloud/config/entities.config.json:1)
+- Staging into `stg_*` tables is controlled by [config/imported-fields.config.json](/home/sevastia/MedfinDataCloud/config/imported-fields.config.json:1)
+- Cron now runs the raw Acute-to-`RepositoryRecord` flow only
+- Staging is a separate run that reads pending/changed `RepositoryRecord` rows and can be rerun without calling Acute again
+- `InvoiceEvent` is sourced from `Invoice.events[]`, so raw invoice sync also creates raw `invoiceEvent` repository rows
 
 ## Run in Docker
 
@@ -124,6 +126,8 @@ Shared run configurations are included in `.run/`, and the IDE setup guide is in
 - `POST /acute-test/entity/:entityKey/fetch`
 - `GET /ingestion/entities`
 - `POST /ingestion/sync/:entityKey`
+- `POST /ingestion/raw/:entityKey`
+- `POST /ingestion/stage/:entityKey`
 
 ## Centralized repository model
 
@@ -134,8 +138,17 @@ Shared run configurations are included in `.run/`, and the IDE setup guide is in
 - raw JSON payload
 - source updated timestamp
 - checksum
+- staging-needed flag
+- last staged timestamp / checksum
+- latest stage error, if staging failed
 
 For entities that define imported fields in [config/imported-fields.config.json](/home/sevastia/MedfinDataCloud/config/imported-fields.config.json:1), the repository stores only the configured subset of source fields. This is the current privacy-control mechanism and is also intended to become reusable AI metadata later.
+
+Staging tables are populated in a separate run from `RepositoryRecord`. This means:
+
+- Acute fetch failures do not directly corrupt staging writes
+- staging can be retried independently
+- changed raw rows can be restaged later without another Acute call
 
 For nested entities like `InvoiceEvent`, the payload may also include `_parentContext` values copied from the parent invoice so the raw repository keeps enough source context for later modeling.
 

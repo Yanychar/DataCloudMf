@@ -14,8 +14,20 @@ export class IngestionController {
   }
 
   @Post('sync/:entityKey')
-  @ApiOperation({ summary: 'Run sync for a single entity immediately' })
+  @ApiOperation({ summary: 'Run full sync for a single entity immediately (raw then stage)' })
   syncEntity(@Param('entityKey') entityKey: string) {
     return this.ingestionOrchestratorService.syncEntity(entityKey);
+  }
+
+  @Post('raw/:entityKey')
+  @ApiOperation({ summary: 'Run raw Acute-to-RepositoryRecord sync for a single entity immediately' })
+  syncRawEntity(@Param('entityKey') entityKey: string) {
+    return this.ingestionOrchestratorService.syncRawEntity(entityKey);
+  }
+
+  @Post('stage/:entityKey')
+  @ApiOperation({ summary: 'Run RepositoryRecord-to-staging sync for a single entity immediately' })
+  stageEntity(@Param('entityKey') entityKey: string) {
+    return this.ingestionOrchestratorService.stageEntity(entityKey);
   }
 }

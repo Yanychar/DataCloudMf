@@ -1,7 +1,8 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { SyncMode } from '@prisma/client';
+import { Prisma, SyncMode } from '@prisma/client';
 import { AcuteClientService } from '../acute/acute-client.service';
 import { AcuteConfigService } from '../acute/acute-config.service';
+import { AcuteEntityConfig } from '../acute/acute.types';
 import { RepositoryService } from '../repository/repository.service';
 
 @Injectable()
@@ -9,6 +10,9 @@ export class IngestionOrchestratorService {
   private readonly logger = new Logger(IngestionOrchestratorService.name);
   private readonly maxWindowAttempts = 3;
   private readonly retryDelayMs = 5_000;
+  private readonly stageMaxAttempts = 3;
+  private readonly stageRetryDelayMs = 1_000;
+  private readonly stageBatchSize = 250;
 
   constructor(
     private readonly acuteConfigService: AcuteConfigService,
@@ -17,13 +21,79 @@ export class IngestionOrchestratorService {
   ) {}
 
   async syncEntity(entityKey: string) {
+    const rawResult = await this.syncRawEntity(entityKey);
+    if (rawResult.skipped) {
+      return {
+        entityKey,
+        flowType: 'full',
+        raw: rawResult,
+        stage: [],
+      };
+    }
+
     const entityConfig = this.acuteConfigService.getEntityConfigOrThrow(entityKey);
+    const stageTargets = [entityKey, ...(entityConfig.derivedEntityKeys ?? [])];
+    const stageResults = [];
+
+    for (const stageEntityKey of stageTargets) {
+      stageResults.push(await this.stageEntity(stageEntityKey));
+    }
+
+    return {
+      entityKey,
+      flowType: 'full',
+      raw: rawResult,
+      stage: stageResults,
+    };
+  }
+
+  async syncRawEntity(entityKey: string) {
+    const entityConfig = this.acuteConfigService.getEntityConfigOrThrow(entityKey);
+    if (entityConfig.sourceOwnedBy) {
+      return {
+        entityKey,
+        flowType: 'raw',
+        mode: entityConfig.mode as SyncMode,
+        skipped: true,
+        reason: `source_owned_by:${entityConfig.sourceOwnedBy}`,
+      };
+    }
+
+    return this.runRawSync(entityConfig);
+  }
+
+  async stageEntity(entityKey: string) {
+    const entityConfig = this.acuteConfigService.getEntityConfigOrThrow(entityKey);
+    return this.runStageSync(entityConfig);
+  }
+
+  getEntityConfigs() {
+    return this.acuteConfigService.getEntityConfigs();
+  }
+
+  async recoverAbandonedRuns(): Promise<number> {
+    return this.repositoryService.recoverAbandonedRuns();
+  }
+
+  private async runRawSync(entityConfig: AcuteEntityConfig) {
+    const entityKey = entityConfig.key;
     const mode = entityConfig.mode as SyncMode;
+    if (!entityConfig.enabled) {
+      return {
+        entityKey,
+        flowType: 'raw',
+        mode,
+        skipped: true,
+        reason: 'disabled',
+      };
+    }
+
     const hasActiveRun = await this.repositoryService.hasActiveRun(entityKey);
 
     if (hasActiveRun) {
       return {
         entityKey,
+        flowType: 'raw',
         mode,
         skipped: true,
         reason: 'already_running',
@@ -31,16 +101,17 @@ export class IngestionOrchestratorService {
     }
 
     const existingState = await this.repositoryService.getEntityState(entityKey);
-
     await this.repositoryService.markRunStarted(entityKey);
-    const run = await this.repositoryService.createRun(entityKey, mode);
+
     const runContext: Record<string, unknown> = {
       entityKey,
+      flowType: 'raw',
       strategy: entityConfig.readStrategy ?? 'single',
       initialCursor: entityConfig.initialCursor ?? null,
       lastSuccessfulCursorBeforeRun: existingState?.lastSuccessfulSyncAt?.toISOString() ?? null,
       quarantinedWindows: [],
     };
+    const run = await this.repositoryService.createRun(entityKey, mode, 'raw', runContext);
 
     try {
       const result =
@@ -67,13 +138,14 @@ export class IngestionOrchestratorService {
         result.fetchedCount,
         result.upsertedCount,
         result.quarantinedWindowCount > 0
-          ? `${result.quarantinedWindowCount} window(s) were quarantined and skipped during this run.`
+          ? `${result.quarantinedWindowCount} window(s) were quarantined and skipped during this raw run.`
           : undefined,
         result.syncContext,
       );
 
       return {
         entityKey,
+        flowType: 'raw',
         mode,
         fetchedCount: result.fetchedCount,
         upsertedCount: result.upsertedCount,
@@ -83,24 +155,151 @@ export class IngestionOrchestratorService {
       };
     } catch (error) {
       const message = (error as Error).message;
-      this.logger.error(`Failed syncing ${entityKey}: ${message}`);
+      this.logger.error(`Failed raw sync for ${entityKey}: ${message}`);
 
-      await this.repositoryService.completeRun(run.id, 'failed', 0, 0, message);
+      await this.repositoryService.completeRun(run.id, 'failed', 0, 0, message, {
+        ...runContext,
+        failure: {
+          message,
+          failedAt: new Date().toISOString(),
+        },
+      });
 
       throw error;
     }
   }
 
-  getEntityConfigs() {
-    return this.acuteConfigService.getEntityConfigs();
-  }
+  private async runStageSync(entityConfig: AcuteEntityConfig) {
+    const entityKey = entityConfig.key;
+    const mode = entityConfig.mode as SyncMode;
+    if (!entityConfig.enabled) {
+      return {
+        entityKey,
+        flowType: 'stage',
+        mode,
+        skipped: true,
+        reason: 'disabled',
+      };
+    }
 
-  async recoverAbandonedRuns(): Promise<number> {
-    return this.repositoryService.recoverAbandonedRuns();
+    const hasActiveRun = await this.repositoryService.hasActiveRun(entityKey);
+
+    if (hasActiveRun) {
+      return {
+        entityKey,
+        flowType: 'stage',
+        mode,
+        skipped: true,
+        reason: 'already_running',
+      };
+    }
+
+    if (!this.repositoryService.hasStagingConfig(entityConfig)) {
+      return {
+        entityKey,
+        flowType: 'stage',
+        mode,
+        skipped: true,
+        reason: 'no_staging_config',
+      };
+    }
+
+    const pendingBeforeRun = await this.repositoryService.countPendingStageRecords(entityKey);
+    const runContext: Record<string, unknown> = {
+      entityKey,
+      flowType: 'stage',
+      pendingBeforeRun,
+      batchSize: this.stageBatchSize,
+      maxAttemptsPerRecord: this.stageMaxAttempts,
+      failures: [],
+    };
+    const run = await this.repositoryService.createRun(entityKey, mode, 'stage', runContext);
+
+    let cursorId: string | undefined;
+    let processedCount = 0;
+    let stagedCount = 0;
+    const failures: Array<{ externalId: string; errorMessage: string }> = [];
+
+    while (true) {
+      const batch = await this.repositoryService.getPendingStageRecords(
+        entityKey,
+        this.stageBatchSize,
+        cursorId,
+      );
+
+      if (!batch.length) {
+        break;
+      }
+
+      cursorId = batch[batch.length - 1].id;
+
+      for (const repositoryRecord of batch) {
+        processedCount += 1;
+        try {
+          await this.stageRecordWithRetry(entityConfig, repositoryRecord);
+          stagedCount += 1;
+        } catch (error) {
+          const errorMessage = (error as Error).message;
+          failures.push({
+            externalId: repositoryRecord.externalId,
+            errorMessage,
+          });
+          await this.repositoryService.markRepositoryRecordStageFailed(
+            repositoryRecord.id,
+            errorMessage,
+          );
+        }
+      }
+
+      await this.repositoryService.updateRunContext(run.id, {
+        ...runContext,
+        cursorId,
+        processedCount,
+        stagedCount,
+        failedCount: failures.length,
+        failures,
+      });
+    }
+
+    const pendingAfterRun = await this.repositoryService.countPendingStageRecords(entityKey);
+    const syncContext = {
+      ...runContext,
+      cursorId,
+      processedCount,
+      stagedCount,
+      failedCount: failures.length,
+      failures,
+      pendingAfterRun,
+    };
+    const status = failures.length > 0 ? 'failed' : 'success';
+    const message =
+      failures.length > 0
+        ? `${failures.length} repository record(s) failed staging for ${entityKey}.`
+        : undefined;
+
+    await this.repositoryService.completeRun(
+      run.id,
+      status,
+      processedCount,
+      stagedCount,
+      message,
+      syncContext,
+    );
+
+    return {
+      entityKey,
+      flowType: 'stage',
+      mode,
+      processedCount,
+      stagedCount,
+      failedCount: failures.length,
+      pendingAfterRun,
+      failures,
+    };
   }
 
   private async syncSingleRequestEntity(
-    entityConfig: ReturnType<AcuteConfigService['getEntityConfigOrThrow']>,
+    entityConfig: AcuteEntityConfig,
     mode: SyncMode,
     lastSuccessfulSyncAt?: Date,
     runId?: string,
@@ -140,12 +339,13 @@ export class IngestionOrchestratorService {
       throw error;
     }
 
-    const upsertedCount = await this.repositoryService.upsertRecords(entityConfig, result.records);
+    const upsertedCount = await this.repositoryService.upsertRawRecords(entityConfig, result.records);
+    const derivedEntityCounts = await this.upsertDerivedEntities(entityConfig, result.records);
     const completedAt = new Date().toISOString();
 
     return {
       fetchedCount: result.records.length,
-      upsertedCount,
+      upsertedCount: upsertedCount + derivedEntityCounts.totalUpsertedCount,
       requestedAt: result.requestedAt,
       lastSuccessfulSyncAt: new Date(),
       quarantinedWindowCount: 0,
@@ -159,12 +359,13 @@ export class IngestionOrchestratorService {
           fetchedCount: result.records.length,
           upsertedCount,
         },
+        derivedEntityCounts: derivedEntityCounts.byEntity,
       },
     };
   }
 
   private async syncDateWindowEntity(
-    entityConfig: ReturnType<AcuteConfigService['getEntityConfigOrThrow']>,
+    entityConfig: AcuteEntityConfig,
     mode: SyncMode,
     runId: string,
     runContext: Record<string, unknown>,
@@ -203,13 +404,13 @@ export class IngestionOrchestratorService {
       const plannedWindowTo = this.addWindow(windowFrom, entityConfig, plannedWindowSize);
       if (plannedWindowTo.getTime() > now.getTime()) {
         this.logger.log(
-          `Stopping ${entityConfig.key} sync before incomplete window ${windowFrom.toISOString()} -> ${plannedWindowTo.toISOString()} because window end is after now (${now.toISOString()})`,
+          `Stopping ${entityConfig.key} raw sync before incomplete window ${windowFrom.toISOString()} -> ${plannedWindowTo.toISOString()} because window end is after now (${now.toISOString()})`,
         );
         break;
       }
 
       this.logger.log(
-        `Syncing ${entityConfig.key} window ${windowFrom.toISOString()} -> ${plannedWindowTo.toISOString()} (initialWindowSize=${plannedWindowSize} ${entityConfig.rangeWindowUnit ?? 'month'})`,
+        `Syncing ${entityConfig.key} raw window ${windowFrom.toISOString()} -> ${plannedWindowTo.toISOString()} (initialWindowSize=${plannedWindowSize} ${entityConfig.rangeWindowUnit ?? 'month'})`,
       );
 
       syncContext = {
@@ -268,7 +469,7 @@ export class IngestionOrchestratorService {
         await this.repositoryService.updateRunContext(runId, syncContext);
 
         this.logger.warn(
-          `Quarantined ${entityConfig.key} window ${windowFrom.toISOString()} -> ${effectiveWindowTo.toISOString()} after ${this.maxWindowAttempts} failed attempts. Continuing with the next window.`,
+          `Quarantined ${entityConfig.key} raw window ${windowFrom.toISOString()} -> ${effectiveWindowTo.toISOString()} after ${this.maxWindowAttempts} failed attempts. Continuing with the next window.`,
         );
 
         windowFrom = effectiveWindowTo;
@@ -277,9 +478,10 @@ export class IngestionOrchestratorService {
 
       const result = windowAttemptResult.result;
 
-      const currentUpsertedCount = await this.repositoryService.upsertRecords(entityConfig, result.records);
+      const currentUpsertedCount = await this.repositoryService.upsertRawRecords(entityConfig, result.records);
+      const derivedEntityCounts = await this.upsertDerivedEntities(entityConfig, result.records);
       fetchedCount += result.records.length;
-      upsertedCount += currentUpsertedCount;
+      upsertedCount += currentUpsertedCount + derivedEntityCounts.totalUpsertedCount;
       lastRequestedAt = result.requestedAt;
       lastCompletedWindowEnd = effectiveWindowTo;
       await this.repositoryService.markSyncProgress(entityConfig.key, mode, effectiveWindowTo);
@@ -296,6 +498,7 @@ export class IngestionOrchestratorService {
           windowSize: effectiveWindowSize,
           fetchedCount: result.records.length,
           upsertedCount: currentUpsertedCount,
+          derivedEntityCounts: derivedEntityCounts.byEntity,
         },
         lastCompletedWindow: {
           from: windowFrom.toISOString(),
@@ -304,6 +507,7 @@ export class IngestionOrchestratorService {
           windowSize: effectiveWindowSize,
           fetchedCount: result.records.length,
           upsertedCount: currentUpsertedCount,
+          derivedEntityCounts: derivedEntityCounts.byEntity,
         },
         cumulativeFetched: fetchedCount,
         cumulativeUpserted: upsertedCount,
@@ -312,14 +516,14 @@ export class IngestionOrchestratorService {
       await this.repositoryService.updateRunContext(runId, syncContext);
 
       this.logger.log(
-        `Completed ${entityConfig.key} window ${windowFrom.toISOString()} -> ${effectiveWindowTo.toISOString()} | windowSize=${effectiveWindowSize} ${entityConfig.rangeWindowUnit ?? 'month'} | fetched=${result.records.length} | upserted=${currentUpsertedCount} | cumulativeFetched=${fetchedCount} | cumulativeUpserted=${upsertedCount}`,
+        `Completed ${entityConfig.key} raw window ${windowFrom.toISOString()} -> ${effectiveWindowTo.toISOString()} | windowSize=${effectiveWindowSize} ${entityConfig.rangeWindowUnit ?? 'month'} | fetched=${result.records.length} | rawUpserted=${currentUpsertedCount} | derivedRawUpserted=${derivedEntityCounts.totalUpsertedCount} | cumulativeFetched=${fetchedCount} | cumulativeUpserted=${upsertedCount}`,
       );
 
       windowFrom = effectiveWindowTo;
     }
 
     this.logger.log(
-      `Finished ${entityConfig.key} date-window sync | totalFetched=${fetchedCount} | totalUpserted=${upsertedCount} | quarantinedWindowCount=${quarantinedWindowCount} | lastCompletedWindowEnd=${lastCompletedWindowEnd?.toISOString() ?? 'none'}`,
+      `Finished ${entityConfig.key} raw date-window sync | totalFetched=${fetchedCount} | totalUpserted=${upsertedCount} | quarantinedWindowCount=${quarantinedWindowCount} | lastCompletedWindowEnd=${lastCompletedWindowEnd?.toISOString() ?? 'none'}`,
     );
 
     return {
@@ -334,7 +538,7 @@ export class IngestionOrchestratorService {
 
   private addWindow(
     windowFrom: Date,
-    entityConfig: ReturnType<AcuteConfigService['getEntityConfigOrThrow']>,
+    entityConfig: AcuteEntityConfig,
     windowSize?: number,
   ): Date {
     const size = windowSize ?? entityConfig.rangeWindowSize ?? 1;
@@ -355,7 +559,7 @@ export class IngestionOrchestratorService {
 
   private formatSyncDate(
     value: Date,
-    entityConfig: ReturnType<AcuteConfigService['getEntityConfigOrThrow']>,
+    entityConfig: AcuteEntityConfig,
   ): string {
     if (entityConfig.rangeDateFormat === 'date') {
       return value.toISOString().slice(0, 10);
@@ -365,7 +569,7 @@ export class IngestionOrchestratorService {
   }
 
   private async fetchWindowWithRetry(
-    entityConfig: ReturnType<AcuteConfigService['getEntityConfigOrThrow']>,
+    entityConfig: AcuteEntityConfig,
     mode: SyncMode,
     lastSuccessfulSyncAt: Date | undefined,
     rangeFromParam: string,
@@ -389,7 +593,7 @@ export class IngestionOrchestratorService {
           : this.addWindow(windowFrom, entityConfig, effectiveWindowSize);
       const attemptStartedAt = new Date().toISOString();
       this.logger.log(
-        `Attempt ${attempt}/${this.maxWindowAttempts} for ${entityConfig.key} window ${windowFrom.toISOString()} -> ${windowTo.toISOString()} (windowSize=${effectiveWindowSize} ${entityConfig.rangeWindowUnit ?? 'month'})`,
+        `Attempt ${attempt}/${this.maxWindowAttempts} for ${entityConfig.key} raw window ${windowFrom.toISOString()} -> ${windowTo.toISOString()} (windowSize=${effectiveWindowSize} ${entityConfig.rangeWindowUnit ?? 'month'})`,
       );
       const attemptContext = {
         ...syncContext,
@@ -419,7 +623,7 @@ export class IngestionOrchestratorService {
 
         if (attempt > 1) {
           this.logger.log(
-            `Recovered ${entityConfig.key} window ${windowFrom.toISOString()} -> ${windowTo.toISOString()} on attempt ${attempt}/${this.maxWindowAttempts}`,
+            `Recovered ${entityConfig.key} raw window ${windowFrom.toISOString()} -> ${windowTo.toISOString()} on attempt ${attempt}/${this.maxWindowAttempts}`,
           );
         }
 
@@ -448,12 +652,13 @@ export class IngestionOrchestratorService {
             windowSize: effectiveWindowSize,
             errorMessage: (error as Error).message,
           },
-          failure: retryable && hasMoreAttempts
-            ? undefined
-            : {
-                message: (error as Error).message,
-                failedAt: new Date().toISOString(),
-              },
+          failure:
+            retryable && hasMoreAttempts
+              ? undefined
+              : {
+                  message: (error as Error).message,
+                  failedAt: new Date().toISOString(),
+                },
         };
         await this.repositoryService.updateRunContext(runId, failedContext);
 
@@ -468,7 +673,7 @@ export class IngestionOrchestratorService {
 
         const retryDetails = this.acuteClientService.getRetryableErrorDetails(error);
         this.logger.warn(
-          `Retryable Acute error detected for ${entityConfig.key} window ${windowFrom.toISOString()} -> ${windowTo.toISOString()} | acuteCode=${String(
+          `Retryable Acute error detected for ${entityConfig.key} raw window ${windowFrom.toISOString()} -> ${windowTo.toISOString()} | acuteCode=${String(
             retryDetails.acuteCode ?? 'unknown',
           )} | acuteStatus=${String(retryDetails.acuteStatus ?? 'unknown')} | nextAttempt=${
             attempt + 1
@@ -488,9 +693,95 @@ export class IngestionOrchestratorService {
     };
   }
 
+  private async stageRecordWithRetry(
+    entityConfig: AcuteEntityConfig,
+    repositoryRecord: {
+      id: string;
+      externalId: string;
+      payload: Prisma.JsonValue;
+      sourceUpdatedAt: Date | null;
+      checksum: string | null;
+    },
+  ) {
+    let lastError: Error | undefined;
+
+    for (let attempt = 1; attempt <= this.stageMaxAttempts; attempt += 1) {
+      try {
+        if (attempt > 1) {
+          this.logger.log(
+            `Retrying staging for ${entityConfig.key}/${repositoryRecord.externalId} on attempt ${attempt}/${this.stageMaxAttempts}`,
+          );
+        }
+
+        await this.repositoryService.stageRepositoryRecord(entityConfig, repositoryRecord);
+        await this.repositoryService.markRepositoryRecordStaged(
+          repositoryRecord.id,
+          repositoryRecord.checksum,
+        );
+        return;
+      } catch (error) {
+        lastError = error as Error;
+
+        if (attempt >= this.stageMaxAttempts) {
+          this.logger.error(
+            `Failed staging ${entityConfig.key}/${repositoryRecord.externalId} after ${this.stageMaxAttempts} attempts: ${(error as Error).message}`,
+          );
+          break;
+        }
+
+        this.logger.warn(
+          `Retryable staging failure for ${entityConfig.key}/${repositoryRecord.externalId} | nextAttempt=${attempt + 1}/${this.stageMaxAttempts} | delayMs=${this.stageRetryDelayMs} | message=${(error as Error).message}`,
+        );
+        await this.sleep(this.stageRetryDelayMs);
+      }
+    }
+
+    throw lastError ?? new Error(`Unknown staging error for ${entityConfig.key}/${repositoryRecord.externalId}`);
+  }
+
   private async sleep(delayMs: number) {
     await new Promise((resolve) => {
       setTimeout(resolve, delayMs);
     });
+  }
+
+  private async upsertDerivedEntities(
+    entityConfig: AcuteEntityConfig,
+    parentRecords: Record<string, unknown>[],
+  ) {
+    const derivedEntityKeys = entityConfig.derivedEntityKeys ?? [];
+
+    if (!derivedEntityKeys.length) {
+      return {
+        totalUpsertedCount: 0,
+        byEntity: {} as Record<string, { fetchedCount: number; upsertedCount: number }>,
+      };
+    }
+
+    let totalUpsertedCount = 0;
+    const byEntity: Record<string, { fetchedCount: number; upsertedCount: number }> = {};
+
+    for (const childEntityKey of derivedEntityKeys) {
+      const childConfig = this.acuteConfigService.getEntityConfigOrThrow(childEntityKey);
+      const childRecords = this.acuteClientService.extractConfiguredChildRecords(
+        parentRecords,
+        childConfig,
+      );
+      const childUpsertedCount = await this.repositoryService.upsertRawRecords(
+        childConfig,
+        childRecords,
+      );
+
+      totalUpsertedCount += childUpsertedCount;
+      byEntity[childEntityKey] = {
+        fetchedCount: childRecords.length,
+        upsertedCount: childUpsertedCount,
+      };
+    }
+
+    return {
+      totalUpsertedCount,
+      byEntity,
+    };
   }
 }

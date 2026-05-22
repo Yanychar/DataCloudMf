@@ -30,17 +30,17 @@ export class IngestionSchedulerService implements OnModuleInit {
     }
 
     for (const entityConfig of this.acuteConfigService.getEntityConfigs()) {
-      if (!entityConfig.enabled) {
+      if (!entityConfig.enabled || entityConfig.scheduled === false || !entityConfig.cron) {
         continue;
       }
 
       const job = new CronJob(entityConfig.cron, async () => {
-        this.logger.log(`Triggered sync for entity ${entityConfig.key}`);
+        this.logger.log(`Triggered raw sync for entity ${entityConfig.key}`);
         try {
-          await this.ingestionOrchestratorService.syncEntity(entityConfig.key);
+          await this.ingestionOrchestratorService.syncRawEntity(entityConfig.key);
         } catch (error) {
           this.logger.error(
-            `Scheduled sync failed for entity ${entityConfig.key}: ${(error as Error).message}`,
+            `Scheduled raw sync failed for entity ${entityConfig.key}: ${(error as Error).message}`,
           );
         }
       });

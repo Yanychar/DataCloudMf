@@ -59,7 +59,7 @@ Content-Type: application/json
   "path": "/invoices",
   "params": {
     "dateType": "invoiceDate",
-    "showEvents": true,
+    "showEvents": false,
     "startDate": "2024-04-01",
     "endDate": "2024-05-01"
   },

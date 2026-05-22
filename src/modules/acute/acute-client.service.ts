@@ -166,6 +166,13 @@ export class AcuteClientService {
     );
   }
 
+  extractConfiguredChildRecords(
+    parentRecords: Record<string, unknown>[],
+    childEntityConfig: AcuteEntityConfig,
+  ): Record<string, unknown>[] {
+    return this.extractRecordPath(parentRecords, childEntityConfig);
+  }
+
   private buildEntityParams(
     entityConfig: AcuteEntityConfig,
     lastSuccessfulSyncAt?: Date,

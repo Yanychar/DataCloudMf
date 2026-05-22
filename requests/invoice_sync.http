@@ -1,0 +1,17 @@
+### Trigger full invoice sync (raw + stage)
+POST http://localhost:3000/ingestion/sync/invoice
+
+### Trigger invoice raw sync only
+POST http://localhost:3000/ingestion/raw/invoice
+
+### Trigger invoice stage sync only
+POST http://localhost:3000/ingestion/stage/invoice
+
+### Trigger invoiceEvent stage sync only
+POST http://localhost:3000/ingestion/stage/invoiceEvent
+
+### Trigger full invoiceEvent sync (expected to be source-owned by invoice)
+POST http://localhost:3000/ingestion/sync/invoiceEvent
+
+### List configured ingestion entities
+GET http://localhost:3000/ingestion/entities
