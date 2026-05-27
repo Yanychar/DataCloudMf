@@ -7,14 +7,11 @@ services:
     env_file:
       - .env.docker
     ports:
-      - "${PORT:-3000}:3000"
+      - "3010:3000"
     depends_on:
       mysql:
         condition: service_healthy
-    volumes:
-      - .:/app
-      - /app/node_modules
-    command: sh -c "npx prisma generate && npx prisma db push && npm run start:dev"
+    command: sh -c "npx prisma db push && npm run start"
 
   mysql:
     image: mysql:8.4
