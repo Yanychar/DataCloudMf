@@ -13,6 +13,8 @@ export class IngestionOrchestratorService {
   private readonly stageMaxAttempts = 3;
   private readonly stageRetryDelayMs = 1_000;
   private readonly stageBatchSize = 250;
+  private readonly stageWaitForRawTimeoutMs = 30 * 60 * 1000;
+  private readonly stageWaitForRawPollMs = 15_000;
 
   constructor(
     private readonly acuteConfigService: AcuteConfigService,
@@ -73,6 +75,32 @@ export class IngestionOrchestratorService {
 
   async recoverAbandonedRuns(): Promise<number> {
     return this.repositoryService.recoverAbandonedRuns();
+  }
+
+  async hasActiveStageRun(entityKey: string): Promise<boolean> {
+    return this.repositoryService.hasActiveRun(entityKey, 'stage');
+  }
+
+  async waitForRawRunToFinish(entityKey: string): Promise<
+    | { ready: true }
+    | { ready: false; reason: 'raw_still_running'; waitedMs: number }
+  > {
+    const startedAt = Date.now();
+
+    while (Date.now() - startedAt < this.stageWaitForRawTimeoutMs) {
+      const rawRun = await this.repositoryService.getActiveRun(entityKey, 'raw');
+      if (!rawRun) {
+        return { ready: true };
+      }
+
+      await this.delay(this.stageWaitForRawPollMs);
+    }
+
+    return {
+      ready: false,
+      reason: 'raw_still_running',
+      waitedMs: Date.now() - startedAt,
+    };
   }
 
   private async runRawSync(entityConfig: AcuteEntityConfig) {
@@ -182,15 +210,25 @@ export class IngestionOrchestratorService {
       };
     }
 
-    const hasActiveRun = await this.repositoryService.hasActiveRun(entityKey);
-
-    if (hasActiveRun) {
+    const hasActiveStageRun = await this.repositoryService.hasActiveRun(entityKey, 'stage');
+    if (hasActiveStageRun) {
       return {
         entityKey,
         flowType: 'stage',
         mode,
         skipped: true,
         reason: 'already_running',
+      };
+    }
+
+    const hasActiveRawRun = await this.repositoryService.hasActiveRun(entityKey, 'raw');
+    if (hasActiveRawRun) {
+      return {
+        entityKey,
+        flowType: 'stage',
+        mode,
+        skipped: true,
+        reason: 'raw_running',
       };
     }
 
@@ -737,6 +775,10 @@ export class IngestionOrchestratorService {
     }
 
     throw lastError ?? new Error(`Unknown staging error for ${entityConfig.key}/${repositoryRecord.externalId}`);
+  }
+
+  private async delay(ms: number): Promise<void> {
+    await new Promise((resolve) => setTimeout(resolve, ms));
   }
 
   private async sleep(delayMs: number) {

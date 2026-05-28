@@ -1,16 +1,26 @@
 import { Controller, Get, Param, Post } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { IngestionOrchestratorService } from './ingestion-orchestrator.service';
+import { IngestionSchedulerService } from './ingestion-scheduler.service';
 
 @ApiTags('ingestion')
 @Controller('ingestion')
 export class IngestionController {
-  constructor(private readonly ingestionOrchestratorService: IngestionOrchestratorService) {}
+  constructor(
+    private readonly ingestionOrchestratorService: IngestionOrchestratorService,
+    private readonly ingestionSchedulerService: IngestionSchedulerService,
+  ) {}
 
   @Get('entities')
   @ApiOperation({ summary: 'List configured Acute entities for synchronization' })
   getEntityConfigs() {
     return this.ingestionOrchestratorService.getEntityConfigs();
+  }
+
+  @Get('scheduler')
+  @ApiOperation({ summary: 'Show raw and stage scheduler status' })
+  getSchedulerStatus() {
+    return this.ingestionSchedulerService.getSchedulerStatus();
   }
 
   @Post('sync/:entityKey')

@@ -14,11 +14,12 @@ export class RepositoryService {
     });
   }
 
-  async hasActiveRun(entityKey: string): Promise<boolean> {
+  async hasActiveRun(entityKey: string, flowType?: 'raw' | 'stage'): Promise<boolean> {
     const activeRun = await this.prisma.syncRun.findFirst({
       where: {
         entityKey,
         finishedAt: null,
+        ...(flowType ? { flowType } : {}),
       },
       select: {
         id: true,
@@ -29,6 +30,27 @@ export class RepositoryService {
     });
 
     return Boolean(activeRun);
+  }
+
+  async getActiveRun(
+    entityKey: string,
+    flowType?: 'raw' | 'stage',
+  ): Promise<Pick<Prisma.SyncRunGetPayload<{ select: { id: true; flowType: true; startedAt: true } }>, 'id' | 'flowType' | 'startedAt'> | null> {
+    return this.prisma.syncRun.findFirst({
+      where: {
+        entityKey,
+        finishedAt: null,
+        ...(flowType ? { flowType } : {}),
+      },
+      select: {
+        id: true,
+        flowType: true,
+        startedAt: true,
+      },
+      orderBy: {
+        startedAt: 'desc',
+      },
+    });
   }
 
   hasStagingConfig(entityConfig: AcuteEntityConfig): boolean {

@@ -1,0 +1,5 @@
+### Show scheduler status on local app
+GET http://localhost:3000/ingestion/scheduler
+
+### Show scheduler status on Docker collector
+GET http://localhost:3010/ingestion/scheduler

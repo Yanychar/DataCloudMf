@@ -45,8 +45,16 @@ export class AcuteConfigService {
     return this.configService.get<string>('DATA_SYNC_ENABLED', 'true') === 'true';
   }
 
+  getDataStageEnabled(): boolean {
+    return this.configService.get<string>('DATA_STAGE_ENABLED', 'true') === 'true';
+  }
+
   getDefaultCron(): string {
     return this.configService.get<string>('DATA_SYNC_DEFAULT_CRON', '*/30 * * * *');
+  }
+
+  getStageDailyCron(): string {
+    return this.configService.get<string>('DATA_STAGE_DAILY_CRON', '30 2 * * *');
   }
 
   getDefaultMode(): 'full' | 'incremental' {

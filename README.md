@@ -66,6 +66,8 @@ Copy `.env.example` to `.env` and update:
 - `OPENAI_BASE_URL`
 - `OPENAI_REPORT_MODEL`
 - `OPENAI_TIMEOUT_MS`
+- `DATA_STAGE_ENABLED`
+- `DATA_STAGE_DAILY_CRON`
 
 Acute environment selection is automatic:
 
@@ -102,6 +104,8 @@ Important sync-policy note:
 - Staging into `stg_*` tables is controlled by [config/imported-fields.config.json](/home/sevastia/MedfinDataCloud/config/imported-fields.config.json:1)
 - Cron now runs the raw Acute-to-`RepositoryRecord` flow only
 - Staging is a separate run that reads pending/changed `RepositoryRecord` rows and can be rerun without calling Acute again
+- A separate global daily stage cron can be enabled with `DATA_STAGE_ENABLED=true`
+- The default stage schedule is controlled by `DATA_STAGE_DAILY_CRON`
 - `InvoiceEvent` is sourced from `Invoice.events[]`, so raw invoice sync also creates raw `invoiceEvent` repository rows
 
 ## Run in Docker
