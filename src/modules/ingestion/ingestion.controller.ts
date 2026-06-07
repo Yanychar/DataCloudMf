@@ -23,6 +23,15 @@ export class IngestionController {
     return this.ingestionSchedulerService.getSchedulerStatus();
   }
 
+  @Get('enum-lookup/:entityKey/:fieldKey')
+  @ApiOperation({ summary: 'List enum lookup values for one staged field' })
+  getEnumLookupValues(
+    @Param('entityKey') entityKey: string,
+    @Param('fieldKey') fieldKey: string,
+  ) {
+    return this.ingestionOrchestratorService.getEnumLookupValues(entityKey, fieldKey);
+  }
+
   @Post('sync/:entityKey')
   @ApiOperation({ summary: 'Run full sync for a single entity immediately (raw then stage)' })
   syncEntity(@Param('entityKey') entityKey: string) {

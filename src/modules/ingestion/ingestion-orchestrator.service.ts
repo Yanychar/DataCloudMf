@@ -73,6 +73,10 @@ export class IngestionOrchestratorService {
     return this.acuteConfigService.getEntityConfigs();
   }
 
+  async getEnumLookupValues(entityKey: string, fieldKey: string) {
+    return this.repositoryService.getEnumLookupValues(entityKey, fieldKey);
+  }
+
   async recoverAbandonedRuns(): Promise<number> {
     return this.repositoryService.recoverAbandonedRuns();
   }
@@ -243,10 +247,12 @@ export class IngestionOrchestratorService {
     }
 
     const pendingBeforeRun = await this.repositoryService.countPendingStageRecords(entityKey);
+    const seededLookupValueCount = await this.repositoryService.syncKnownEnumLookupValues(entityConfig);
     const runContext: Record<string, unknown> = {
       entityKey,
       flowType: 'stage',
       pendingBeforeRun,
+      seededLookupValueCount,
       batchSize: this.stageBatchSize,
       maxAttemptsPerRecord: this.stageMaxAttempts,
       failures: [],

@@ -23,12 +23,42 @@
         "dataType": "string",
         "isColumn": true,
         "filterable": true,
-        "includeInAiContext": true
+        "includeInAiContext": true,
+        "possibleValues": [
+          {
+            "codeText": "Unknown",
+            "codeLabel": "Unknown",
+            "sortOrder": 1
+          },
+          {
+            "codeText": "Male",
+            "codeLabel": "Male",
+            "sortOrder": 2
+          },
+          {
+            "codeText": "Female",
+            "codeLabel": "Female",
+            "sortOrder": 3
+          },
+          {
+            "codeText": "Undefined",
+            "codeLabel": "Undefined",
+            "sortOrder": 4
+          }
+        ]
       },
       {
         "key": "homeUnit",
         "description": "Primary Medfin unit linked to client",
         "dataType": "string",
+        "isColumn": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "postcode",
+        "description": "Home postal code",
+        "dataType": "string",
+        "isColumn": true,
         "includeInAiContext": true
       },
       {
@@ -47,8 +77,22 @@
         "includeInAiContext": true
       },
       {
+        "key": "municipalityCode",
+        "description": "Home municipality code",
+        "dataType": "string",
+        "isColumn": true,
+        "includeInAiContext": true
+      },
+      {
         "key": "countryId",
         "description": "Client's home address country code according to ISO 3166-1 alpha-2",
+        "dataType": "string",
+        "isColumn": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "employers",
+        "description": "URI-reference to list of client employers",
         "dataType": "string",
         "isColumn": true,
         "includeInAiContext": true
@@ -61,6 +105,13 @@
         "includeInAiContext": true
       },
       {
+        "key": "creditCheckNotOkNotes",
+        "description": "Notes if credit details are not OK",
+        "dataType": "string",
+        "isColumn": true,
+        "includeInAiContext": true
+      },
+      {
         "key": "lang",
         "description": "Client's primary language ISO 639-1 code.",
         "dataType": "string",
@@ -68,21 +119,38 @@
         "includeInAiContext": true
       },
       {
+        "key": "authenticationTypeId",
+        "description": "Authentication type to external systems",
+        "dataType": "number",
+        "isColumn": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "authenticationTypeDescription",
+        "description": "Description of authentication type",
+        "dataType": "string",
+        "isColumn": true,
+        "includeInAiContext": true
+      },
+      {
         "key": "decisions",
         "description": "Possible communication channels preferences by client.",
-        "dataType": "array",
+        "dataType": "object",
+        "isColumn": true,
         "includeInAiContext": true
       },
       {
         "key": "defaultNurse",
         "description": "Default nurse resource",
         "dataType": "string",
+        "isColumn": true,
         "includeInAiContext": true
       },
       {
         "key": "defaultDoctor",
         "description": "Default doctor resource",
         "dataType": "string",
+        "isColumn": true,
         "includeInAiContext": true
       },
       {
@@ -90,23 +158,132 @@
         "description": "Kela eligibility status Possible values: 0=not checked, 1=is eligible, 2=not eligible",
         "dataType": "number",
         "isColumn": true,
-        "includeInAiContext": true
+        "includeInAiContext": true,
+        "possibleValues": [
+          {
+            "codeInt": 0,
+            "codeLabel": "not checked",
+            "sortOrder": 1
+          },
+          {
+            "codeInt": 1,
+            "codeLabel": "is eligible",
+            "sortOrder": 2
+          },
+          {
+            "codeInt": 2,
+            "codeLabel": "not eligible",
+            "sortOrder": 3
+          }
+        ]
       },
       {
         "key": "kelaCardCheckDate",
         "description": "When KELA compensation status was last checked",
         "dataType": "date",
+        "isColumn": true,
         "includeInAiContext": true
       },
       {
         "key": "invoiceDeliveryMethod",
-        "description": "Client invoicing delivery method",
+        "description": "Client invoicing delivery method Possible values: \"ElectronicInvoice\", \"BankTransferOnPaper\", \"Portal\", \"InvoiceThroughEmail\"",
         "dataType": "string",
+        "isColumn": true,
+        "possibleValues": [
+          {
+            "codeText": "ElectronicInvoice",
+            "codeLabel": "ElectronicInvoice",
+            "sortOrder": 1
+          },
+          {
+            "codeText": "BankTransferOnPaper",
+            "codeLabel": "BankTransferOnPaper",
+            "sortOrder": 2
+          },
+          {
+            "codeText": "Portal",
+            "codeLabel": "Portal",
+            "sortOrder": 3
+          },
+          {
+            "codeText": "InvoiceThroughEmail",
+            "codeLabel": "InvoiceThroughEmail",
+            "sortOrder": 4
+          }
+        ],
+        "includeInAiContext": true
+      },
+      {
+        "key": "updateInfoText",
+        "description": "Information on who last updated the client information",
+        "dataType": "string",
+        "isColumn": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "reservationInfo",
+        "description": "Additional information for reservations",
+        "dataType": "string",
+        "isColumn": true,
         "includeInAiContext": true
       },
       {
         "key": "maritalStatusType",
         "description": "Client's marital status code/value Possible values: \"Single, \"Married\", \"Divorced\", \"Cohabiting\", \"WidowOrWidower\", \"RegisteredPartnership\", \"Separated\", \"Other\", \"NotKnown\"",
+        "dataType": "string",
+        "isColumn": true,
+        "includeInAiContext": true,
+        "possibleValues": [
+          {
+            "codeText": "Single",
+            "codeLabel": "Single",
+            "sortOrder": 1
+          },
+          {
+            "codeText": "Married",
+            "codeLabel": "Married",
+            "sortOrder": 2
+          },
+          {
+            "codeText": "Divorced",
+            "codeLabel": "Divorced",
+            "sortOrder": 3
+          },
+          {
+            "codeText": "Cohabiting",
+            "codeLabel": "Cohabiting",
+            "sortOrder": 4
+          },
+          {
+            "codeText": "WidowOrWidower",
+            "codeLabel": "WidowOrWidower",
+            "sortOrder": 5
+          },
+          {
+            "codeText": "RegisteredPartnership",
+            "codeLabel": "RegisteredPartnership",
+            "sortOrder": 6
+          },
+          {
+            "codeText": "Separated",
+            "codeLabel": "Separated",
+            "sortOrder": 7
+          },
+          {
+            "codeText": "Other",
+            "codeLabel": "Other",
+            "sortOrder": 8
+          },
+          {
+            "codeText": "NotKnown",
+            "codeLabel": "NotKnown",
+            "sortOrder": 9
+          }
+        ]
+      },
+      {
+        "key": "maritalStatusText",
+        "description": "Marital status description",
         "dataType": "string",
         "isColumn": true,
         "includeInAiContext": true
@@ -119,15 +296,24 @@
         "includeInAiContext": true
       },
       {
+        "key": "deathRegisteredDate",
+        "description": "Death registered date",
+        "dataType": "date",
+        "isColumn": true,
+        "includeInAiContext": true
+      },
+      {
         "key": "workAddress",
         "description": "Workplace address",
         "dataType": "string",
+        "isColumn": true,
         "includeInAiContext": true
       },
       {
         "key": "workPostCode",
         "description": "Workplace postal code",
         "dataType": "string",
+        "isColumn": true,
         "includeInAiContext": true
       },
       {
@@ -143,7 +329,19 @@
         "dataType": "string",
         "isColumn": true,
         "filterable": true,
-        "includeInAiContext": true
+        "includeInAiContext": true,
+        "possibleValues": [
+          {
+            "codeText": "PersonalCustomer",
+            "codeLabel": "PersonalCustomer",
+            "sortOrder": 1
+          },
+          {
+            "codeText": "ContactPerson",
+            "codeLabel": "ContactPerson",
+            "sortOrder": 2
+          }
+        ]
       },
       {
         "key": "endDate",
@@ -163,30 +361,52 @@
         "key": "latestSavePersonnelId",
         "description": "Personnel ID of the latest updater",
         "dataType": "number",
+        "isColumn": true,
         "includeInAiContext": true
       },
       {
         "key": "latestSaveRestUserId",
         "description": "REST user ID of the latest updater",
         "dataType": "number",
+        "isColumn": true,
         "includeInAiContext": true
       },
       {
         "key": "defaultEventPayerType",
-        "description": "Default payer type for client events",
+        "description": "Default payer type for client events Possible values: \"Client\", \"Organisation\", \"PaymentCommitment\"",
         "dataType": "string",
+        "isColumn": true,
+        "possibleValues": [
+          {
+            "codeText": "Client",
+            "codeLabel": "Client",
+            "sortOrder": 1
+          },
+          {
+            "codeText": "Organisation",
+            "codeLabel": "Organisation",
+            "sortOrder": 2
+          },
+          {
+            "codeText": "PaymentCommitment",
+            "codeLabel": "PaymentCommitment",
+            "sortOrder": 3
+          }
+        ],
         "includeInAiContext": true
       },
       {
         "key": "defaultEventPayerOrgId",
         "description": "Default payer organisation ID",
         "dataType": "number",
+        "isColumn": true,
         "includeInAiContext": true
       },
       {
         "key": "defaultEventPayerPaymentCommitmentId",
         "description": "Default payment commitment ID",
         "dataType": "number",
+        "isColumn": true,
         "includeInAiContext": true
       },
       {
@@ -199,13 +419,15 @@
       {
         "key": "insurance",
         "description": "Insurance details",
-        "dataType": "array",
+        "dataType": "object",
+        "isColumn": true,
         "includeInAiContext": true
       },
       {
         "key": "employerList",
         "description": "Expanded list of employer relationships",
         "dataType": "array",
+        "isColumn": true,
         "includeInAiContext": true
       }
     ]
@@ -218,298 +440,1228 @@
         "key": "orgId",
         "description": "Organisation id",
         "dataType": "number",
-        "isColumn": true,
-        "filterable": true,
-        "includeInAiContext": true
+        "includeInAiContext": true,
+        "isColumn": true
       },
       {
         "key": "orgType",
-        "description": "Organisation type Possible values: 1=\"Organisation client\", 2=\"Other organisation\", 3=\"Service provider\", 4=\"Physician's own ltd company\"",
+        "description": "Organisation type Possible values: 1=\"Organisation client\" 2=\"Other organisation\" 3=\"Service provider\" 4=\"Physician's own ltd company\"",
         "dataType": "number",
+        "includeInAiContext": true,
         "isColumn": true,
-        "filterable": true,
-        "includeInAiContext": true
+        "possibleValues": [
+          {
+            "codeInt": 1,
+            "codeLabel": "Organisation client",
+            "sortOrder": 1
+          },
+          {
+            "codeInt": 2,
+            "codeLabel": "Other organisation",
+            "sortOrder": 2
+          },
+          {
+            "codeInt": 3,
+            "codeLabel": "Service provider",
+            "sortOrder": 3
+          },
+          {
+            "codeInt": 4,
+            "codeLabel": "Physician's own ltd company",
+            "sortOrder": 4
+          }
+        ]
       },
       {
         "key": "agreementId",
         "description": "Agreement id",
         "dataType": "number",
-        "filterable": true,
-        "includeInAiContext": true
+        "includeInAiContext": true,
+        "isColumn": true
       },
       {
         "key": "parentOrgId",
         "description": "Parent level organisation's id",
         "dataType": "number",
-        "filterable": true,
-        "includeInAiContext": true
+        "includeInAiContext": true,
+        "isColumn": true
       },
       {
         "key": "rootOrgId",
         "description": "Root level organisation's id (current orgId if no parentOrgId)",
         "dataType": "number",
-        "filterable": true,
-        "includeInAiContext": true
+        "includeInAiContext": true,
+        "isColumn": true
       },
       {
         "key": "servStartDate",
         "description": "Start date of service",
         "dataType": "date",
-        "isColumn": true,
-        "includeInAiContext": true
+        "includeInAiContext": true,
+        "isColumn": true
       },
       {
         "key": "servEndDate",
         "description": "End date of service",
         "dataType": "date",
-        "isColumn": true,
-        "includeInAiContext": true
+        "includeInAiContext": true,
+        "isColumn": true
       },
       {
         "key": "orgName",
         "description": "Organisation name",
         "dataType": "string",
-        "isColumn": true,
-        "filterable": true,
-        "includeInAiContext": true
+        "includeInAiContext": true,
+        "isColumn": true
       },
       {
         "key": "orgName2",
         "description": "Additional name",
         "dataType": "string",
-        "includeInAiContext": true
+        "includeInAiContext": true,
+        "isColumn": true
       },
       {
         "key": "orgShortName",
         "description": "Short name or common identifier",
         "dataType": "string",
-        "filterable": true,
-        "includeInAiContext": true
+        "includeInAiContext": true,
+        "isColumn": true
       },
       {
         "key": "orgClientStatus",
-        "description": "Organisation status Possible values: 1=\"Archived\",2=\"Under negotiation\", 3=\"Record only - no invoicing\", 4=\"In production - record and invoicing\", 5=\"Parent organisation - no record\"",
+        "description": "Organisation status Possible values: 1=\"Archived\" 2=\"Under negotiation\" 3=\"Record only - no invoicing\" 4=\"In production - record and invoicing\" 5=\"Parent organisation - no record\"",
         "dataType": "number",
+        "includeInAiContext": true,
         "isColumn": true,
-        "filterable": true,
-        "includeInAiContext": true
+        "possibleValues": [
+          {
+            "codeInt": 1,
+            "codeLabel": "Archived",
+            "sortOrder": 1
+          },
+          {
+            "codeInt": 2,
+            "codeLabel": "Under negotiation",
+            "sortOrder": 2
+          },
+          {
+            "codeInt": 3,
+            "codeLabel": "Record only - no invoicing",
+            "sortOrder": 3
+          },
+          {
+            "codeInt": 4,
+            "codeLabel": "In production - record and invoicing",
+            "sortOrder": 4
+          },
+          {
+            "codeInt": 5,
+            "codeLabel": "Parent organisation - no record",
+            "sortOrder": 5
+          }
+        ]
+      },
+      {
+        "key": "extPayerId",
+        "description": "External payer client id",
+        "dataType": "number",
+        "includeInAiContext": true,
+        "isColumn": true
       },
       {
         "key": "respDoctorId",
         "description": "Responsible doctor personnel id",
         "dataType": "number",
-        "filterable": true,
-        "includeInAiContext": true
+        "includeInAiContext": true,
+        "isColumn": true
       },
       {
         "key": "respNurseId",
         "description": "Responsible nurse personnel Id",
         "dataType": "number",
-        "filterable": true,
-        "includeInAiContext": true
+        "includeInAiContext": true,
+        "isColumn": true
+      },
+      {
+        "key": "top10Flag",
+        "description": "Is top 10 organisation",
+        "dataType": "boolean",
+        "includeInAiContext": true,
+        "isColumn": true
+      },
+      {
+        "key": "top20Flag",
+        "description": "Is top 20 organisation",
+        "dataType": "boolean",
+        "includeInAiContext": true,
+        "isColumn": true
       },
       {
         "key": "managerId",
         "description": "Manager client id",
         "dataType": "number",
-        "filterable": true,
-        "includeInAiContext": true
+        "includeInAiContext": true,
+        "isColumn": true
+      },
+      {
+        "key": "streetAddress1",
+        "description": "Street address line 1",
+        "dataType": "string",
+        "includeInAiContext": true,
+        "isColumn": true
+      },
+      {
+        "key": "streetAddress2",
+        "description": "Street address line 2",
+        "dataType": "string",
+        "includeInAiContext": true,
+        "isColumn": true
+      },
+      {
+        "key": "streetPostNo",
+        "description": "Street address post number",
+        "dataType": "string",
+        "includeInAiContext": true,
+        "isColumn": true
       },
       {
         "key": "streetCity",
         "description": "Street address city",
         "dataType": "string",
-        "isColumn": true,
-        "filterable": true,
-        "includeInAiContext": true
+        "includeInAiContext": true,
+        "isColumn": true
       },
       {
         "key": "streetCounty",
         "description": "Street address county",
         "dataType": "string",
-        "isColumn": true,
-        "filterable": true,
-        "includeInAiContext": true
+        "includeInAiContext": true,
+        "isColumn": true
       },
       {
         "key": "streetCountry",
         "description": "Street address country",
         "dataType": "string",
-        "isColumn": true,
-        "filterable": true,
-        "includeInAiContext": true
+        "includeInAiContext": true,
+        "isColumn": true
       },
       {
         "key": "streetCountryCode",
         "description": "Street address country ISO 3166-1 alpha-2 code Should be set if `streetCountry` is not Finland",
         "dataType": "string",
-        "isColumn": true,
-        "filterable": true,
-        "includeInAiContext": true
+        "includeInAiContext": true,
+        "isColumn": true
+      },
+      {
+        "key": "streetRegion",
+        "description": "Street address region",
+        "dataType": "string",
+        "includeInAiContext": true,
+        "isColumn": true
+      },
+      {
+        "key": "streetZip",
+        "description": "Street address zip code",
+        "dataType": "string",
+        "includeInAiContext": true,
+        "isColumn": true
+      },
+      {
+        "key": "streetState",
+        "description": "Street address state",
+        "dataType": "string",
+        "includeInAiContext": true,
+        "isColumn": true
+      },
+      {
+        "key": "postAddress1",
+        "description": "Post address line 1",
+        "dataType": "string",
+        "includeInAiContext": true,
+        "isColumn": true
+      },
+      {
+        "key": "postAddress2",
+        "description": "Post address line 2",
+        "dataType": "string",
+        "includeInAiContext": true,
+        "isColumn": true
+      },
+      {
+        "key": "postPostNo",
+        "description": "Post address post number",
+        "dataType": "string",
+        "includeInAiContext": true,
+        "isColumn": true
+      },
+      {
+        "key": "postCity",
+        "description": "Post address city",
+        "dataType": "string",
+        "includeInAiContext": true,
+        "isColumn": true
+      },
+      {
+        "key": "postCounty",
+        "description": "Post address county",
+        "dataType": "string",
+        "includeInAiContext": true,
+        "isColumn": true
+      },
+      {
+        "key": "postCountry",
+        "description": "Post address country",
+        "dataType": "string",
+        "includeInAiContext": true,
+        "isColumn": true
+      },
+      {
+        "key": "postCountryCode",
+        "description": "Post address country ISO 3166-1 alpha-2 code Should be set if `postCountry` is not Finland",
+        "dataType": "string",
+        "includeInAiContext": true,
+        "isColumn": true
+      },
+      {
+        "key": "postRegion",
+        "description": "Post address region",
+        "dataType": "string",
+        "includeInAiContext": true,
+        "isColumn": true
+      },
+      {
+        "key": "postZip",
+        "description": "Post address zip code",
+        "dataType": "string",
+        "includeInAiContext": true,
+        "isColumn": true
+      },
+      {
+        "key": "postState",
+        "description": "Post address state",
+        "dataType": "string",
+        "includeInAiContext": true,
+        "isColumn": true
       },
       {
         "key": "invPayerId",
         "description": "Invoice payer client id",
         "dataType": "number",
-        "filterable": true,
-        "includeInAiContext": true
+        "includeInAiContext": true,
+        "isColumn": true
+      },
+      {
+        "key": "invAddress1",
+        "description": "Invoicing address line 1",
+        "dataType": "string",
+        "includeInAiContext": true,
+        "isColumn": true
+      },
+      {
+        "key": "invAddress2",
+        "description": "Invoicing address line 2",
+        "dataType": "string",
+        "includeInAiContext": true,
+        "isColumn": true
+      },
+      {
+        "key": "invPostNo",
+        "description": "Invoicing address post number",
+        "dataType": "string",
+        "includeInAiContext": true,
+        "isColumn": true
+      },
+      {
+        "key": "invCity",
+        "description": "Invoicing address city",
+        "dataType": "string",
+        "includeInAiContext": true,
+        "isColumn": true
+      },
+      {
+        "key": "invCounty",
+        "description": "Invoicing address county",
+        "dataType": "string",
+        "includeInAiContext": true,
+        "isColumn": true
+      },
+      {
+        "key": "invCountry",
+        "description": "Invoicing address country",
+        "dataType": "string",
+        "includeInAiContext": true,
+        "isColumn": true
+      },
+      {
+        "key": "invCountryCode",
+        "description": "Invoicing address country ISO 3166-1 alpha-2 code Should be set if `invCountry` is not Finland",
+        "dataType": "string",
+        "includeInAiContext": true,
+        "isColumn": true
+      },
+      {
+        "key": "invRegion",
+        "description": "Invoicing address region",
+        "dataType": "string",
+        "includeInAiContext": true,
+        "isColumn": true
+      },
+      {
+        "key": "invZip",
+        "description": "Invoicing address zip code",
+        "dataType": "string",
+        "includeInAiContext": true,
+        "isColumn": true
+      },
+      {
+        "key": "invState",
+        "description": "Invoicing address state",
+        "dataType": "string",
+        "includeInAiContext": true,
+        "isColumn": true
+      },
+      {
+        "key": "apxAddress1",
+        "description": "Invoice appendix address line 1",
+        "dataType": "string",
+        "includeInAiContext": true,
+        "isColumn": true
+      },
+      {
+        "key": "apxAddress2",
+        "description": "Invoice appendix address line 2",
+        "dataType": "string",
+        "includeInAiContext": true,
+        "isColumn": true
+      },
+      {
+        "key": "apxPostNo",
+        "description": "Invoice appendix address post number",
+        "dataType": "string",
+        "includeInAiContext": true,
+        "isColumn": true
+      },
+      {
+        "key": "apxCity",
+        "description": "Invoice appendix address city",
+        "dataType": "string",
+        "includeInAiContext": true,
+        "isColumn": true
+      },
+      {
+        "key": "apxCounty",
+        "description": "Invoice appendix address county",
+        "dataType": "string",
+        "includeInAiContext": true,
+        "isColumn": true
+      },
+      {
+        "key": "apxCountry",
+        "description": "Invoice appendix address country",
+        "dataType": "string",
+        "includeInAiContext": true,
+        "isColumn": true
+      },
+      {
+        "key": "apxCountryCode",
+        "description": "Invoice appendix address country ISO 3166-1 alpha-2 code Should be set if `apxCountry` is not Finland",
+        "dataType": "string",
+        "includeInAiContext": true,
+        "isColumn": true
+      },
+      {
+        "key": "apxRegion",
+        "description": "Invoice appendix address region",
+        "dataType": "string",
+        "includeInAiContext": true,
+        "isColumn": true
+      },
+      {
+        "key": "apxZip",
+        "description": "Invoice appendix address zip code",
+        "dataType": "string",
+        "includeInAiContext": true,
+        "isColumn": true
+      },
+      {
+        "key": "apxState",
+        "description": "Invoice appendix address state",
+        "dataType": "string",
+        "includeInAiContext": true,
+        "isColumn": true
+      },
+      {
+        "key": "apxMessageEmail",
+        "description": "Invoice appendix email address",
+        "dataType": "string",
+        "includeInAiContext": true,
+        "isColumn": true
+      },
+      {
+        "key": "telTel1",
+        "description": "Primary telephone number",
+        "dataType": "string",
+        "includeInAiContext": true,
+        "isColumn": true
+      },
+      {
+        "key": "telTel2",
+        "description": "Secondary telephone number",
+        "dataType": "string",
+        "includeInAiContext": true,
+        "isColumn": true
+      },
+      {
+        "key": "telFax",
+        "description": "Fax number",
+        "dataType": "string",
+        "includeInAiContext": true,
+        "isColumn": true
+      },
+      {
+        "key": "telGsm",
+        "description": "Mobile telephone number",
+        "dataType": "string",
+        "includeInAiContext": true,
+        "isColumn": true
+      },
+      {
+        "key": "eExtranetUsername",
+        "description": "Extranet username",
+        "dataType": "string",
+        "includeInAiContext": true,
+        "isColumn": true
+      },
+      {
+        "key": "eExtranetPassword",
+        "description": "Extranet password",
+        "dataType": "string",
+        "includeInAiContext": true,
+        "isColumn": true
+      },
+      {
+        "key": "eEmail",
+        "description": "Email address",
+        "dataType": "string",
+        "includeInAiContext": true,
+        "isColumn": true
+      },
+      {
+        "key": "eWww",
+        "description": "Website",
+        "dataType": "string",
+        "includeInAiContext": true,
+        "isColumn": true
       },
       {
         "key": "busCategoryCode",
         "description": "Business category code (5 digit TOL 2008 code)",
         "dataType": "string",
-        "filterable": true,
-        "includeInAiContext": true
+        "includeInAiContext": true,
+        "isColumn": true
+      },
+      {
+        "key": "busVat",
+        "description": "Business VAT number",
+        "dataType": "string",
+        "includeInAiContext": true,
+        "isColumn": true
+      },
+      {
+        "key": "busLyNumber",
+        "description": "Business LY number (Business ID, Y-tunnus)",
+        "dataType": "string",
+        "includeInAiContext": true,
+        "isColumn": true
+      },
+      {
+        "key": "busRegno",
+        "description": "Business trade register number",
+        "dataType": "string",
+        "includeInAiContext": true,
+        "isColumn": true
+      },
+      {
+        "key": "busCreditLimit",
+        "description": "Credit limit",
+        "dataType": "number",
+        "includeInAiContext": true,
+        "isColumn": true
+      },
+      {
+        "key": "busOverdueInterest",
+        "description": "Overdue interest amount",
+        "dataType": "number",
+        "includeInAiContext": true,
+        "isColumn": true
+      },
+      {
+        "key": "busPaymentStatus",
+        "description": "Payment status id",
+        "dataType": "number",
+        "includeInAiContext": true,
+        "isColumn": true
+      },
+      {
+        "key": "busFiscalStart",
+        "description": "Fiscal period start",
+        "dataType": "date",
+        "includeInAiContext": true,
+        "isColumn": true
+      },
+      {
+        "key": "busFiscalEnd",
+        "description": "Fiscal period end",
+        "dataType": "date",
+        "includeInAiContext": true,
+        "isColumn": true
+      },
+      {
+        "key": "busFiscalLength",
+        "description": "Fiscal period length Possible values: 0=\"Less than 12 months\" 1=\"12 months\" 2=\"More than 12 months\"",
+        "dataType": "number",
+        "includeInAiContext": true,
+        "isColumn": true,
+        "possibleValues": [
+          {
+            "codeInt": 0,
+            "codeLabel": "Less than 12 months",
+            "sortOrder": 1
+          },
+          {
+            "codeInt": 1,
+            "codeLabel": "12 months",
+            "sortOrder": 2
+          },
+          {
+            "codeInt": 2,
+            "codeLabel": "More than 12 months",
+            "sortOrder": 3
+          }
+        ]
+      },
+      {
+        "key": "busOurInvRef",
+        "description": "Our invoice reference",
+        "dataType": "string",
+        "includeInAiContext": true,
+        "isColumn": true
+      },
+      {
+        "key": "busYourInvRef",
+        "description": "Your invoice reference",
+        "dataType": "string",
+        "includeInAiContext": true,
+        "isColumn": true
+      },
+      {
+        "key": "busClaimPeriod",
+        "description": "Claim period in days",
+        "dataType": "number",
+        "includeInAiContext": true,
+        "isColumn": true
+      },
+      {
+        "key": "busCashDiscount",
+        "description": "Cash discount",
+        "dataType": "number",
+        "includeInAiContext": true,
+        "isColumn": true
+      },
+      {
+        "key": "respUnitId",
+        "description": "Responsible unit id",
+        "dataType": "number",
+        "includeInAiContext": true,
+        "isColumn": true
       },
       {
         "key": "givenClientNbr",
         "description": "Number of employees",
         "dataType": "number",
+        "includeInAiContext": true,
+        "isColumn": true
+      },
+      {
+        "key": "invContClientId",
+        "description": "Invoice appendix contact client id",
+        "dataType": "number",
+        "includeInAiContext": true,
+        "isColumn": true
+      },
+      {
+        "key": "agrContClientId",
+        "description": "Agreement contact client id",
+        "dataType": "number",
+        "includeInAiContext": true,
+        "isColumn": true
+      },
+      {
+        "key": "hrContClientId",
+        "description": "HR contact client id",
+        "dataType": "number",
+        "includeInAiContext": true,
+        "isColumn": true
+      },
+      {
+        "key": "orgTargetFlag",
+        "description": "Organisation categories in use",
+        "dataType": "boolean",
+        "includeInAiContext": true,
+        "isColumn": true
+      },
+      {
+        "key": "unitTargetFlag",
+        "description": "Unit target flag",
+        "dataType": "boolean",
+        "includeInAiContext": true,
+        "isColumn": true
+      },
+      {
+        "key": "sepProjFlag",
+        "description": "Contains separate projects",
+        "dataType": "boolean",
+        "includeInAiContext": true,
+        "isColumn": true
+      },
+      {
+        "key": "otherTargetFlag",
+        "description": "Contains other categories",
+        "dataType": "boolean",
+        "includeInAiContext": true,
+        "isColumn": true
+      },
+      {
+        "key": "disInsOorgId",
+        "description": "Insurance org id for accidents/diseases",
+        "dataType": "number",
+        "includeInAiContext": true,
+        "isColumn": true
+      },
+      {
+        "key": "disInsurance",
+        "description": "Insurance policy number for accidents/diseases",
+        "dataType": "string",
+        "includeInAiContext": true,
+        "isColumn": true
+      },
+      {
+        "key": "persInsOorgId",
+        "description": "Employee insurance org id",
+        "dataType": "number",
+        "includeInAiContext": true,
+        "isColumn": true
+      },
+      {
+        "key": "persInsurance",
+        "description": "Employee insurance policy number",
+        "dataType": "string",
+        "includeInAiContext": true,
+        "isColumn": true
+      },
+      {
+        "key": "insFundFlag",
+        "description": "Has a sickness fund",
+        "dataType": "boolean",
+        "includeInAiContext": true,
+        "isColumn": true
+      },
+      {
+        "key": "insFundOorgId",
+        "description": "Sickness fund org id",
+        "dataType": "number",
+        "includeInAiContext": true,
+        "isColumn": true
+      },
+      {
+        "key": "insFundPct",
+        "description": "Sickness fund percentage",
+        "dataType": "number",
+        "includeInAiContext": true,
+        "isColumn": true
+      },
+      {
+        "key": "pensOrgId",
+        "description": "Pension insurance org id",
+        "dataType": "number",
+        "includeInAiContext": true,
+        "isColumn": true
+      },
+      {
+        "key": "pensInsurance",
+        "description": "Pension insurance policy number",
+        "dataType": "string",
+        "includeInAiContext": true,
+        "isColumn": true
+      },
+      {
+        "key": "notes",
+        "description": "General notes",
+        "dataType": "string",
+        "includeInAiContext": true,
+        "isColumn": true
+      },
+      {
+        "key": "insFundNotes",
+        "description": "Sickness fund notes",
+        "dataType": "string",
+        "includeInAiContext": true,
+        "isColumn": true
+      },
+      {
+        "key": "insDepartFlag",
+        "description": "Has departments",
+        "dataType": "boolean",
+        "includeInAiContext": true,
+        "isColumn": true
+      },
+      {
+        "key": "insWorkPosFlag",
+        "description": "Has open work positions",
+        "dataType": "boolean",
+        "includeInAiContext": true,
+        "isColumn": true
+      },
+      {
+        "key": "insDataTransferHrFlag",
+        "description": "Has HR interface",
+        "dataType": "boolean",
+        "includeInAiContext": true,
+        "isColumn": true
+      },
+      {
+        "key": "cptValidDate",
+        "description": "CPT is valid from",
+        "dataType": "date",
+        "includeInAiContext": true,
+        "isColumn": true
+      },
+      {
+        "key": "cptCheckDate",
+        "description": "CPT last checked at",
+        "dataType": "date",
+        "includeInAiContext": true,
+        "isColumn": true
+      },
+      {
+        "key": "cptPersonnelId",
+        "description": "CPT last checked by personnel id",
+        "dataType": "number",
+        "includeInAiContext": true,
+        "isColumn": true
+      },
+      {
+        "key": "cptCheckedBy",
+        "description": "Text description of CPT check",
+        "dataType": "string",
+        "includeInAiContext": true,
+        "isColumn": true
+      },
+      {
+        "key": "toleranceId",
+        "description": "Tolerance id",
+        "dataType": "number",
+        "includeInAiContext": true,
+        "isColumn": true
+      },
+      {
+        "key": "ediAddress",
+        "description": "EDI Address",
+        "dataType": "string",
+        "includeInAiContext": true,
+        "isColumn": true
+      },
+      {
+        "key": "paymentCommitmentPayerTypeId",
+        "description": "Payment commitment payer type **0:** Not selected **1:** Patient **2:** SVOL **3:** Kela **4:** Municipality **5:** State Treasury **6:** Ministry of Labour **7:** Insurance institution **8:** Employer **9:** Other payer Possible values: 0=\"Not selected\" 1=\"Patient\" 2=\"SVOL\" 3=\"Kela\" 4=\"Municipality\" 5=\"State Treasury\" 6=\"Ministry of Labour\" 7=\"Insurance institution\" 8=\"Employer\" 9=\"Other payer\"",
+        "dataType": "number",
+        "includeInAiContext": true,
         "isColumn": true,
-        "filterable": true,
-        "includeInAiContext": true
+        "possibleValues": [
+          {
+            "codeInt": 0,
+            "codeLabel": "Not selected",
+            "sortOrder": 1
+          },
+          {
+            "codeInt": 1,
+            "codeLabel": "Patient",
+            "sortOrder": 2
+          },
+          {
+            "codeInt": 2,
+            "codeLabel": "SVOL",
+            "sortOrder": 3
+          },
+          {
+            "codeInt": 3,
+            "codeLabel": "Kela",
+            "sortOrder": 4
+          },
+          {
+            "codeInt": 4,
+            "codeLabel": "Municipality",
+            "sortOrder": 5
+          },
+          {
+            "codeInt": 5,
+            "codeLabel": "State Treasury",
+            "sortOrder": 6
+          },
+          {
+            "codeInt": 6,
+            "codeLabel": "Ministry of Labour",
+            "sortOrder": 7
+          },
+          {
+            "codeInt": 7,
+            "codeLabel": "Insurance institution",
+            "sortOrder": 8
+          },
+          {
+            "codeInt": 8,
+            "codeLabel": "Employer",
+            "sortOrder": 9
+          },
+          {
+            "codeInt": 9,
+            "codeLabel": "Other payer",
+            "sortOrder": 10
+          }
+        ]
+      },
+      {
+        "key": "clientShareFlag",
+        "description": "Client share",
+        "dataType": "boolean",
+        "includeInAiContext": true,
+        "isColumn": true
+      },
+      {
+        "key": "iban",
+        "description": "Bank account IBAN",
+        "dataType": "string",
+        "includeInAiContext": true,
+        "isColumn": true
+      },
+      {
+        "key": "intermediatorCode",
+        "description": "Bank account intermediator code",
+        "dataType": "string",
+        "includeInAiContext": true,
+        "isColumn": true
+      },
+      {
+        "key": "ediCode",
+        "description": "Bank account EDI code",
+        "dataType": "string",
+        "includeInAiContext": true,
+        "isColumn": true
       },
       {
         "key": "latestSaveDate",
         "description": "Date and time of last modification",
         "dataType": "date",
-        "isColumn": true,
-        "includeInAiContext": true
+        "includeInAiContext": true,
+        "isColumn": true
       },
       {
         "key": "latestSavePersonnelId",
         "description": "Author personnel id of last modification",
         "dataType": "number",
-        "includeInAiContext": true
+        "includeInAiContext": true,
+        "isColumn": true
       },
       {
         "key": "accSpecialAddress",
         "description": "Invoice address org id",
+        "dataType": "string",
+        "includeInAiContext": true,
+        "isColumn": true
+      },
+      {
+        "key": "svCode",
+        "description": "SV code",
+        "dataType": "string",
+        "includeInAiContext": true,
+        "isColumn": true
+      },
+      {
+        "key": "einvoiceAddressType",
+        "description": "E-invoice address type",
         "dataType": "number",
-        "includeInAiContext": true
+        "includeInAiContext": true,
+        "isColumn": true
+      },
+      {
+        "key": "agreedCode",
+        "description": "E-invoice code",
+        "dataType": "string",
+        "includeInAiContext": true,
+        "isColumn": true
+      },
+      {
+        "key": "pensionInsuranceType",
+        "description": "Pension insurance type id",
+        "dataType": "number",
+        "includeInAiContext": true,
+        "isColumn": true
       },
       {
         "key": "oid",
         "description": "unique OID",
         "dataType": "string",
-        "isColumn": true,
-        "filterable": true,
-        "includeInAiContext": true
+        "includeInAiContext": true,
+        "isColumn": true
       },
       {
         "key": "orgOid",
         "description": "Organisations unique OID",
         "dataType": "string",
-        "isColumn": true,
-        "filterable": true,
-        "includeInAiContext": true
+        "includeInAiContext": true,
+        "isColumn": true
       },
       {
         "key": "agreementDoneDate",
         "description": "Date of service agreement",
         "dataType": "date",
-        "isColumn": true,
-        "includeInAiContext": true
+        "includeInAiContext": true,
+        "isColumn": true
       },
       {
         "key": "eInvoiceFormatType",
-        "description": "E-invoice format Possible values: 0=\"Not selected\", 1=\"Electronic\", 2=\"Hard copy\"",
+        "description": "E-invoice format Possible values: 0=\"Not selected\" 1=\"Electronic\" 2=\"Hard copy\"",
         "dataType": "number",
-        "filterable": true,
-        "includeInAiContext": true
+        "includeInAiContext": true,
+        "isColumn": true,
+        "possibleValues": [
+          {
+            "codeInt": 0,
+            "codeLabel": "Not selected",
+            "sortOrder": 1
+          },
+          {
+            "codeInt": 1,
+            "codeLabel": "Electronic",
+            "sortOrder": 2
+          },
+          {
+            "codeInt": 2,
+            "codeLabel": "Hard copy",
+            "sortOrder": 3
+          }
+        ]
       },
       {
         "key": "busLySpecifier",
         "description": "Business LY number specifier",
         "dataType": "string",
-        "filterable": true,
-        "includeInAiContext": true
+        "includeInAiContext": true,
+        "isColumn": true
       },
       {
         "key": "financialCategory",
         "description": "Financial category",
         "dataType": "string",
-        "filterable": true,
-        "includeInAiContext": true
+        "includeInAiContext": true,
+        "isColumn": true
       },
       {
         "key": "orgClientTypeId",
-        "description": "Organisation type Possible values: 0=\"Not selected\", 1=\"External\", 2=\"Internal\", 3=\"Concern\", 4=\"Kela\", 5=\"Insurance organisation\", 6=\"City/municipality\", 7=\"Municipal enterprise\"",
+        "description": "Organisation type Possible values: 0=\"Not selected\" 1=\"External\" 2=\"Internal\" 3=\"Concern\" 4=\"Kela\",\" 5=\"Insurance organisation\" 6=\"City/municipality\" 7=\"Municipal enterprise\"",
         "dataType": "number",
-        "filterable": true,
-        "includeInAiContext": true
+        "includeInAiContext": true,
+        "isColumn": true,
+        "possibleValues": [
+          {
+            "codeInt": 0,
+            "codeLabel": "Not selected",
+            "sortOrder": 1
+          },
+          {
+            "codeInt": 1,
+            "codeLabel": "External",
+            "sortOrder": 2
+          },
+          {
+            "codeInt": 2,
+            "codeLabel": "Internal",
+            "sortOrder": 3
+          },
+          {
+            "codeInt": 3,
+            "codeLabel": "Concern",
+            "sortOrder": 4
+          },
+          {
+            "codeInt": 4,
+            "codeLabel": "Kela\",",
+            "sortOrder": 5
+          },
+          {
+            "codeInt": 5,
+            "codeLabel": "Insurance organisation",
+            "sortOrder": 6
+          },
+          {
+            "codeInt": 6,
+            "codeLabel": "City/municipality",
+            "sortOrder": 7
+          },
+          {
+            "codeInt": 7,
+            "codeLabel": "Municipal enterprise",
+            "sortOrder": 8
+          }
+        ]
       },
       {
         "key": "paymentInfoFromOrg",
         "description": "Payment info taken from organisation",
         "dataType": "boolean",
-        "includeInAiContext": true
+        "includeInAiContext": true,
+        "isColumn": true
       },
       {
         "key": "invoicingStartDate",
         "description": "Start date of invoicing",
         "dataType": "date",
-        "isColumn": true,
-        "includeInAiContext": true
+        "includeInAiContext": true,
+        "isColumn": true
       },
       {
         "key": "annualFeeCreatedAutomatically",
         "description": "Should annual fees be created automatically",
         "dataType": "boolean",
-        "includeInAiContext": true
+        "includeInAiContext": true,
+        "isColumn": true
       },
       {
         "key": "oneAmountFlag",
         "description": "Use total reimbursement",
         "dataType": "boolean",
-        "includeInAiContext": true
+        "includeInAiContext": true,
+        "isColumn": true
       },
       {
         "key": "oneAmountValue",
         "description": "Total reimbursement amount",
         "dataType": "number",
-        "includeInAiContext": true
+        "includeInAiContext": true,
+        "isColumn": true
+      },
+      {
+        "key": "diagSpecialityId",
+        "description": "Service provider speciality",
+        "dataType": "number",
+        "includeInAiContext": true,
+        "isColumn": true
+      },
+      {
+        "key": "transitInvoicingFlag",
+        "description": "Transit invoicing",
+        "dataType": "boolean",
+        "includeInAiContext": true,
+        "isColumn": true
+      },
+      {
+        "key": "resProhibit",
+        "description": "Reservations prohibited",
+        "dataType": "boolean",
+        "includeInAiContext": true,
+        "isColumn": true
+      },
+      {
+        "key": "reservationNotes",
+        "description": "To be noted when making an appointment",
+        "dataType": "string",
+        "includeInAiContext": true,
+        "isColumn": true
+      },
+      {
+        "key": "labNotes",
+        "description": "To be noted in laboratory examinations",
+        "dataType": "string",
+        "includeInAiContext": true,
+        "isColumn": true
+      },
+      {
+        "key": "imagingNotes",
+        "description": "To be noted when imaging",
+        "dataType": "string",
+        "includeInAiContext": true,
+        "isColumn": true
+      },
+      {
+        "key": "receptionNotes",
+        "description": "To be noted at reception",
+        "dataType": "string",
+        "includeInAiContext": true,
+        "isColumn": true
+      },
+      {
+        "key": "otherNotes",
+        "description": "Other notes",
+        "dataType": "string",
+        "includeInAiContext": true,
+        "isColumn": true
       },
       {
         "key": "paymentTermId",
         "description": "Payment term id (see GET /paymentTerms)",
         "dataType": "number",
-        "filterable": true,
-        "includeInAiContext": true
+        "includeInAiContext": true,
+        "isColumn": true
       },
       {
         "key": "kelaSummaryAgreementStartDate",
         "description": "KELA summary agreement start date",
         "dataType": "date",
-        "isColumn": true,
-        "includeInAiContext": true
+        "includeInAiContext": true,
+        "isColumn": true
       },
       {
         "key": "kelaSummaryAgreementEndDate",
         "description": "KELA summary agreement end date",
         "dataType": "date",
-        "isColumn": true,
-        "includeInAiContext": true
+        "includeInAiContext": true,
+        "isColumn": true
       },
       {
         "key": "ekelaOid",
         "description": "eKELA oid",
         "dataType": "string",
-        "filterable": true,
-        "includeInAiContext": true
+        "includeInAiContext": true,
+        "isColumn": true
+      },
+      {
+        "key": "municipalityCode",
+        "description": "Municipality Code",
+        "dataType": "string",
+        "includeInAiContext": true,
+        "isColumn": true
       },
       {
         "key": "publicOrgFlag",
         "description": "Is public organisation",
         "dataType": "boolean",
-        "filterable": true,
-        "includeInAiContext": true
+        "includeInAiContext": true,
+        "isColumn": true
       },
       {
         "key": "categories",
         "description": "Organisation categories by role. Key is category role id, e.g. `1` (see GET /categoryRoles) Value is category uri, e.g. `\"/categories/123\"`",
         "dataType": "object",
-        "includeInAiContext": true
+        "includeInAiContext": true,
+        "isColumn": true
+      },
+      {
+        "key": "hideAnswersInEService",
+        "description": "Are the results hidden in the electronic service?",
+        "dataType": "boolean",
+        "includeInAiContext": true,
+        "isColumn": true
       }
     ]
   },
@@ -521,157 +1673,184 @@
         "key": "employer",
         "description": "Client employment identifier",
         "dataType": "string",
-        "includeInAiContext": true
+        "includeInAiContext": true,
+        "isColumn": true
+      },
+      {
+        "key": "name",
+        "description": "Name of employer",
+        "dataType": "string",
+        "includeInAiContext": true,
+        "isColumn": true
       },
       {
         "key": "orgId",
         "description": "Employer organisation id",
         "dataType": "number",
-        "isColumn": true,
-        "filterable": true,
-        "includeInAiContext": true
+        "includeInAiContext": true,
+        "isColumn": true
+      },
+      {
+        "key": "bossId",
+        "description": "Client id of client's boss",
+        "dataType": "number",
+        "includeInAiContext": true,
+        "isColumn": true
       },
       {
         "key": "agreement",
         "description": "Agreement identifier",
-        "dataType": "number",
-        "filterable": true,
-        "includeInAiContext": true
+        "dataType": "string",
+        "includeInAiContext": true,
+        "isColumn": true
       },
       {
         "key": "respUnit",
         "description": "Unit specified in agreement",
         "dataType": "string",
-        "filterable": true,
-        "includeInAiContext": true
+        "includeInAiContext": true,
+        "isColumn": true
       },
       {
         "key": "respNurse",
         "description": "Client's primary nurse's name",
         "dataType": "string",
-        "filterable": true,
-        "includeInAiContext": true
+        "includeInAiContext": true,
+        "isColumn": true
       },
       {
         "key": "respNurseId",
         "description": "Reference to primary nurse as resource",
         "dataType": "string",
-        "isColumn": true,
-        "filterable": true,
-        "includeInAiContext": true
+        "includeInAiContext": true,
+        "isColumn": true
       },
       {
         "key": "respDoctor",
         "description": "Client's primary doctor's name",
         "dataType": "string",
-        "filterable": true,
-        "includeInAiContext": true
+        "includeInAiContext": true,
+        "isColumn": true
       },
       {
         "key": "respDoctorId",
         "description": "Reference to primary doctor as resource",
         "dataType": "string",
-        "isColumn": true,
-        "includeInAiContext": true
+        "includeInAiContext": true,
+        "isColumn": true
       },
       {
         "key": "mainEmployer",
         "description": "Marks this employer as client's main employer",
         "dataType": "boolean",
-        "isColumn": true,
-        "filterable": true,
-        "includeInAiContext": true
+        "includeInAiContext": true,
+        "isColumn": true
       },
       {
         "key": "startDate",
         "description": "First day of employment",
         "dataType": "date",
-        "isColumn": true,
-        "includeInAiContext": true
+        "includeInAiContext": true,
+        "isColumn": true
       },
       {
         "key": "endDate",
         "description": "Last day of employment",
         "dataType": "date",
-        "isColumn": true,
-        "includeInAiContext": true
+        "includeInAiContext": true,
+        "isColumn": true
       },
       {
         "key": "profDescr",
         "description": "Client's profession description",
         "dataType": "string",
-        "filterable": true,
-        "includeInAiContext": true
+        "includeInAiContext": true,
+        "isColumn": true
       },
       {
         "key": "educationClassificationCode",
         "description": "Classification of education identifier",
         "dataType": "string",
-        "includeInAiContext": true
+        "includeInAiContext": true,
+        "isColumn": true
       },
       {
         "key": "appointmentReservationProhibition",
         "description": "Cannot make reservations for this organisation",
         "dataType": "boolean",
-        "filterable": true,
-        "includeInAiContext": true
+        "includeInAiContext": true,
+        "isColumn": true
       },
       {
         "key": "department",
         "description": "Client's department within the employer organisation",
         "dataType": "string",
-        "includeInAiContext": true
+        "includeInAiContext": true,
+        "isColumn": true
       },
       {
         "key": "departmentId",
         "description": "Client's department id within the employer organisation",
         "dataType": "number",
-        "includeInAiContext": true
+        "includeInAiContext": true,
+        "isColumn": true
       },
       {
         "key": "agreementLevel",
         "description": "Level of agreement",
-        "dataType": "string",
-        "isColumn": true,
-        "filterable": true,
-        "includeInAiContext": true
+        "dataType": "number",
+        "includeInAiContext": true,
+        "isColumn": true
       },
       {
         "key": "agreementLevelText",
         "description": "Description of agreement level",
         "dataType": "string",
-        "filterable": true,
-        "includeInAiContext": true
+        "includeInAiContext": true,
+        "isColumn": true
       },
       {
         "key": "orgRespUnit",
         "description": "Unit specified in organisation",
         "dataType": "string",
-        "isColumn": true,
-        "filterable": true,
-        "includeInAiContext": true
+        "includeInAiContext": true,
+        "isColumn": true
       },
       {
         "key": "clientRoleId",
         "description": "This employment's client role id (see GET /clientRoles)",
         "dataType": "number",
-        "filterable": true,
-        "includeInAiContext": true
+        "includeInAiContext": true,
+        "isColumn": true
       },
       {
         "key": "externalId",
+        "targetColumn": "sourceExternalId",
         "description": "Employment ID in an external system",
         "dataType": "string",
-        "filterable": true,
-        "includeInAiContext": true
+        "includeInAiContext": true,
+        "isColumn": true
       },
       {
         "key": "clientId",
         "description": "Client ID",
         "dataType": "number",
-        "isColumn": true,
-        "filterable": true,
-        "includeInAiContext": true
+        "includeInAiContext": true,
+        "isColumn": true
+      },
+      {
+        "key": "client",
+        "description": "",
+        "dataType": "string",
+        "includeInAiContext": true,
+        "isColumn": true
+      },
+      {
+        "key": "organisation",
+        "description": "",
+        "dataType": "string",
+        "includeInAiContext": true,
+        "isColumn": true
       }
     ]
   },
@@ -683,106 +1862,294 @@
         "key": "personnelId",
         "description": "Personnel identifier",
         "dataType": "number",
-        "isColumn": true,
-        "filterable": true,
-        "includeInAiContext": true
+        "includeInAiContext": true,
+        "isColumn": true
       },
       {
         "key": "firstName",
         "description": "Firstname",
         "dataType": "string",
-        "filterable": true,
-        "includeInAiContext": true
+        "includeInAiContext": true,
+        "isColumn": true
       },
       {
         "key": "lastName",
         "description": "Lastname",
         "dataType": "string",
-        "filterable": true,
-        "includeInAiContext": true
+        "includeInAiContext": true,
+        "isColumn": true
+      },
+      {
+        "key": "idString",
+        "description": "Social security number",
+        "dataType": "string",
+        "includeInAiContext": true,
+        "isColumn": true
+      },
+      {
+        "key": "phone",
+        "description": "Contact phone number (mobile)",
+        "dataType": "string",
+        "includeInAiContext": true,
+        "isColumn": true
       },
       {
         "key": "workPhone",
         "description": "Contact phone number (work)",
         "dataType": "string",
-        "includeInAiContext": true
+        "includeInAiContext": true,
+        "isColumn": true
       },
       {
         "key": "homePhone",
         "description": "Contact phone number (home)",
         "dataType": "string",
-        "includeInAiContext": true
+        "includeInAiContext": true,
+        "isColumn": true
+      },
+      {
+        "key": "professionRegisterId",
+        "description": "Profession register identifier",
+        "dataType": "string",
+        "includeInAiContext": true,
+        "isColumn": true
       },
       {
         "key": "professionTitleCode",
         "description": "Profession title code",
         "dataType": "string",
-        "isColumn": true,
-        "filterable": true,
-        "includeInAiContext": true
+        "includeInAiContext": true,
+        "isColumn": true
       },
       {
         "key": "professionTitleName",
         "description": "Profession title name",
         "dataType": "string",
-        "filterable": true,
-        "includeInAiContext": true
+        "includeInAiContext": true,
+        "isColumn": true
       },
       {
         "key": "specialityId",
         "description": "Speciality identifier",
-        "dataType": "number",
-        "filterable": true,
-        "includeInAiContext": true
+        "dataType": "string",
+        "includeInAiContext": true,
+        "isColumn": true
       },
       {
         "key": "specialityCode",
         "description": "Speciality code",
         "dataType": "string",
-        "filterable": true,
-        "includeInAiContext": true
+        "includeInAiContext": true,
+        "isColumn": true
       },
       {
         "key": "specialityDescr",
         "description": "Speciality description",
         "dataType": "string",
-        "filterable": true,
-        "includeInAiContext": true
+        "includeInAiContext": true,
+        "isColumn": true
       },
       {
         "key": "statsProfessionCode",
         "description": "Profession code defined by Statistics Finland.",
         "dataType": "string",
-        "filterable": true,
-        "includeInAiContext": true
+        "includeInAiContext": true,
+        "isColumn": true
       },
       {
         "key": "statsProfessionName",
         "description": "Profession name defined by Statistics Finland.",
         "dataType": "string",
-        "filterable": true,
-        "includeInAiContext": true
+        "includeInAiContext": true,
+        "isColumn": true
       },
       {
         "key": "professions",
         "description": "List of professions",
         "dataType": "array",
-        "includeInAiContext": true
+        "includeInAiContext": true,
+        "isColumn": true
       },
       {
         "key": "activated",
         "description": "Has personnel ever been activated",
         "dataType": "boolean",
-        "filterable": true,
-        "includeInAiContext": true
+        "includeInAiContext": true,
+        "isColumn": true
       },
       {
         "key": "deleted",
         "description": "Is marked as deleted",
         "dataType": "boolean",
+        "includeInAiContext": true,
+        "isColumn": true
+      },
+      {
+        "key": "requiresApproval",
+        "description": "Is approval required",
+        "dataType": "boolean",
+        "includeInAiContext": true,
+        "isColumn": true
+      },
+      {
+        "key": "approvalDate",
+        "description": "Timestamp of latest approval",
+        "dataType": "date",
+        "includeInAiContext": true,
+        "isColumn": true
+      },
+      {
+        "key": "approvalPersonnelId",
+        "description": "Personnel identifier of latest approver",
+        "dataType": "number",
+        "includeInAiContext": true,
+        "isColumn": true
+      },
+      {
+        "key": "personnelState",
+        "description": "Personnel state - working status Possible values: Active=\"Active\" Passive=\"Passive\" Virtual=\"Virtual\" Administrator=\"Administrator\"",
+        "dataType": "string",
+        "includeInAiContext": true,
         "isColumn": true,
-        "filterable": true,
-        "includeInAiContext": true
+        "possibleValues": [
+          {
+            "codeText": "Active",
+            "codeLabel": "Active",
+            "sortOrder": 1
+          },
+          {
+            "codeText": "Passive",
+            "codeLabel": "Passive",
+            "sortOrder": 2
+          },
+          {
+            "codeText": "Virtual",
+            "codeLabel": "Virtual",
+            "sortOrder": 3
+          },
+          {
+            "codeText": "Administrator",
+            "codeLabel": "Administrator",
+            "sortOrder": 4
+          }
+        ]
+      },
+      {
+        "key": "personnelCategory",
+        "description": "Personnel relation to the organisation Possible values: Internal=\"Internal\" External=\"External\"",
+        "dataType": "string",
+        "includeInAiContext": true,
+        "isColumn": true,
+        "possibleValues": [
+          {
+            "codeText": "Internal",
+            "codeLabel": "Internal",
+            "sortOrder": 1
+          },
+          {
+            "codeText": "External",
+            "codeLabel": "External",
+            "sortOrder": 2
+          }
+        ]
+      },
+      {
+        "key": "email",
+        "description": "Email",
+        "dataType": "string",
+        "includeInAiContext": true,
+        "isColumn": true
+      },
+      {
+        "key": "streetAddress1",
+        "description": "Street address line 1",
+        "dataType": "string",
+        "includeInAiContext": true,
+        "isColumn": true
+      },
+      {
+        "key": "streetAddress2",
+        "description": "Street address line 2",
+        "dataType": "string",
+        "includeInAiContext": true,
+        "isColumn": true
+      },
+      {
+        "key": "streetPostNo",
+        "description": "Street address post number",
+        "dataType": "string",
+        "includeInAiContext": true,
+        "isColumn": true
+      },
+      {
+        "key": "streetCity",
+        "description": "Street address city",
+        "dataType": "string",
+        "includeInAiContext": true,
+        "isColumn": true
+      },
+      {
+        "key": "streetCountry",
+        "description": "Street address country",
+        "dataType": "string",
+        "includeInAiContext": true,
+        "isColumn": true
+      },
+      {
+        "key": "notes",
+        "description": "Notes",
+        "dataType": "string",
+        "includeInAiContext": true,
+        "isColumn": true
+      },
+      {
+        "key": "defaultUnitId",
+        "description": "Unit identifier of personnel's default unit",
+        "dataType": "number",
+        "includeInAiContext": true,
+        "isColumn": true
+      },
+      {
+        "key": "unitIds",
+        "description": "List of personnel unit identifiers",
+        "dataType": "array",
+        "includeInAiContext": true,
+        "isColumn": true
+      },
+      {
+        "key": "flags",
+        "description": "List of personnel flag codes",
+        "dataType": "array",
+        "includeInAiContext": true,
+        "isColumn": true
+      },
+      {
+        "key": "userProfiles",
+        "description": "List of personnel's user profiles",
+        "dataType": "array",
+        "includeInAiContext": true,
+        "isColumn": true
+      },
+      {
+        "key": "externalOrg",
+        "description": "",
+        "dataType": "string",
+        "includeInAiContext": true,
+        "isColumn": true
+      },
+      {
+        "key": "externalOrgIds",
+        "description": "External organisation identifiers",
+        "dataType": "array",
+        "includeInAiContext": true,
+        "isColumn": true
+      },
+      {
+        "key": "externalOrgs",
+        "description": "External organisations",
+        "dataType": "array",
+        "includeInAiContext": true,
+        "isColumn": true
       }
     ]
   },
@@ -792,8 +2159,9 @@
     "fields": [
       {
         "key": "invoice",
-        "description": "Invoice identifier - reference to invoice",
+        "description": "Ledger invoice identifier",
         "dataType": "string",
+        "isColumn": true,
         "filterable": false,
         "includeInAiContext": true
       },
@@ -809,6 +2177,7 @@
         "key": "personnelId",
         "description": "Acute personnel of the creator of the invoice",
         "dataType": "number",
+        "isColumn": true,
         "filterable": true,
         "includeInAiContext": true
       },
@@ -832,13 +2201,39 @@
         "key": "invoiceNbr",
         "description": "Receipt number",
         "dataType": "number",
+        "isColumn": true,
         "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "cashDeskId",
+        "description": "Cash desk id configured in Acute",
+        "dataType": "number",
+        "isColumn": true,
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "appendixTypes",
+        "description": "List of appendix types configured for the payer organisation",
+        "dataType": "array",
+        "isColumn": true,
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "notes",
+        "description": "Invoice notes",
+        "dataType": "string",
+        "isColumn": true,
+        "filterable": false,
         "includeInAiContext": true
       },
       {
         "key": "unitId",
         "description": "Unit id where the invoice was created",
         "dataType": "number",
+        "isColumn": true,
         "filterable": true,
         "includeInAiContext": true
       },
@@ -846,6 +2241,7 @@
         "key": "ourRefNbr",
         "description": "Reference number",
         "dataType": "string",
+        "isColumn": true,
         "filterable": true,
         "includeInAiContext": true
       },
@@ -853,6 +2249,7 @@
         "key": "payerName",
         "description": "Name of payer",
         "dataType": "string",
+        "isColumn": true,
         "filterable": true,
         "includeInAiContext": true
       },
@@ -924,6 +2321,7 @@
         "key": "invNumberingSystem",
         "description": "Invoice numbering system",
         "dataType": "number",
+        "isColumn": true,
         "filterable": true,
         "includeInAiContext": true
       },
@@ -939,6 +2337,7 @@
         "key": "paymentTerm",
         "description": "Description of payment terms",
         "dataType": "string",
+        "isColumn": true,
         "filterable": true,
         "includeInAiContext": true
       },
@@ -946,6 +2345,39 @@
         "key": "legalUnit",
         "description": "Legal level unit of invoice unit",
         "dataType": "string",
+        "isColumn": true,
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "payerAddress",
+        "description": "Payer's address line",
+        "dataType": "string",
+        "isColumn": true,
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "payerPostcode",
+        "description": "Payer's address post code",
+        "dataType": "string",
+        "isColumn": true,
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "payerCity",
+        "description": "Payer's address city",
+        "dataType": "string",
+        "isColumn": true,
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "payerIdString",
+        "description": "HETU of payer (if person)",
+        "dataType": "string",
+        "isColumn": true,
         "filterable": true,
         "includeInAiContext": true
       },
@@ -953,7 +2385,72 @@
         "key": "payerLyNumber",
         "description": "Business LY number (Business ID, Y-tunnus) of payer (if organisation)",
         "dataType": "string",
+        "isColumn": true,
         "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "reminderAmount",
+        "description": "Reminder fee",
+        "dataType": "string",
+        "isColumn": true,
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "channel",
+        "description": "Invoice channel",
+        "dataType": "string",
+        "isColumn": true,
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "unpaidAmount",
+        "description": "Amount left unpaid",
+        "dataType": "string",
+        "isColumn": true,
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "channelDescription",
+        "description": "Invoice channel description",
+        "dataType": "string",
+        "isColumn": true,
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "totalPaid",
+        "description": "Total amount paid",
+        "dataType": "string",
+        "isColumn": true,
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "ledgerStatusId",
+        "description": "Invoice status id in ledger",
+        "dataType": "number",
+        "isColumn": true,
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "ledgerStatusDescr",
+        "description": "Description of status in ledger",
+        "dataType": "string",
+        "isColumn": true,
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "otherIds",
+        "description": "Other related ids in ledger",
+        "dataType": "array",
+        "isColumn": true,
+        "filterable": false,
         "includeInAiContext": true
       }
     ]
@@ -974,6 +2471,15 @@
         "key": "authorPersonnelId",
         "description": "Acute event author personnel id",
         "dataType": "number",
+        "isColumn": true,
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "authorPersonnelProfName",
+        "description": "Profession name of event author",
+        "dataType": "string",
+        "isColumn": true,
         "filterable": true,
         "includeInAiContext": true
       },
@@ -1021,6 +2527,15 @@
         "key": "unitId",
         "description": "Unit id of event",
         "dataType": "number",
+        "isColumn": true,
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "unitName",
+        "description": "Unit name",
+        "dataType": "string",
+        "isColumn": true,
         "filterable": true,
         "includeInAiContext": true
       },
@@ -1036,6 +2551,7 @@
         "key": "invoiceNbr",
         "description": "Invoice number",
         "dataType": "number",
+        "isColumn": true,
         "filterable": true,
         "includeInAiContext": true
       },
@@ -1043,6 +2559,7 @@
         "key": "paidFlag",
         "description": "Invoice has been paid",
         "dataType": "boolean",
+        "isColumn": true,
         "filterable": true,
         "includeInAiContext": true
       },
@@ -1050,6 +2567,7 @@
         "key": "paymentCommitmentId",
         "description": "Payment commitment id",
         "dataType": "number",
+        "isColumn": true,
         "filterable": true,
         "includeInAiContext": true
       },
@@ -1057,6 +2575,7 @@
         "key": "paymentCommitmentDescr",
         "description": "Description of payment commitment",
         "dataType": "string",
+        "isColumn": true,
         "filterable": true,
         "includeInAiContext": true
       },
@@ -1064,6 +2583,7 @@
         "key": "clientPaymentShareFlag",
         "description": "True if this part of the price is \"franchise part\"",
         "dataType": "boolean",
+        "isColumn": true,
         "filterable": true,
         "includeInAiContext": true
       },
@@ -1087,6 +2607,7 @@
         "key": "approvalStatusDescr",
         "description": "Approval status description",
         "dataType": "string",
+        "isColumn": true,
         "filterable": true,
         "includeInAiContext": true
       },
@@ -1107,10 +2628,27 @@
         "includeInAiContext": true
       },
       {
-        "key": "eventCategoryMembers",
-        "description": "List of event category members (not in use)",
-        "dataType": "array",
-        "filterable": false,
+        "key": "sessionId",
+        "description": "Parent session (encounter) id of event",
+        "dataType": "number",
+        "isColumn": true,
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "eventGroupId",
+        "description": "Group of event in product catalog",
+        "dataType": "number",
+        "isColumn": true,
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "eventGroupName",
+        "description": "Name of event group",
+        "dataType": "string",
+        "isColumn": true,
+        "filterable": true,
         "includeInAiContext": true
       },
       {
@@ -1125,6 +2663,7 @@
         "key": "itemName",
         "description": "Item name",
         "dataType": "string",
+        "isColumn": true,
         "filterable": true,
         "includeInAiContext": true
       },
@@ -1132,6 +2671,14 @@
         "key": "orgId",
         "description": "Client employer organisation id",
         "dataType": "number",
+        "isColumn": true,
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "orgName",
+        "description": "Employer name",
+        "dataType": "string",
         "isColumn": true,
         "filterable": true,
         "includeInAiContext": true
@@ -1145,9 +2692,18 @@
         "includeInAiContext": true
       },
       {
+        "key": "kelaStatusDescr",
+        "description": "Kela classification as text",
+        "dataType": "string",
+        "isColumn": true,
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
         "key": "kelaCode",
         "description": "Service identification code",
         "dataType": "string",
+        "isColumn": true,
         "filterable": true,
         "includeInAiContext": true
       },
@@ -1155,6 +2711,7 @@
         "key": "kelaSubvention",
         "description": "Kela's standard share of full price",
         "dataType": "string",
+        "isColumn": true,
         "filterable": true,
         "includeInAiContext": true
       },
@@ -1258,6 +2815,7 @@
         "key": "vatClassDescr",
         "description": "VAT class description",
         "dataType": "string",
+        "isColumn": true,
         "filterable": true,
         "includeInAiContext": true
       },
@@ -1265,6 +2823,7 @@
         "key": "vatAccountCode",
         "description": "Account for VAT",
         "dataType": "string",
+        "isColumn": true,
         "filterable": true,
         "includeInAiContext": true
       },
@@ -1272,6 +2831,15 @@
         "key": "account",
         "description": "Account for service",
         "dataType": "number",
+        "isColumn": true,
+        "filterable": false,
+        "includeInAiContext": true
+      },
+      {
+        "key": "notes",
+        "description": "Event notes",
+        "dataType": "string",
+        "isColumn": true,
         "filterable": false,
         "includeInAiContext": true
       },
@@ -1279,6 +2847,7 @@
         "key": "invMethod",
         "description": "Payment method",
         "dataType": "number",
+        "isColumn": true,
         "filterable": true,
         "includeInAiContext": true
       },
@@ -1302,6 +2871,39 @@
         "key": "personnel",
         "description": "Acute personnel id of the professional (doctor) responsible",
         "dataType": "number",
+        "isColumn": true,
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "personnelName",
+        "description": "Name of professional",
+        "dataType": "string",
+        "isColumn": true,
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "realUnitId",
+        "description": "Unit id where the event took place",
+        "dataType": "number",
+        "isColumn": true,
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "realUnitName",
+        "description": "Name of unit where the event took place",
+        "dataType": "string",
+        "isColumn": true,
+        "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "agreementId",
+        "description": "Agreement id used for event price",
+        "dataType": "number",
+        "isColumn": true,
         "filterable": true,
         "includeInAiContext": true
       },
@@ -1309,6 +2911,7 @@
         "key": "kelaDetId",
         "description": "Detailed Kela classification",
         "dataType": "number",
+        "isColumn": true,
         "filterable": true,
         "includeInAiContext": true
       },
@@ -1316,6 +2919,7 @@
         "key": "kelaTimeRaisedFlag",
         "description": "Whether the Kela time multiplier should be used",
         "dataType": "boolean",
+        "isColumn": true,
         "filterable": false,
         "includeInAiContext": true
       },
@@ -1323,6 +2927,7 @@
         "key": "kelaTimeRaisedSubvention",
         "description": "Amount of the kela time multiplier",
         "dataType": "string",
+        "isColumn": true,
         "filterable": false,
         "includeInAiContext": true
       },
@@ -1330,6 +2935,7 @@
         "key": "kelaSpecDocRaisedFlag",
         "description": "Whether the kela speciality doctor multiplier should be used",
         "dataType": "boolean",
+        "isColumn": true,
         "filterable": false,
         "includeInAiContext": true
       },
@@ -1337,6 +2943,7 @@
         "key": "kelaSpecDocRaisedSubvention",
         "description": "Amount of the kela tspeciality doctor multiplier",
         "dataType": "string",
+        "isColumn": true,
         "filterable": false,
         "includeInAiContext": true
       },
@@ -1344,6 +2951,7 @@
         "key": "kelaHomeRaisedFlag",
         "description": "Whether the kela home treatment multiplier should be used",
         "dataType": "boolean",
+        "isColumn": true,
         "filterable": false,
         "includeInAiContext": true
       },
@@ -1351,6 +2959,7 @@
         "key": "kelaHomeRaisedSubvention",
         "description": "Amount of the kela home treatment multiplier",
         "dataType": "string",
+        "isColumn": true,
         "filterable": false,
         "includeInAiContext": true
       },
@@ -1358,7 +2967,16 @@
         "key": "kelaSubventionFlag",
         "description": "Whether the kela subvention should be used at all",
         "dataType": "boolean",
+        "isColumn": true,
         "filterable": true,
+        "includeInAiContext": true
+      },
+      {
+        "key": "kelaSubventionInfo",
+        "description": "Textual information why the kela subvention is denied",
+        "dataType": "array",
+        "isColumn": true,
+        "filterable": false,
         "includeInAiContext": true
       }
     ]

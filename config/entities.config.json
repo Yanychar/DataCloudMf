@@ -41,7 +41,7 @@
   {
     "key": "invoice",
     "label": "Invoice",
-    "endpoint": "/invoices",
+    "endpoint": "/ledger",
     "cron": "0 * * * *",
     "mode": "incremental",
     "enabled": true,
@@ -60,12 +60,12 @@
       "showEvents": true,
       "dateType": "invoiceDate"
     },
-    "notes": "MF-issued outbound sales invoice. Payer is identified by payerClientId or payerOrgId. Reads are executed in 30-day windows using startDate and endDate so the first historical load is explicit instead of relying on Acute default invoice listing behavior. The invoice handler also extracts and persists invoiceEvent rows from the same source response."
+    "notes": "MF-issued outbound sales invoice sourced from the ledger endpoint. Payer is identified by payerClientId or payerOrgId. Reads are executed in date windows using startDate and endDate. The invoice handler also extracts and persists invoiceEvent rows from the same source response."
   },
   {
     "key": "invoiceEvent",
     "label": "InvoiceEvent",
-    "endpoint": "/invoices",
+    "endpoint": "/ledger",
     "mode": "incremental",
     "enabled": true,
     "scheduled": false,
@@ -75,10 +75,10 @@
       "dateType": "invoiceDate"
     },
     "recordPath": "events",
-    "recordContextParentFields": ["invoiceNo", "payerClientId", "payerOrgId", "personnelId", "unitId", "legalUnit"],
+    "recordContextParentFields": ["invoiceNbr", "payerClientId", "payerOrgId", "personnelId", "unitId", "legalUnit"],
     "externalIdField": "eventPayerId",
     "sourceUpdatedAtField": "created",
-    "notes": "Preferred analytical billed service line entity sourced from Invoice.events[]. The invoice endpoint must be called with showEvents=true. Reads follow the same explicit 30-day invoice windows as the parent invoice sync."
+    "notes": "Preferred analytical billed service line entity sourced from Ledger.events[]. Reads follow the same explicit invoice windows as the parent invoice sync."
   },
   {
     "key": "personnel",

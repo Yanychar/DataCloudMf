@@ -4,13 +4,13 @@ GET http://localhost:3000/health
 ### Acute client config ping
 GET http://localhost:3000/acute-test/ping
 
-### Dry run raw Acute request to /invoices for one 30-day window
+### Dry run raw Acute request to /ledger for one date window
 POST http://localhost:3000/acute-test/request?dryRun=true
 Content-Type: application/json
 
 {
   "method": "GET",
-  "path": "/invoices",
+  "path": "/ledger",
   "params": {
     "dateType": "invoiceDate",
     "startDate": "2024-04-01",
@@ -19,13 +19,13 @@ Content-Type: application/json
   "timeoutMs": 60000
 }
 
-### Raw Acute request to /invoices for one 30-day window
+### Raw Acute request to /ledger for one date window
 POST http://localhost:3000/acute-test/request
 Content-Type: application/json
 
 {
   "method": "GET",
-  "path": "/invoices",
+  "path": "/ledger",
   "params": {
     "dateType": "invoiceDate",
     "startDate": "2024-04-01",
@@ -34,13 +34,13 @@ Content-Type: application/json
   "timeoutMs": 60000
 }
 
-### Dry run raw Acute request to /invoices including events
+### Dry run raw Acute request to /ledger including events
 POST http://localhost:3000/acute-test/request?dryRun=true
 Content-Type: application/json
 
 {
   "method": "GET",
-  "path": "/invoices",
+  "path": "/ledger",
   "params": {
     "dateType": "invoiceDate",
     "showEvents": true,
@@ -50,16 +50,16 @@ Content-Type: application/json
   "timeoutMs": 60000
 }
 
-### Raw Acute request to /invoices including events
+### Raw Acute request to /ledger including events
 POST http://localhost:3000/acute-test/request
 Content-Type: application/json
 
 {
   "method": "GET",
-  "path": "/invoices",
+  "path": "/ledger",
   "params": {
     "dateType": "invoiceDate",
-    "showEvents": false,
+    "showEvents": true,
     "startDate": "2024-04-01",
     "endDate": "2024-05-01"
   },

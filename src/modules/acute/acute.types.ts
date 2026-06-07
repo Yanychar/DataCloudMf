@@ -2,14 +2,23 @@ export type SyncMode = 'full' | 'incremental';
 export type ReadStrategy = 'single' | 'date_window';
 export type ImportedFieldDataType = 'string' | 'number' | 'boolean' | 'date' | 'object' | 'array';
 
+export interface ImportedFieldPossibleValueConfig {
+  codeInt?: number;
+  codeText?: string;
+  codeLabel: string;
+  sortOrder?: number;
+}
+
 export interface ImportedFieldConfig {
   key: string;
   sourcePath?: string;
+  targetColumn?: string;
   description: string;
   dataType?: ImportedFieldDataType;
   isColumn?: boolean;
   filterable?: boolean;
   includeInAiContext?: boolean;
+  possibleValues?: ImportedFieldPossibleValueConfig[];
 }
 
 export interface ImportedEntityConfig {
