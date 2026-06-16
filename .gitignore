@@ -10,3 +10,4 @@ coverage
 prisma/dev.db
 /.run/
 /docs/
+/reports/

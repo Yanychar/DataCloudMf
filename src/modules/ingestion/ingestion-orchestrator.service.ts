@@ -3,7 +3,10 @@ import { Prisma, SyncMode } from '@prisma/client';
 import { AcuteClientService } from '../acute/acute-client.service';
 import { AcuteConfigService } from '../acute/acute-config.service';
 import { AcuteEntityConfig } from '../acute/acute.types';
+import { TelegramNotifierService } from '../notifications/telegram-notifier.service';
 import { RepositoryService } from '../repository/repository.service';
+
+type SyncTrigger = 'scheduled' | 'manual';
 
 @Injectable()
 export class IngestionOrchestratorService {
@@ -20,10 +23,11 @@ export class IngestionOrchestratorService {
     private readonly acuteConfigService: AcuteConfigService,
     private readonly acuteClientService: AcuteClientService,
     private readonly repositoryService: RepositoryService,
+    private readonly telegramNotifierService: TelegramNotifierService,
   ) {}
 
-  async syncEntity(entityKey: string) {
-    const rawResult = await this.syncRawEntity(entityKey);
+  async syncEntity(entityKey: string, trigger: SyncTrigger = 'manual') {
+    const rawResult = await this.syncRawEntity(entityKey, trigger);
     if (rawResult.skipped) {
       return {
         entityKey,
@@ -38,7 +42,7 @@ export class IngestionOrchestratorService {
     const stageResults = [];
 
     for (const stageEntityKey of stageTargets) {
-      stageResults.push(await this.stageEntity(stageEntityKey));
+      stageResults.push(await this.stageEntity(stageEntityKey, trigger));
     }
 
     return {
@@ -49,7 +53,7 @@ export class IngestionOrchestratorService {
     };
   }
 
-  async syncRawEntity(entityKey: string) {
+  async syncRawEntity(entityKey: string, trigger: SyncTrigger = 'manual') {
     const entityConfig = this.acuteConfigService.getEntityConfigOrThrow(entityKey);
     if (entityConfig.sourceOwnedBy) {
       return {
@@ -61,12 +65,12 @@ export class IngestionOrchestratorService {
       };
     }
 
-    return this.runRawSync(entityConfig);
+    return this.runRawSync(entityConfig, trigger);
   }
 
-  async stageEntity(entityKey: string) {
+  async stageEntity(entityKey: string, trigger: SyncTrigger = 'manual') {
     const entityConfig = this.acuteConfigService.getEntityConfigOrThrow(entityKey);
-    return this.runStageSync(entityConfig);
+    return this.runStageSync(entityConfig, trigger);
   }
 
   getEntityConfigs() {
@@ -107,7 +111,7 @@ export class IngestionOrchestratorService {
     };
   }
 
-  private async runRawSync(entityConfig: AcuteEntityConfig) {
+  private async runRawSync(entityConfig: AcuteEntityConfig, trigger: SyncTrigger) {
     const entityKey = entityConfig.key;
     const mode = entityConfig.mode as SyncMode;
     if (!entityConfig.enabled) {
@@ -154,6 +158,7 @@ export class IngestionOrchestratorService {
               run.id,
               runContext,
               existingState?.lastSuccessfulSyncAt ?? undefined,
+              trigger,
             )
           : await this.syncSingleRequestEntity(
               entityConfig,
@@ -196,12 +201,18 @@ export class IngestionOrchestratorService {
           failedAt: new Date().toISOString(),
         },
       });
+      await this.telegramNotifierService.notifySyncFailure({
+        entityKey,
+        flowType: 'raw',
+        trigger,
+        errorMessage: message,
+      });
 
       throw error;
     }
   }
 
-  private async runStageSync(entityConfig: AcuteEntityConfig) {
+  private async runStageSync(entityConfig: AcuteEntityConfig, trigger: SyncTrigger) {
     const entityKey = entityConfig.key;
     const mode = entityConfig.mode as SyncMode;
     if (!entityConfig.enabled) {
@@ -264,82 +275,123 @@ export class IngestionOrchestratorService {
     let stagedCount = 0;
     const failures: Array<{ externalId: string; errorMessage: string }> = [];
 
-    while (true) {
-      const batch = await this.repositoryService.getPendingStageRecords(
-        entityKey,
-        this.stageBatchSize,
-        cursorId,
-      );
+    try {
+      while (true) {
+        const batch = await this.repositoryService.getPendingStageRecords(
+          entityKey,
+          this.stageBatchSize,
+          cursorId,
+        );
 
-      if (!batch.length) {
-        break;
-      }
-
-      cursorId = batch[batch.length - 1].id;
-
-      for (const repositoryRecord of batch) {
-        processedCount += 1;
-        try {
-          await this.stageRecordWithRetry(entityConfig, repositoryRecord);
-          stagedCount += 1;
-        } catch (error) {
-          const errorMessage = (error as Error).message;
-          failures.push({
-            externalId: repositoryRecord.externalId,
-            errorMessage,
-          });
-          await this.repositoryService.markRepositoryRecordStageFailed(
-            repositoryRecord.id,
-            errorMessage,
-          );
+        if (!batch.length) {
+          break;
         }
+
+        cursorId = batch[batch.length - 1].id;
+
+        for (const repositoryRecord of batch) {
+          processedCount += 1;
+          try {
+            await this.stageRecordWithRetry(entityConfig, repositoryRecord);
+            stagedCount += 1;
+          } catch (error) {
+            const errorMessage = (error as Error).message;
+            failures.push({
+              externalId: repositoryRecord.externalId,
+              errorMessage,
+            });
+            await this.repositoryService.markRepositoryRecordStageFailed(
+              repositoryRecord.id,
+              errorMessage,
+            );
+          }
+        }
+
+        await this.repositoryService.updateRunContext(run.id, {
+          ...runContext,
+          cursorId,
+          processedCount,
+          stagedCount,
+          failedCount: failures.length,
+          failures,
+        });
       }
 
-      await this.repositoryService.updateRunContext(run.id, {
+      const pendingAfterRun = await this.repositoryService.countPendingStageRecords(entityKey);
+      const syncContext = {
         ...runContext,
         cursorId,
         processedCount,
         stagedCount,
         failedCount: failures.length,
         failures,
+        pendingAfterRun,
+      };
+      const status = failures.length > 0 ? 'failed' : 'success';
+      const message =
+        failures.length > 0
+          ? `${failures.length} repository record(s) failed staging for ${entityKey}.`
+          : undefined;
+
+      await this.repositoryService.completeRun(
+        run.id,
+        status,
+        processedCount,
+        stagedCount,
+        message,
+        syncContext,
+      );
+
+      if (message) {
+        await this.telegramNotifierService.notifySyncFailure({
+          entityKey,
+          flowType: 'stage',
+          trigger,
+          errorMessage: message,
+        });
+      }
+
+      return {
+        entityKey,
+        flowType: 'stage',
+        mode,
+        processedCount,
+        stagedCount,
+        failedCount: failures.length,
+        pendingAfterRun,
+        failures,
+      };
+    } catch (error) {
+      const errorMessage = (error as Error).message;
+
+      await this.repositoryService.completeRun(
+        run.id,
+        'failed',
+        processedCount,
+        stagedCount,
+        errorMessage,
+        {
+          ...runContext,
+          cursorId,
+          processedCount,
+          stagedCount,
+          failedCount: failures.length,
+          failures,
+          failure: {
+            message: errorMessage,
+            failedAt: new Date().toISOString(),
+          },
+        },
+      );
+      await this.telegramNotifierService.notifySyncFailure({
+        entityKey,
+        flowType: 'stage',
+        trigger,
+        errorMessage,
       });
+
+      throw error;
     }
-
-    const pendingAfterRun = await this.repositoryService.countPendingStageRecords(entityKey);
-    const syncContext = {
-      ...runContext,
-      cursorId,
-      processedCount,
-      stagedCount,
-      failedCount: failures.length,
-      failures,
-      pendingAfterRun,
-    };
-    const status = failures.length > 0 ? 'failed' : 'success';
-    const message =
-      failures.length > 0
-        ? `${failures.length} repository record(s) failed staging for ${entityKey}.`
-        : undefined;
-
-    await this.repositoryService.completeRun(
-      run.id,
-      status,
-      processedCount,
-      stagedCount,
-      message,
-      syncContext,
-    );
-
-    return {
-      entityKey,
-      flowType: 'stage',
-      mode,
-      processedCount,
-      stagedCount,
-      failedCount: failures.length,
-      pendingAfterRun,
-      failures,
-    };
   }
 
   private async syncSingleRequestEntity(
@@ -414,6 +466,7 @@ export class IngestionOrchestratorService {
     runId: string,
     runContext: Record<string, unknown>,
     lastSuccessfulSyncAt?: Date,
+    trigger: SyncTrigger = 'manual',
   ) {
     const rangeFromParam = entityConfig.rangeFromParam;
     const rangeToParam = entityConfig.rangeToParam;
@@ -515,6 +568,18 @@ export class IngestionOrchestratorService {
         this.logger.warn(
           `Quarantined ${entityConfig.key} raw window ${windowFrom.toISOString()} -> ${effectiveWindowTo.toISOString()} after ${this.maxWindowAttempts} failed attempts. Continuing with the next window.`,
         );
+        if (windowAttemptResult.attemptCount >= this.maxWindowAttempts) {
+          await this.telegramNotifierService.notifyRawWindowFailure({
+            entityKey: entityConfig.key,
+            trigger,
+            windowFrom: windowFrom.toISOString(),
+            windowTo: effectiveWindowTo.toISOString(),
+            attemptCount: windowAttemptResult.attemptCount,
+            windowSize: effectiveWindowSize,
+            windowUnit: entityConfig.rangeWindowUnit,
+            errorMessage: windowAttemptResult.error.message,
+          });
+        }
 
         windowFrom = effectiveWindowTo;
         continue;
@@ -712,6 +777,7 @@ export class IngestionOrchestratorService {
             error: error as Error,
             windowTo,
             windowSize: effectiveWindowSize,
+            attemptCount: attempt,
           };
         }
 
@@ -734,6 +800,7 @@ export class IngestionOrchestratorService {
       error: lastError ?? new Error('Unknown window fetch error'),
       windowTo: plannedWindowTo,
       windowSize: entityConfig.rangeWindowSize ?? 1,
+      attemptCount: this.maxWindowAttempts,
     };
   }
 

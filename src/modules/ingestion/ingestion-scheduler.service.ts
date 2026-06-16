@@ -65,10 +65,11 @@ export class IngestionSchedulerService implements OnModuleInit {
         const job = new CronJob(entityConfig.cron, async () => {
           this.logger.log(`Triggered raw sync for entity ${entityConfig.key}`);
           try {
-            await this.ingestionOrchestratorService.syncRawEntity(entityConfig.key);
+            await this.ingestionOrchestratorService.syncRawEntity(entityConfig.key, 'scheduled');
           } catch (error) {
+            const errorMessage = (error as Error).message;
             this.logger.error(
-              `Scheduled raw sync failed for entity ${entityConfig.key}: ${(error as Error).message}`,
+              `Scheduled raw sync failed for entity ${entityConfig.key}: ${errorMessage}`,
             );
           }
         });
@@ -111,15 +112,24 @@ export class IngestionSchedulerService implements OnModuleInit {
             continue;
           }
 
-          const stageResult = await this.ingestionOrchestratorService.stageEntity(entityConfig.key);
+          const stageResult = await this.ingestionOrchestratorService.stageEntity(
+            entityConfig.key,
+            'scheduled',
+          );
           if (stageResult.skipped) {
             this.logger.log(
               `Scheduled stage sync skipped for ${entityConfig.key}: ${stageResult.reason}`,
             );
+          } else if ((stageResult.failedCount ?? 0) > 0) {
+            const errorMessage = `${stageResult.failedCount} repository record(s) failed staging for ${entityConfig.key}.`;
+            this.logger.error(
+              `Scheduled stage sync failed for entity ${entityConfig.key}: ${errorMessage}`,
+            );
           }
         } catch (error) {
+          const errorMessage = (error as Error).message;
           this.logger.error(
-            `Scheduled stage sync failed for entity ${entityConfig.key}: ${(error as Error).message}`,
+            `Scheduled stage sync failed for entity ${entityConfig.key}: ${errorMessage}`,
           );
         }
       }

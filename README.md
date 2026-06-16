@@ -68,6 +68,9 @@ Copy `.env.example` to `.env` and update:
 - `OPENAI_TIMEOUT_MS`
 - `DATA_STAGE_ENABLED`
 - `DATA_STAGE_DAILY_CRON`
+- `TELEGRAM_BOT_TOKEN`
+- `TELEGRAM_GROUP_CHAT_ID`
+- `TELEGRAM_NOTIFICATIONS_ENABLED`
 
 Acute environment selection is automatic:
 
@@ -141,6 +144,7 @@ Shared run configurations are included in `.run/`, and the IDE setup guide is in
 - `POST /ingestion/sync/:entityKey`
 - `POST /ingestion/raw/:entityKey`
 - `POST /ingestion/stage/:entityKey`
+- `POST /notifications/telegram/test`
 
 ## Centralized repository model
 
