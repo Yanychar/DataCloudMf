@@ -143,6 +143,7 @@ Shared run configurations are included in `.run/`, and the IDE setup guide is in
 - `GET /ingestion/entities`
 - `POST /ingestion/sync/:entityKey`
 - `POST /ingestion/raw/:entityKey`
+- `POST /ingestion/raw/:entityKey/window`
 - `POST /ingestion/stage/:entityKey`
 - `POST /notifications/telegram/test`
 

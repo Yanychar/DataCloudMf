@@ -4,6 +4,16 @@ POST http://localhost:3000/ingestion/sync/invoice
 ### Trigger invoice raw sync only
 POST http://localhost:3000/ingestion/raw/invoice
 
+### Recover one invoice raw date window without moving the sync cursor
+POST http://localhost:3000/ingestion/raw/invoice/window
+Content-Type: application/json
+
+{
+  "from": "2026-05-15",
+  "to": "2026-05-16",
+  "note": "Recover failed raw invoice window"
+}
+
 ### Trigger invoice stage sync only
 POST http://localhost:3000/ingestion/stage/invoice
 
@@ -18,6 +28,16 @@ POST http://localhost:3010/ingestion/sync/invoice
 
 ### Trigger invoice raw sync only on Docker collector
 POST http://localhost:3010/ingestion/raw/invoice
+
+### Recover one invoice raw date window on Docker collector
+POST http://localhost:3010/ingestion/raw/invoice/window
+Content-Type: application/json
+
+{
+  "from": "2026-05-15",
+  "to": "2026-05-16",
+  "note": "Recover failed raw invoice window"
+}
 
 ### Trigger invoice stage sync only on Docker collector
 POST http://localhost:3010/ingestion/stage/invoice

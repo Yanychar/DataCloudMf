@@ -1,5 +1,6 @@
-import { Controller, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { RecoverRawWindowDto } from './dto/recover-raw-window.dto';
 import { IngestionOrchestratorService } from './ingestion-orchestrator.service';
 import { IngestionSchedulerService } from './ingestion-scheduler.service';
 
@@ -42,6 +43,15 @@ export class IngestionController {
   @ApiOperation({ summary: 'Run raw Acute-to-RepositoryRecord sync for a single entity immediately' })
   syncRawEntity(@Param('entityKey') entityKey: string) {
     return this.ingestionOrchestratorService.syncRawEntity(entityKey);
+  }
+
+  @Post('raw/:entityKey/window')
+  @ApiOperation({ summary: 'Recover one explicit raw date window without moving the sync cursor' })
+  recoverRawWindow(
+    @Param('entityKey') entityKey: string,
+    @Body() dto: RecoverRawWindowDto,
+  ) {
+    return this.ingestionOrchestratorService.recoverRawWindow(entityKey, dto);
   }
 
   @Post('stage/:entityKey')

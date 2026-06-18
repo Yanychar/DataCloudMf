@@ -5,7 +5,7 @@ GET http://localhost:3000/health
 GET http://localhost:3000/acute-test/ping
 
 ### Dry run raw Acute request to /ledger for one date window
-POST http://localhost:3000/acute-test/request?dryRun=true
+POST http://localhost:3000/acute-test/request
 Content-Type: application/json
 
 {
@@ -13,8 +13,8 @@ Content-Type: application/json
   "path": "/ledger",
   "params": {
     "dateType": "invoiceDate",
-    "startDate": "2024-04-01",
-    "endDate": "2024-05-01"
+    "startDate": "2026-05-17",
+    "endDate": "2026-05-18"
   },
   "timeoutMs": 60000
 }

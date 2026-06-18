@@ -1,10 +1,11 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { Prisma, SyncMode } from '@prisma/client';
 import { AcuteClientService } from '../acute/acute-client.service';
 import { AcuteConfigService } from '../acute/acute-config.service';
 import { AcuteEntityConfig } from '../acute/acute.types';
 import { TelegramNotifierService } from '../notifications/telegram-notifier.service';
 import { RepositoryService } from '../repository/repository.service';
+import { RecoverRawWindowDto } from './dto/recover-raw-window.dto';
 
 type SyncTrigger = 'scheduled' | 'manual';
 
@@ -66,6 +67,35 @@ export class IngestionOrchestratorService {
     }
 
     return this.runRawSync(entityConfig, trigger);
+  }
+
+  async recoverRawWindow(entityKey: string, dto: RecoverRawWindowDto) {
+    const entityConfig = this.acuteConfigService.getEntityConfigOrThrow(entityKey);
+
+    if (entityConfig.sourceOwnedBy) {
+      return {
+        entityKey,
+        flowType: 'raw',
+        skipped: true,
+        reason: `source_owned_by:${entityConfig.sourceOwnedBy}`,
+      };
+    }
+
+    if (entityConfig.readStrategy !== 'date_window') {
+      throw new BadRequestException(`Entity "${entityKey}" does not use date-window raw sync.`);
+    }
+
+    if (!entityConfig.rangeFromParam || !entityConfig.rangeToParam) {
+      throw new BadRequestException(`Entity "${entityKey}" is missing date-window parameters.`);
+    }
+
+    const windowFrom = this.parseWindowBoundary(dto.from, 'from');
+    const windowTo = this.parseWindowBoundary(dto.to, 'to');
+    if (windowTo.getTime() <= windowFrom.getTime()) {
+      throw new BadRequestException('"to" must be later than "from".');
+    }
+
+    return this.runRawWindowRecovery(entityConfig, windowFrom, windowTo, dto.note);
   }
 
   async stageEntity(entityKey: string, trigger: SyncTrigger = 'manual') {
@@ -207,6 +237,168 @@ export class IngestionOrchestratorService {
         trigger,
         errorMessage: message,
       });
+
+      throw error;
+    }
+  }
+
+  private async runRawWindowRecovery(
+    entityConfig: AcuteEntityConfig,
+    windowFrom: Date,
+    windowTo: Date,
+    note?: string,
+  ) {
+    const entityKey = entityConfig.key;
+    const mode = entityConfig.mode as SyncMode;
+    const rangeFromParam = entityConfig.rangeFromParam;
+    const rangeToParam = entityConfig.rangeToParam;
+
+    if (!rangeFromParam || !rangeToParam) {
+      throw new BadRequestException(`Entity "${entityKey}" is missing date-window parameters.`);
+    }
+
+    if (!entityConfig.enabled) {
+      return {
+        entityKey,
+        flowType: 'raw',
+        mode,
+        skipped: true,
+        reason: 'disabled',
+      };
+    }
+
+    const hasActiveRawRun = await this.repositoryService.hasActiveRun(entityKey, 'raw');
+    if (hasActiveRawRun) {
+      return {
+        entityKey,
+        flowType: 'raw',
+        mode,
+        skipped: true,
+        reason: 'already_running',
+      };
+    }
+
+    await this.repositoryService.markRunStarted(entityKey);
+    const runContext: Record<string, unknown> = {
+      entityKey,
+      flowType: 'raw',
+      strategy: 'manual_window_recovery',
+      requestedWindow: {
+        from: windowFrom.toISOString(),
+        to: windowTo.toISOString(),
+      },
+      note: note ?? null,
+      doesNotAdvanceCursor: true,
+    };
+    const run = await this.repositoryService.createRun(entityKey, mode, 'raw', runContext);
+
+    let runFinished = false;
+    try {
+      const windowResult = await this.fetchExactWindowWithRetry(
+        entityConfig,
+        rangeFromParam,
+        rangeToParam,
+        windowFrom,
+        windowTo,
+        run.id,
+        runContext,
+      );
+
+      if (windowResult.status === 'failed') {
+        const failureContext = {
+          ...runContext,
+          status: 'failed',
+          failedWindow: {
+            from: windowFrom.toISOString(),
+            to: windowTo.toISOString(),
+            attemptCount: windowResult.attemptCount,
+            errorMessage: windowResult.error.message,
+          },
+        };
+        await this.repositoryService.completeRun(
+          run.id,
+          'failed',
+          0,
+          0,
+          windowResult.error.message,
+          failureContext,
+        );
+        runFinished = true;
+        if (windowResult.attemptCount >= this.maxWindowAttempts) {
+          await this.telegramNotifierService.notifyRawWindowFailure({
+            entityKey,
+            trigger: 'manual',
+            windowFrom: windowFrom.toISOString(),
+            windowTo: windowTo.toISOString(),
+            attemptCount: windowResult.attemptCount,
+            windowSize: this.calculateRecoveryWindowSize(windowFrom, windowTo, entityConfig),
+            windowUnit: entityConfig.rangeWindowUnit,
+            errorMessage: windowResult.error.message,
+          });
+        }
+
+        throw windowResult.error;
+      }
+
+      const rawUpsertedCount = await this.repositoryService.upsertRawRecords(
+        entityConfig,
+        windowResult.result.records,
+      );
+      const derivedEntityCounts = await this.upsertDerivedEntities(
+        entityConfig,
+        windowResult.result.records,
+      );
+      const upsertedCount = rawUpsertedCount + derivedEntityCounts.totalUpsertedCount;
+      const syncContext = {
+        ...runContext,
+        status: 'success',
+        recoveredWindow: {
+          from: windowFrom.toISOString(),
+          to: windowTo.toISOString(),
+          attemptCount: windowResult.attemptCount,
+          fetchedCount: windowResult.result.records.length,
+          rawUpsertedCount,
+          derivedEntityCounts: derivedEntityCounts.byEntity,
+          recoveredAt: new Date().toISOString(),
+        },
+      };
+
+      await this.repositoryService.completeRun(
+        run.id,
+        'success',
+        windowResult.result.records.length,
+        upsertedCount,
+        undefined,
+        syncContext,
+      );
+      runFinished = true;
+
+      return {
+        entityKey,
+        flowType: 'raw',
+        mode,
+        recovery: true,
+        windowFrom: windowFrom.toISOString(),
+        windowTo: windowTo.toISOString(),
+        fetchedCount: windowResult.result.records.length,
+        rawUpsertedCount,
+        upsertedCount,
+        derivedEntityCounts: derivedEntityCounts.byEntity,
+        attemptCount: windowResult.attemptCount,
+        cursorAdvanced: false,
+      };
+    } catch (error) {
+      if (!runFinished) {
+        const errorMessage = (error as Error).message;
+        await this.repositoryService.completeRun(run.id, 'failed', 0, 0, errorMessage, {
+          ...runContext,
+          status: 'failed',
+          failure: {
+            message: errorMessage,
+            failedAt: new Date().toISOString(),
+          },
+        });
+      }
 
       throw error;
     }
@@ -802,6 +994,122 @@ export class IngestionOrchestratorService {
       windowSize: entityConfig.rangeWindowSize ?? 1,
       attemptCount: this.maxWindowAttempts,
     };
+  }
+
+  private async fetchExactWindowWithRetry(
+    entityConfig: AcuteEntityConfig,
+    rangeFromParam: string,
+    rangeToParam: string,
+    windowFrom: Date,
+    windowTo: Date,
+    runId: string,
+    syncContext: Record<string, unknown>,
+  ) {
+    let lastError: Error | undefined;
+
+    for (let attempt = 1; attempt <= this.maxWindowAttempts; attempt += 1) {
+      const attemptStartedAt = new Date().toISOString();
+      const attemptContext = {
+        ...syncContext,
+        lastAttemptedWindow: {
+          from: windowFrom.toISOString(),
+          to: windowTo.toISOString(),
+          status: 'in_progress',
+          startedAt: attemptStartedAt,
+          attempt,
+          maxAttempts: this.maxWindowAttempts,
+          exactWindowRecovery: true,
+        },
+      };
+      await this.repositoryService.updateRunContext(runId, attemptContext);
+
+      try {
+        const result = await this.acuteClientService.fetchEntity(entityConfig, undefined, {
+          [rangeFromParam]: this.formatSyncDate(windowFrom, entityConfig),
+          [rangeToParam]: this.formatSyncDate(windowTo, entityConfig),
+        });
+
+        return {
+          status: 'success' as const,
+          result,
+          attemptCount: attempt,
+        };
+      } catch (error) {
+        lastError = error as Error;
+        const hasMoreAttempts = attempt < this.maxWindowAttempts;
+        await this.repositoryService.updateRunContext(runId, {
+          ...syncContext,
+          lastAttemptedWindow: {
+            from: windowFrom.toISOString(),
+            to: windowTo.toISOString(),
+            status: hasMoreAttempts ? 'retrying' : 'failed',
+            startedAt: attemptStartedAt,
+            finishedAt: new Date().toISOString(),
+            attempt,
+            maxAttempts: this.maxWindowAttempts,
+            exactWindowRecovery: true,
+            errorMessage: lastError.message,
+          },
+          failure: hasMoreAttempts
+            ? undefined
+            : {
+                message: lastError.message,
+                failedAt: new Date().toISOString(),
+              },
+        });
+
+        if (!hasMoreAttempts) {
+          return {
+            status: 'failed' as const,
+            error: lastError,
+            attemptCount: attempt,
+          };
+        }
+
+        this.logger.warn(
+          `Manual raw window recovery failed for ${entityConfig.key} ${windowFrom.toISOString()} -> ${windowTo.toISOString()} | nextAttempt=${
+            attempt + 1
+          }/${this.maxWindowAttempts} | delayMs=${this.retryDelayMs} | message=${lastError.message}`,
+        );
+        await this.sleep(this.retryDelayMs);
+      }
+    }
+
+    return {
+      status: 'failed' as const,
+      error: lastError ?? new Error('Unknown manual raw window recovery error'),
+      attemptCount: this.maxWindowAttempts,
+    };
+  }
+
+  private parseWindowBoundary(value: string, fieldName: 'from' | 'to'): Date {
+    const parsed = new Date(value);
+    if (Number.isNaN(parsed.getTime())) {
+      throw new BadRequestException(`"${fieldName}" must be a valid date or datetime.`);
+    }
+
+    return parsed;
+  }
+
+  private calculateRecoveryWindowSize(
+    windowFrom: Date,
+    windowTo: Date,
+    entityConfig: AcuteEntityConfig,
+  ): number {
+    const diffMs = windowTo.getTime() - windowFrom.getTime();
+
+    if (entityConfig.rangeWindowUnit === 'day') {
+      return diffMs / (24 * 60 * 60 * 1000);
+    }
+
+    if (entityConfig.rangeWindowUnit === 'month') {
+      return (
+        (windowTo.getUTCFullYear() - windowFrom.getUTCFullYear()) * 12 +
+        (windowTo.getUTCMonth() - windowFrom.getUTCMonth())
+      );
+    }
+
+    return diffMs;
   }
 
   private async stageRecordWithRetry(
