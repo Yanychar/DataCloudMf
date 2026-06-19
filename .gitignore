@@ -9,3 +9,4 @@ coverage
 prisma/dev.db
 /.run/
 .env.docker
+/reports/
