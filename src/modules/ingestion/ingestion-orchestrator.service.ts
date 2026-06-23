@@ -742,6 +742,7 @@ export class IngestionOrchestratorService {
           status: 'success',
           fetchedCount: result.records.length,
           upsertedCount,
+          invoiceEventHydration: hydrated.summary,
         },
         derivedEntityCounts: derivedEntityCounts.byEntity,
       },
@@ -896,6 +897,7 @@ export class IngestionOrchestratorService {
           windowSize: effectiveWindowSize,
           fetchedCount: result.records.length,
           upsertedCount: currentUpsertedCount,
+          invoiceEventHydration: hydrated.summary,
           derivedEntityCounts: derivedEntityCounts.byEntity,
         },
         lastCompletedWindow: {
