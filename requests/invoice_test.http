@@ -83,3 +83,15 @@ POST http://localhost:3000/ingestion/sync/invoice
 
 ### Trigger real invoiceEvent sync
 POST http://localhost:3000/ingestion/sync/invoiceEvent
+
+###  Testing requests by invoice number
+
+### Dry run raw Acute request to /ledger including events
+POST http://localhost:3000/acute-test/request
+Content-Type: application/json
+
+{
+  "method": "GET",
+  "path": "/ledger/133015",
+  "timeoutMs": 60000
+}

@@ -45,11 +45,13 @@ model RepositoryRecord {
   stageError      String?  @db.Text
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
+  payloadInvoiceDate String? @db.VarChar(10)
 
   @@unique([entityType, externalId])
   @@index([entityType, sourceUpdatedAt])
   @@index([entityType, stagingNeeded, updatedAt])
   @@index([entityType, stagingNeeded, id])
+  @@index([entityType, payloadInvoiceDate])
 }
 
 model EnumLookup {

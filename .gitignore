@@ -11,3 +11,5 @@ prisma/dev.db
 /.run/
 /docs/
 /reports/
+/outputs/
+/scripts/

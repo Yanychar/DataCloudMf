@@ -1,5 +1,6 @@
 import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { RecoverRawFromDateDto } from './dto/recover-raw-from-date.dto';
 import { RecoverRawWindowDto } from './dto/recover-raw-window.dto';
 import { IngestionOrchestratorService } from './ingestion-orchestrator.service';
 import { IngestionSchedulerService } from './ingestion-scheduler.service';
@@ -52,6 +53,15 @@ export class IngestionController {
     @Body() dto: RecoverRawWindowDto,
   ) {
     return this.ingestionOrchestratorService.recoverRawWindow(entityKey, dto);
+  }
+
+  @Post('raw/:entityKey/recover-from')
+  @ApiOperation({ summary: 'Recover raw invoice data day-by-day from a date through today' })
+  recoverRawFromDate(
+    @Param('entityKey') entityKey: string,
+    @Body() dto: RecoverRawFromDateDto,
+  ) {
+    return this.ingestionOrchestratorService.recoverRawFromDate(entityKey, dto);
   }
 
   @Post('stage/:entityKey')

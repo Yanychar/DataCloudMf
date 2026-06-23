@@ -57,7 +57,6 @@
     "rangeRetryWindowSizes": [1, 1, 1],
     "initialCursor": "2000-01-01T00:00:00",
     "staticParams": {
-      "showEvents": true,
       "dateType": "invoiceDate"
     },
     "notes": "MF-issued outbound sales invoice sourced from the ledger endpoint. Payer is identified by payerClientId or payerOrgId. Reads are executed in date windows using startDate and endDate. The invoice handler also extracts and persists invoiceEvent rows from the same source response."
@@ -71,7 +70,6 @@
     "scheduled": false,
     "sourceOwnedBy": "invoice",
     "staticParams": {
-      "showEvents": true,
       "dateType": "invoiceDate"
     },
     "recordPath": "events",

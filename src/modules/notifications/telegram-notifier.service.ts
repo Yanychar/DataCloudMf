@@ -30,6 +30,11 @@ export interface RawWindowFailureNotification {
   errorMessage: string;
 }
 
+export interface InvoiceEventsMissingNotification {
+  invoiceId: string;
+  invoiceDate?: string;
+  errorMessage: string;
+}
 @Injectable()
 export class TelegramNotifierService {
   private readonly logger = new Logger(TelegramNotifierService.name);
@@ -86,6 +91,23 @@ export class TelegramNotifierService {
     );
   }
 
+
+  async notifyInvoiceEventsMissing(notification: InvoiceEventsMissingNotification): Promise<void> {
+    const result = await this.sendMessage(this.buildInvoiceEventsMissingMessage(notification));
+
+    if (result.sent) {
+      return;
+    }
+
+    if (result.skippedReason) {
+      this.logger.warn(`Telegram invoice events missing notification skipped: ${result.skippedReason}.`);
+      return;
+    }
+
+    this.logger.warn(
+      `Telegram invoice events missing notification could not be sent: ${result.errorMessage ?? 'unknown error'}`,
+    );
+  }
   private async sendMessage(text: string): Promise<TelegramSendResult> {
     if (!this.isEnabled()) {
       return {
@@ -171,6 +193,19 @@ export class TelegramNotifierService {
     ].join('\n');
   }
 
+
+  private buildInvoiceEventsMissingMessage(notification: InvoiceEventsMissingNotification): string {
+    return [
+      'Medfin Data Cloud invoice events missing',
+      '',
+      `Environment: ${this.configService.get<string>('APP_ENV', 'development')}`,
+      `Host: ${hostname()}`,
+      `Invoice ID: ${notification.invoiceId}`,
+      `Invoice date: ${notification.invoiceDate ?? 'unknown'}`,
+      `Time: ${new Date().toISOString()}`,
+      `Error: ${notification.errorMessage}`,
+    ].join('\n');
+  }
   private isEnabled(): boolean {
     return this.configService.get<string>('TELEGRAM_NOTIFICATIONS_ENABLED', 'false') === 'true';
   }

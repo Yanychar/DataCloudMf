@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsOptional, IsString } from 'class-validator';
+import { IsBoolean, IsInt, IsOptional, IsString, Min } from 'class-validator';
 
 export class RecoverRawWindowDto {
   @ApiProperty({
@@ -10,8 +10,8 @@ export class RecoverRawWindowDto {
   from!: string;
 
   @ApiProperty({
-    description: 'Exclusive raw window end. Use the next day for a one-day recovery.',
-    example: '2026-05-16',
+    description: 'Raw window end. Use the same date for a one-day Acute ledger recovery.',
+    example: '2026-05-15',
   })
   @IsString()
   to!: string;
@@ -24,4 +24,23 @@ export class RecoverRawWindowDto {
   @IsOptional()
   @IsString()
   note?: string;
+
+  @ApiProperty({
+    required: false,
+    description: 'Optional showEvents override for this recovery request.',
+    example: false,
+  })
+  @IsOptional()
+  @IsBoolean()
+  showEvents?: boolean;
+
+  @ApiProperty({
+    required: false,
+    description: 'Optional Acute timeout override in milliseconds for this recovery request.',
+    example: 60000,
+  })
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  timeoutMs?: number;
 }

@@ -5,9 +5,27 @@ import { AcuteConfigService } from '../acute/acute-config.service';
 import { AcuteEntityConfig } from '../acute/acute.types';
 import { TelegramNotifierService } from '../notifications/telegram-notifier.service';
 import { RepositoryService } from '../repository/repository.service';
+import { RecoverRawFromDateDto } from './dto/recover-raw-from-date.dto';
 import { RecoverRawWindowDto } from './dto/recover-raw-window.dto';
 
 type SyncTrigger = 'scheduled' | 'manual';
+
+interface InvoiceEventHydrationFailure {
+  invoiceId: string;
+  invoiceDate?: string;
+  message: string;
+}
+
+interface InvoiceEventHydrationSummary {
+  invoicesByIdRequests: number;
+  invoicesByIdEventsRecovered: number;
+  missingEventsAfterFallback: InvoiceEventHydrationFailure[];
+}
+
+interface InvoiceEventHydrationResult {
+  records: Record<string, unknown>[];
+  summary: InvoiceEventHydrationSummary;
+}
 
 @Injectable()
 export class IngestionOrchestratorService {
@@ -91,11 +109,75 @@ export class IngestionOrchestratorService {
 
     const windowFrom = this.parseWindowBoundary(dto.from, 'from');
     const windowTo = this.parseWindowBoundary(dto.to, 'to');
-    if (windowTo.getTime() <= windowFrom.getTime()) {
-      throw new BadRequestException('"to" must be later than "from".');
+    if (windowTo.getTime() < windowFrom.getTime()) {
+      throw new BadRequestException('"to" must not be earlier than "from".');
     }
 
-    return this.runRawWindowRecovery(entityConfig, windowFrom, windowTo, dto.note);
+    return this.runRawWindowRecovery(entityConfig, windowFrom, windowTo, dto.note, {
+      showEvents: dto.showEvents,
+      timeoutMs: dto.timeoutMs,
+    });
+  }
+
+  async recoverRawFromDate(entityKey: string, dto: RecoverRawFromDateDto) {
+    if (entityKey !== 'invoice') {
+      throw new BadRequestException('Day-by-day recovery from date is supported for invoice only.');
+    }
+
+    const entityConfig = this.acuteConfigService.getEntityConfigOrThrow(entityKey);
+    const firstDay = this.parseDateOnlyBoundary(dto.from, 'from');
+    const today = this.todayUtcDateOnly();
+
+    if (firstDay.getTime() > today.getTime()) {
+      throw new BadRequestException('"from" must not be later than today.');
+    }
+
+    const days = [];
+    for (
+      let currentDay = new Date(firstDay);
+      currentDay.getTime() <= today.getTime();
+      currentDay = this.addDays(currentDay, 1)
+    ) {
+      const date = this.formatDateOnly(currentDay);
+      try {
+        const result = await this.runRawWindowRecovery(
+          entityConfig,
+          currentDay,
+          currentDay,
+          dto.note ?? `Recover invoice raw data for ${date}`,
+          { timeoutMs: dto.timeoutMs },
+        );
+        days.push({
+          date,
+          status: result.skipped ? 'skipped' : 'success',
+          result,
+        });
+      } catch (error) {
+        days.push({
+          date,
+          status: 'failed',
+          errorMessage: (error as Error).message,
+        });
+      }
+    }
+
+    const succeededCount = days.filter((day) => day.status === 'success').length;
+    const failedCount = days.filter((day) => day.status === 'failed').length;
+    const skippedCount = days.filter((day) => day.status === 'skipped').length;
+
+    return {
+      entityKey,
+      flowType: 'raw',
+      recovery: true,
+      strategy: 'daily_from_date',
+      from: this.formatDateOnly(firstDay),
+      to: this.formatDateOnly(today),
+      totalDays: days.length,
+      succeededCount,
+      failedCount,
+      skippedCount,
+      days,
+    };
   }
 
   async stageEntity(entityKey: string, trigger: SyncTrigger = 'manual') {
@@ -247,6 +329,7 @@ export class IngestionOrchestratorService {
     windowFrom: Date,
     windowTo: Date,
     note?: string,
+    options: { showEvents?: boolean; timeoutMs?: number } = {},
   ) {
     const entityKey = entityConfig.key;
     const mode = entityConfig.mode as SyncMode;
@@ -288,6 +371,10 @@ export class IngestionOrchestratorService {
         to: windowTo.toISOString(),
       },
       note: note ?? null,
+      recoveryOverrides: {
+        showEvents: options.showEvents ?? null,
+        timeoutMs: options.timeoutMs ?? null,
+      },
       doesNotAdvanceCursor: true,
     };
     const run = await this.repositoryService.createRun(entityKey, mode, 'raw', runContext);
@@ -302,6 +389,7 @@ export class IngestionOrchestratorService {
         windowTo,
         run.id,
         runContext,
+        options,
       );
 
       if (windowResult.status === 'failed') {
@@ -340,13 +428,18 @@ export class IngestionOrchestratorService {
         throw windowResult.error;
       }
 
-      const rawUpsertedCount = await this.repositoryService.upsertRawRecords(
+      const hydrated = await this.hydrateInvoiceEventsIfNeeded(
         entityConfig,
         windowResult.result.records,
+        options.timeoutMs,
+      );
+      const rawUpsertedCount = await this.repositoryService.upsertRawRecords(
+        entityConfig,
+        hydrated.records,
       );
       const derivedEntityCounts = await this.upsertDerivedEntities(
         entityConfig,
-        windowResult.result.records,
+        hydrated.records,
       );
       const upsertedCount = rawUpsertedCount + derivedEntityCounts.totalUpsertedCount;
       const syncContext = {
@@ -358,6 +451,7 @@ export class IngestionOrchestratorService {
           attemptCount: windowResult.attemptCount,
           fetchedCount: windowResult.result.records.length,
           rawUpsertedCount,
+          invoiceEventHydration: hydrated.summary,
           derivedEntityCounts: derivedEntityCounts.byEntity,
           recoveredAt: new Date().toISOString(),
         },
@@ -384,6 +478,7 @@ export class IngestionOrchestratorService {
         rawUpsertedCount,
         upsertedCount,
         derivedEntityCounts: derivedEntityCounts.byEntity,
+        invoiceEventHydration: hydrated.summary,
         attemptCount: windowResult.attemptCount,
         cursorAdvanced: false,
       };
@@ -627,8 +722,9 @@ export class IngestionOrchestratorService {
       throw error;
     }
 
-    const upsertedCount = await this.repositoryService.upsertRawRecords(entityConfig, result.records);
-    const derivedEntityCounts = await this.upsertDerivedEntities(entityConfig, result.records);
+    const hydrated = await this.hydrateInvoiceEventsIfNeeded(entityConfig, result.records);
+    const upsertedCount = await this.repositoryService.upsertRawRecords(entityConfig, hydrated.records);
+    const derivedEntityCounts = await this.upsertDerivedEntities(entityConfig, hydrated.records);
     const completedAt = new Date().toISOString();
 
     return {
@@ -646,6 +742,7 @@ export class IngestionOrchestratorService {
           status: 'success',
           fetchedCount: result.records.length,
           upsertedCount,
+          invoiceEventHydration: hydrated.summary,
         },
         derivedEntityCounts: derivedEntityCounts.byEntity,
       },
@@ -779,8 +876,9 @@ export class IngestionOrchestratorService {
 
       const result = windowAttemptResult.result;
 
-      const currentUpsertedCount = await this.repositoryService.upsertRawRecords(entityConfig, result.records);
-      const derivedEntityCounts = await this.upsertDerivedEntities(entityConfig, result.records);
+      const hydrated = await this.hydrateInvoiceEventsIfNeeded(entityConfig, result.records);
+      const currentUpsertedCount = await this.repositoryService.upsertRawRecords(entityConfig, hydrated.records);
+      const derivedEntityCounts = await this.upsertDerivedEntities(entityConfig, hydrated.records);
       fetchedCount += result.records.length;
       upsertedCount += currentUpsertedCount + derivedEntityCounts.totalUpsertedCount;
       lastRequestedAt = result.requestedAt;
@@ -799,6 +897,7 @@ export class IngestionOrchestratorService {
           windowSize: effectiveWindowSize,
           fetchedCount: result.records.length,
           upsertedCount: currentUpsertedCount,
+          invoiceEventHydration: hydrated.summary,
           derivedEntityCounts: derivedEntityCounts.byEntity,
         },
         lastCompletedWindow: {
@@ -808,6 +907,7 @@ export class IngestionOrchestratorService {
           windowSize: effectiveWindowSize,
           fetchedCount: result.records.length,
           upsertedCount: currentUpsertedCount,
+          invoiceEventHydration: hydrated.summary,
           derivedEntityCounts: derivedEntityCounts.byEntity,
         },
         cumulativeFetched: fetchedCount,
@@ -879,6 +979,7 @@ export class IngestionOrchestratorService {
     plannedWindowTo: Date,
     runId: string,
     syncContext: Record<string, unknown>,
+    options: { showEvents?: boolean; timeoutMs?: number } = {},
   ) {
     let lastError: Error | undefined;
     const retryWindowSizes = entityConfig.rangeRetryWindowSizes ?? [];
@@ -1004,6 +1105,7 @@ export class IngestionOrchestratorService {
     windowTo: Date,
     runId: string,
     syncContext: Record<string, unknown>,
+    options: { showEvents?: boolean; timeoutMs?: number } = {},
   ) {
     let lastError: Error | undefined;
 
@@ -1024,10 +1126,20 @@ export class IngestionOrchestratorService {
       await this.repositoryService.updateRunContext(runId, attemptContext);
 
       try {
-        const result = await this.acuteClientService.fetchEntity(entityConfig, undefined, {
+        const extraParams: Record<string, unknown> = {
           [rangeFromParam]: this.formatSyncDate(windowFrom, entityConfig),
           [rangeToParam]: this.formatSyncDate(windowTo, entityConfig),
-        });
+        };
+        if (typeof options.showEvents === 'boolean') {
+          extraParams.showEvents = options.showEvents;
+        }
+
+        const result = await this.acuteClientService.fetchEntity(
+          entityConfig,
+          undefined,
+          extraParams,
+          { timeoutMs: options.timeoutMs },
+        );
 
         return {
           status: 'success' as const,
@@ -1156,6 +1268,146 @@ export class IngestionOrchestratorService {
     }
 
     throw lastError ?? new Error(`Unknown staging error for ${entityConfig.key}/${repositoryRecord.externalId}`);
+  }
+
+  private async hydrateInvoiceEventsIfNeeded(
+    entityConfig: AcuteEntityConfig,
+    records: Record<string, unknown>[],
+    timeoutMs?: number,
+  ): Promise<InvoiceEventHydrationResult> {
+    const summary: InvoiceEventHydrationSummary = {
+      invoicesByIdRequests: 0,
+      invoicesByIdEventsRecovered: 0,
+      missingEventsAfterFallback: [],
+    };
+
+    if (entityConfig.key !== 'invoice') {
+      return { records, summary };
+    }
+
+    const hydratedRecords: Record<string, unknown>[] = [];
+
+    for (const record of records) {
+      if (this.hasNonNullEvents(record)) {
+        hydratedRecords.push(record);
+        continue;
+      }
+
+      const invoiceId = this.extractInvoiceId(record);
+      if (!invoiceId) {
+        hydratedRecords.push(record);
+        continue;
+      }
+
+      const invoiceDate = this.extractInvoiceDate(record);
+
+      try {
+        summary.invoicesByIdRequests += 1;
+        const invoiceResponse = await this.acuteClientService.request(`/invoices/${invoiceId}`, undefined, {
+          timeoutMs,
+        });
+        const invoiceEvents = this.isObject(invoiceResponse) ? invoiceResponse.events : undefined;
+
+        if (invoiceEvents !== null && typeof invoiceEvents !== 'undefined') {
+          summary.invoicesByIdEventsRecovered += 1;
+          hydratedRecords.push({
+            ...record,
+            events: invoiceEvents,
+          });
+          continue;
+        }
+      } catch (error) {
+        await this.recordInvoiceEventsMissing(summary, {
+          invoiceId,
+          invoiceDate,
+          message: `Invoices invoice-by-id event hydration failed: ${(error as Error).message}`,
+        });
+        hydratedRecords.push(record);
+        continue;
+      }
+
+      await this.recordInvoiceEventsMissing(summary, {
+        invoiceId,
+        invoiceDate,
+        message: 'Events are null after Invoices invoice-by-id fallback request.',
+      });
+      hydratedRecords.push(record);
+    }
+
+    return {
+      records: hydratedRecords,
+      summary,
+    };
+  }
+
+  private async recordInvoiceEventsMissing(
+    summary: InvoiceEventHydrationSummary,
+    failure: InvoiceEventHydrationFailure,
+  ): Promise<void> {
+    summary.missingEventsAfterFallback.push(failure);
+    this.logger.error(
+      `Invoice events missing after fallback | invoiceId=${failure.invoiceId} | invoiceDate=${
+        failure.invoiceDate ?? 'unknown'
+      } | message=${failure.message}`,
+    );
+    await this.telegramNotifierService.notifyInvoiceEventsMissing({
+      invoiceId: failure.invoiceId,
+      invoiceDate: failure.invoiceDate,
+      errorMessage: failure.message,
+    });
+  }
+
+  private hasNonNullEvents(record: Record<string, unknown>): boolean {
+    return 'events' in record && record.events !== null && typeof record.events !== 'undefined';
+  }
+
+  private extractInvoiceId(record: Record<string, unknown>): string | undefined {
+    const value = record.invoiceId;
+    if (typeof value === 'string' || typeof value === 'number') {
+      return String(value);
+    }
+
+    return undefined;
+  }
+
+  private extractInvoiceDate(record: Record<string, unknown>): string | undefined {
+    const value = record.invoiceDate;
+    if (typeof value === 'string' || typeof value === 'number') {
+      return String(value);
+    }
+
+    return undefined;
+  }
+
+  private isObject(value: unknown): value is Record<string, unknown> {
+    return typeof value === 'object' && value !== null && !Array.isArray(value);
+  }
+
+  private parseDateOnlyBoundary(value: string, fieldName: string): Date {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+      throw new BadRequestException(`"${fieldName}" must use YYYY-MM-DD format.`);
+    }
+
+    const parsed = new Date(`${value}T00:00:00.000Z`);
+    if (Number.isNaN(parsed.getTime())) {
+      throw new BadRequestException(`Invalid "${fieldName}" date.`);
+    }
+
+    return parsed;
+  }
+
+  private todayUtcDateOnly(): Date {
+    return this.parseDateOnlyBoundary(new Date().toISOString().slice(0, 10), 'today');
+  }
+
+  private addDays(value: Date, days: number): Date {
+    const next = new Date(value);
+    next.setUTCDate(next.getUTCDate() + days);
+    return next;
+  }
+
+  private formatDateOnly(value: Date): string {
+    return value.toISOString().slice(0, 10);
   }
 
   private async delay(ms: number): Promise<void> {
