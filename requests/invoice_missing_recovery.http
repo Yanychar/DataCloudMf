@@ -1,0 +1,63 @@
+### Health check
+GET http://localhost:3010/health
+
+### Acute client config ping
+GET http://localhost:3010/acute-test/ping
+
+### Test raw Acute request to /ledger for one date window. Just Acute reading without processing
+POST http://localhost:3010/acute-test/request
+Content-Type: application/json
+
+{
+  "method": "GET",
+  "path": "/ledger",
+  "params": {
+    "dateType": "invoiceDate",
+    "showEvents": false,
+    "startDate": "2026-05-19",
+    "endDate": "2026-05-19"
+  },
+  "timeoutMs": 60000
+}
+### Read and process invoice data from Acute
+POST http://localhost:3010/ingestion/raw/invoice/window
+Content-Type: application/json
+
+{
+  "from": "2026-05-19",
+  "to": "2026-05-19",
+  "note": "Recover missing invoice day 2026-05-119",
+  "timeoutMs": 60000
+}
+
+
+###  Testing requests by invoice number
+
+### Dry run raw Acute request to /ledger including events
+POST http://localhost:3010/acute-test/request
+Content-Type: application/json
+
+{
+  "method": "GET",
+  "path": "/ledger/133612",
+  "timeoutMs": 60000
+}
+### Raw Acute request to /invoice including events
+POST http://localhost:3010/acute-test/request
+Content-Type: application/json
+
+{
+  "method": "GET",
+  "path": "/invoices/133612",
+  "timeoutMs": 60000
+}
+
+### Dry run raw Acute request to /invoice including events
+POST http://localhost:3010/ingestion/raw/invoice/recover-from
+Content-Type: application/json
+
+{
+"from": "2026-01-01",
+"note": "Recover invoices from 2026-01-01 through today",
+"timeoutMs": 60000
+}

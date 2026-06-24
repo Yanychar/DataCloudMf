@@ -4,28 +4,28 @@ GET http://localhost:3000/health
 ### Acute client config ping
 GET http://localhost:3000/acute-test/ping
 
-### Dry run raw Acute request to /invoices for one 30-day window
-POST http://localhost:3000/acute-test/request?dryRun=true
-Content-Type: application/json
-
-{
-  "method": "GET",
-  "path": "/invoices",
-  "params": {
-    "dateType": "invoiceDate",
-    "startDate": "2024-04-01",
-    "endDate": "2024-05-01"
-  },
-  "timeoutMs": 60000
-}
-
-### Raw Acute request to /invoices for one 30-day window
+### Dry run raw Acute request to /ledger for one date window
 POST http://localhost:3000/acute-test/request
 Content-Type: application/json
 
 {
   "method": "GET",
-  "path": "/invoices",
+  "path": "/ledger",
+  "params": {
+    "dateType": "invoiceDate",
+    "startDate": "2026-05-17",
+    "endDate": "2026-05-18"
+  },
+  "timeoutMs": 60000
+}
+
+### Raw Acute request to /ledger for one date window
+POST http://localhost:3000/acute-test/request
+Content-Type: application/json
+
+{
+  "method": "GET",
+  "path": "/ledger",
   "params": {
     "dateType": "invoiceDate",
     "startDate": "2024-04-01",
@@ -34,13 +34,13 @@ Content-Type: application/json
   "timeoutMs": 60000
 }
 
-### Dry run raw Acute request to /invoices including events
+### Dry run raw Acute request to /ledger including events
 POST http://localhost:3000/acute-test/request?dryRun=true
 Content-Type: application/json
 
 {
   "method": "GET",
-  "path": "/invoices",
+  "path": "/ledger",
   "params": {
     "dateType": "invoiceDate",
     "showEvents": true,
@@ -50,13 +50,13 @@ Content-Type: application/json
   "timeoutMs": 60000
 }
 
-### Raw Acute request to /invoices including events
+### Raw Acute request to /ledger including events
 POST http://localhost:3000/acute-test/request
 Content-Type: application/json
 
 {
   "method": "GET",
-  "path": "/invoices",
+  "path": "/ledger",
   "params": {
     "dateType": "invoiceDate",
     "showEvents": false,
@@ -83,3 +83,15 @@ POST http://localhost:3000/ingestion/sync/invoice
 
 ### Trigger real invoiceEvent sync
 POST http://localhost:3000/ingestion/sync/invoiceEvent
+
+###  Testing requests by invoice number
+
+### Dry run raw Acute request to /ledger including events
+POST http://localhost:3000/acute-test/request
+Content-Type: application/json
+
+{
+  "method": "GET",
+  "path": "/ledger/133015",
+  "timeoutMs": 60000
+}

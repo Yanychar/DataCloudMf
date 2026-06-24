@@ -8,6 +8,7 @@ import { PrismaModule } from './modules/prisma/prisma.module';
 import { IngestionModule } from './modules/ingestion/ingestion.module';
 import { ClientAdminModule } from './modules/client-admin/client-admin.module';
 import { ReportingAdminModule } from './modules/reporting-admin/reporting-admin.module';
+import { NotificationsModule } from './modules/notifications/notifications.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { ReportingAdminModule } from './modules/reporting-admin/reporting-admin.
     PrismaModule,
     RepositoryModule,
     AcuteModule,
+    NotificationsModule,
     IngestionModule,
     ClientAdminModule,
     ReportingAdminModule,

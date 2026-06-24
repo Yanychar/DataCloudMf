@@ -6,6 +6,7 @@ import {
   AcuteEntityConfig,
   ImportedEntityConfig,
   ImportedFieldConfig,
+  ImportedFieldPossibleValueConfig,
   ReadStrategy,
 } from './acute.types';
 
@@ -45,8 +46,16 @@ export class AcuteConfigService {
     return this.configService.get<string>('DATA_SYNC_ENABLED', 'true') === 'true';
   }
 
+  getDataStageEnabled(): boolean {
+    return this.configService.get<string>('DATA_STAGE_ENABLED', 'true') === 'true';
+  }
+
   getDefaultCron(): string {
     return this.configService.get<string>('DATA_SYNC_DEFAULT_CRON', '*/30 * * * *');
+  }
+
+  getStageDailyCron(): string {
+    return this.configService.get<string>('DATA_STAGE_DAILY_CRON', '30 2 * * *');
   }
 
   getDefaultMode(): 'full' | 'incremental' {
@@ -143,11 +152,13 @@ export class AcuteConfigService {
       .map((item) => ({
         key: typeof item.key === 'string' ? item.key : '',
         sourcePath: typeof item.sourcePath === 'string' ? item.sourcePath : undefined,
+        targetColumn: typeof item.targetColumn === 'string' ? item.targetColumn : undefined,
         description: typeof item.description === 'string' ? item.description : '',
         dataType: AcuteConfigService.normalizeImportedFieldDataType(item.dataType),
         isColumn: item.isColumn === true,
         filterable: item.filterable === true,
         includeInAiContext: item.includeInAiContext !== false,
+        possibleValues: AcuteConfigService.normalizeImportedFieldPossibleValues(item.possibleValues),
       }))
       .filter((item) => item.key && item.description);
 
@@ -203,6 +214,30 @@ export class AcuteConfigService {
       default:
         return undefined;
     }
+  }
+
+  private static normalizeImportedFieldPossibleValues(
+    value: unknown,
+  ): ImportedFieldPossibleValueConfig[] | undefined {
+    if (!Array.isArray(value)) {
+      return undefined;
+    }
+
+    const normalized = value
+      .filter((item): item is Record<string, unknown> => typeof item === 'object' && item !== null)
+      .map((item) => ({
+        codeInt: typeof item.codeInt === 'number' ? item.codeInt : undefined,
+        codeText: typeof item.codeText === 'string' ? item.codeText : undefined,
+        codeLabel: typeof item.codeLabel === 'string' ? item.codeLabel : '',
+        sortOrder: typeof item.sortOrder === 'number' ? item.sortOrder : undefined,
+      }))
+      .filter(
+        (item) =>
+          item.codeLabel &&
+          (Number.isInteger(item.codeInt) || Boolean(item.codeText)),
+      );
+
+    return normalized.length ? normalized : undefined;
   }
 
   private getAcuteEnvVarName(suffix: 'BASE_URL' | 'LOGIN' | 'PASSWORD'): string {

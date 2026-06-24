@@ -17,6 +17,7 @@ services:
     image: mysql:8.4
     container_name: medfin-data-cloud-mysql
     restart: unless-stopped
+    command: --sort-buffer-size=8M
     environment:
       MYSQL_DATABASE: datacloud
       MYSQL_USER: datacloud

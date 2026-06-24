@@ -1,0 +1,17 @@
+### Trigger client raw sync on Docker collector
+POST http://localhost:3010/ingestion/raw/client
+
+### Trigger organisation raw sync on Docker collector
+POST http://localhost:3010/ingestion/raw/organisation
+
+### Trigger employer raw sync on Docker collector
+POST http://localhost:3010/ingestion/raw/employer
+
+### Trigger personnel raw sync on Docker collector
+POST http://localhost:3010/ingestion/raw/personnel
+
+### Trigger invoice raw sync on Docker collector
+POST http://localhost:3010/ingestion/raw/invoice
+
+### List configured ingestion entities on Docker collector
+GET http://localhost:3010/ingestion/entities

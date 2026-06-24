@@ -1,12 +1,25 @@
 import { createHash } from 'crypto';
 import { Injectable } from '@nestjs/common';
 import { Prisma, RepositoryRecord, SyncMode } from '@prisma/client';
-import { AcuteEntityConfig, ImportedFieldConfig } from '../acute/acute.types';
+import {
+  AcuteEntityConfig,
+  ImportedFieldConfig,
+  ImportedFieldPossibleValueConfig,
+} from '../acute/acute.types';
 import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class RepositoryService {
   constructor(private readonly prisma: PrismaService) {}
+
+  private get enumLookupDelegate(): {
+    upsert: (args: unknown) => Promise<unknown>;
+    findMany: (args: unknown) => Promise<unknown>;
+  } {
+    return (this.prisma as unknown as Record<string, { upsert: (args: unknown) => Promise<unknown>; findMany: (args: unknown) => Promise<unknown> }>)[
+      'enumLookup'
+    ];
+  }
 
   async getEntityState(entityKey: string) {
     return this.prisma.entitySyncState.findUnique({
@@ -14,11 +27,12 @@ export class RepositoryService {
     });
   }
 
-  async hasActiveRun(entityKey: string): Promise<boolean> {
+  async hasActiveRun(entityKey: string, flowType?: 'raw' | 'stage'): Promise<boolean> {
     const activeRun = await this.prisma.syncRun.findFirst({
       where: {
         entityKey,
         finishedAt: null,
+        ...(flowType ? { flowType } : {}),
       },
       select: {
         id: true,
@@ -29,6 +43,27 @@ export class RepositoryService {
     });
 
     return Boolean(activeRun);
+  }
+
+  async getActiveRun(
+    entityKey: string,
+    flowType?: 'raw' | 'stage',
+  ): Promise<Pick<Prisma.SyncRunGetPayload<{ select: { id: true; flowType: true; startedAt: true } }>, 'id' | 'flowType' | 'startedAt'> | null> {
+    return this.prisma.syncRun.findFirst({
+      where: {
+        entityKey,
+        finishedAt: null,
+        ...(flowType ? { flowType } : {}),
+      },
+      select: {
+        id: true,
+        flowType: true,
+        startedAt: true,
+      },
+      orderBy: {
+        startedAt: 'desc',
+      },
+    });
   }
 
   hasStagingConfig(entityConfig: AcuteEntityConfig): boolean {
@@ -204,27 +239,35 @@ export class RepositoryService {
       'id' | 'entityType' | 'externalId' | 'payload' | 'sourceUpdatedAt' | 'checksum' | 'updatedAt'
     >[]
   > {
-    return this.prisma.repositoryRecord.findMany({
-      where: {
-        entityType: entityKey,
-        stagingNeeded: true,
-      },
-      orderBy: {
-        id: 'asc',
-      },
-      cursor: cursorId ? { id: cursorId } : undefined,
-      skip: cursorId ? 1 : 0,
-      take,
-      select: {
-        id: true,
-        entityType: true,
-        externalId: true,
-        payload: true,
-        sourceUpdatedAt: true,
-        checksum: true,
-        updatedAt: true,
-      },
-    });
+    const baseQuery = Prisma.sql`
+      SELECT
+        id,
+        entityType,
+        externalId,
+        payload,
+        sourceUpdatedAt,
+        checksum,
+        updatedAt
+      FROM RepositoryRecord FORCE INDEX (RepositoryRecord_entityType_stagingNeeded_id_idx)
+      WHERE entityType = ${entityKey}
+        AND stagingNeeded = true
+    `;
+
+    const cursorClause = cursorId
+      ? Prisma.sql`AND id > ${cursorId}`
+      : Prisma.empty;
+
+    return this.prisma.$queryRaw<
+      Pick<
+        RepositoryRecord,
+        'id' | 'entityType' | 'externalId' | 'payload' | 'sourceUpdatedAt' | 'checksum' | 'updatedAt'
+      >[]
+    >(Prisma.sql`
+      ${baseQuery}
+      ${cursorClause}
+      ORDER BY id ASC
+      LIMIT ${take}
+    `);
   }
 
   async countPendingStageRecords(entityKey: string): Promise<number> {
@@ -268,6 +311,31 @@ export class RepositoryService {
       repositoryRecord.sourceUpdatedAt ?? undefined,
       repositoryRecord.checksum ?? createHash('sha256').update(JSON.stringify(payload)).digest('hex'),
     );
+  }
+
+  async syncKnownEnumLookupValues(entityConfig: AcuteEntityConfig): Promise<number> {
+    const fields = entityConfig.importedFields?.fields ?? [];
+    let upsertedCount = 0;
+
+    for (const field of fields) {
+      const possibleValues = field.possibleValues ?? [];
+      for (const value of possibleValues) {
+        await this.upsertEnumLookupValue(entityConfig.key, field.key, value);
+        upsertedCount += 1;
+      }
+    }
+
+    return upsertedCount;
+  }
+
+  async getEnumLookupValues(entityKey: string, fieldKey: string) {
+    return this.enumLookupDelegate.findMany({
+      where: {
+        entityKey,
+        fieldKey,
+      },
+      orderBy: [{ sortOrder: 'asc' }, { codeInt: 'asc' }],
+    });
   }
 
   async markRepositoryRecordStaged(recordId: string, checksum?: string | null) {
@@ -352,6 +420,8 @@ export class RepositoryService {
       return;
     }
 
+    await this.ensureEnumLookupValuesForRecord(entityConfig, sanitizedRecord);
+
     const split = this.splitStructuredRecord(importedConfig.fields, sanitizedRecord);
     const structuredData = this.buildStructuredRecordData(importedConfig.fields, split.columnData);
 
@@ -386,8 +456,10 @@ export class RepositoryService {
         continue;
       }
 
+      const targetKey = field.targetColumn ?? field.key;
+
       if (field.isColumn) {
-        columnData[field.key] = value;
+        columnData[targetKey] = value;
       } else {
         jsonData[field.key] = value;
       }
@@ -397,6 +469,85 @@ export class RepositoryService {
       columnData,
       jsonData,
     };
+  }
+
+  private async ensureEnumLookupValuesForRecord(
+    entityConfig: AcuteEntityConfig,
+    sanitizedRecord: Record<string, unknown>,
+  ): Promise<void> {
+    const fields = entityConfig.importedFields?.fields ?? [];
+
+    for (const field of fields) {
+      if (!field.possibleValues?.length) {
+        continue;
+      }
+
+      const value = sanitizedRecord[field.key];
+      const unknownLookupValue = this.buildUnknownLookupValue(value);
+      if (!unknownLookupValue) {
+        continue;
+      }
+
+      const knownValue = field.possibleValues.find((item) =>
+        item.codeText ? item.codeText === value : item.codeInt === value,
+      );
+
+      await this.upsertEnumLookupValue(
+        entityConfig.key,
+        field.key,
+        knownValue ?? unknownLookupValue,
+      );
+    }
+  }
+
+  private async upsertEnumLookupValue(
+    entityKey: string,
+    fieldKey: string,
+    value: ImportedFieldPossibleValueConfig,
+  ): Promise<void> {
+    const domainKey = this.buildEnumDomainKey(entityKey, fieldKey);
+    const createData = {
+      domainKey,
+      entityKey,
+      fieldKey,
+      codeInt: typeof value.codeInt === 'number' ? value.codeInt : null,
+      codeText: typeof value.codeText === 'string' ? value.codeText : null,
+      codeLabel: value.codeLabel,
+      sortOrder: value.sortOrder,
+    };
+    const updateData = {
+      entityKey,
+      fieldKey,
+      codeLabel: value.codeLabel,
+      sortOrder: value.sortOrder ?? null,
+    };
+
+    if (typeof value.codeText === 'string') {
+      await this.enumLookupDelegate.upsert({
+        where: {
+          domainKey_codeText: {
+            domainKey,
+            codeText: value.codeText,
+          },
+        },
+        create: createData,
+        update: updateData,
+      });
+      return;
+    }
+
+    if (typeof value.codeInt === 'number') {
+      await this.enumLookupDelegate.upsert({
+        where: {
+          domainKey_codeInt: {
+            domainKey,
+            codeInt: value.codeInt,
+          },
+        },
+        create: createData,
+        update: updateData,
+      });
+    }
   }
 
   private buildStructuredRecordData(
@@ -410,10 +561,16 @@ export class RepositoryService {
         continue;
       }
 
+      const targetKey = field.targetColumn ?? field.key;
       structuredData[field.key] = this.normalizeStructuredValue(
-        columnData[field.key],
+        columnData[targetKey],
         field.dataType,
       );
+
+      if (targetKey !== field.key) {
+        structuredData[targetKey] = structuredData[field.key];
+        delete structuredData[field.key];
+      }
     }
 
     return structuredData;
@@ -511,5 +668,27 @@ export class RepositoryService {
 
   private getPrismaDelegateName(targetTable: string): string {
     return targetTable.replace(/_([a-z])/g, (_, character: string) => character.toUpperCase());
+  }
+
+  private buildEnumDomainKey(entityKey: string, fieldKey: string): string {
+    return `${entityKey}.${fieldKey}`;
+  }
+
+  private buildUnknownLookupValue(value: unknown): ImportedFieldPossibleValueConfig | undefined {
+    if (Number.isInteger(value)) {
+      return {
+        codeInt: Number(value),
+        codeLabel: 'unknown',
+      };
+    }
+
+    if (typeof value === 'string' && value) {
+      return {
+        codeText: value,
+        codeLabel: 'unknown',
+      };
+    }
+
+    return undefined;
   }
 }

@@ -14,7 +14,8 @@
     "reset:test-state": "node scripts/reset-test-state.js",
     "prisma:generate": "prisma generate",
     "prisma:push": "prisma db push",
-    "test": "echo \"Tests are not set up yet\""
+    "test": "echo \"Tests are not set up yet\"",
+    "db:repository-indexes": "docker exec -i medfin-data-cloud-mysql mysql -uroot -proot datacloud < scripts/sql/repository_record_invoice_date_index.sql"
   },
   "keywords": [
     "nestjs",

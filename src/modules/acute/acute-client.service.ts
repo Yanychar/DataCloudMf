@@ -142,9 +142,11 @@ export class AcuteClientService {
     entityConfig: AcuteEntityConfig,
     lastSuccessfulSyncAt?: Date,
     extraParams?: Record<string, unknown>,
+    options?: { timeoutMs?: number },
   ): Promise<AcuteFetchResult> {
     const params = this.buildEntityParams(entityConfig, lastSuccessfulSyncAt, extraParams);
     const data = await this.request(entityConfig.endpoint, params, {
+      timeoutMs: options?.timeoutMs,
       treatItemNotFoundAsEmpty: entityConfig.label,
     });
     const records = this.normalizeRecords(data, entityConfig);
@@ -154,7 +156,6 @@ export class AcuteClientService {
       requestedAt: new Date().toISOString(),
     };
   }
-
   buildEntityRequestPreview(
     entityConfig: AcuteEntityConfig,
     lastSuccessfulSyncAt?: Date,

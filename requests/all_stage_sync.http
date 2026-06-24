@@ -1,0 +1,21 @@
+### Trigger client stage sync
+POST http://localhost:3010/ingestion/stage/client
+
+### Trigger organisation stage sync only
+POST http://localhost:3010/ingestion/stage/organisation
+
+### Trigger personnel stage sync only
+POST http://localhost:3010/ingestion/stage/personnel
+
+### Trigger employer stage sync only
+POST http://localhost:3010/ingestion/stage/employer
+
+### Trigger invoice stage sync only
+POST http://localhost:3010/ingestion/stage/invoice
+
+### Trigger invoiceEvents stage sync only
+POST http://localhost:3010/ingestion/stage/invoiceEvent
+
+### List configured ingestion entities
+GET http://localhost:3010/ingestion/entities
+
