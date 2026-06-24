@@ -21,5 +21,7 @@ COPY --from=build /app/dist ./dist
 COPY --from=build /app/prisma ./prisma
 COPY --from=build /app/node_modules/.prisma ./node_modules/.prisma
 COPY --from=build /app/node_modules/@prisma ./node_modules/@prisma
+COPY config ./config
+COPY public ./public
 EXPOSE 3000
 CMD ["sh", "-c", "npx prisma db push && node dist/main.js"]

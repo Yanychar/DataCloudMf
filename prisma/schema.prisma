@@ -62,9 +62,15 @@ model StgClient {
   municipality          String?
   municipalityCode      String?
   countryId             String?
+  creditCheck           Boolean?
+  lang                  String?
+  kelaCardCheckStatus   Int?
+  maritalStatusType     String?
+  workCity              String?
   clientType            String?
   endDate               DateTime?
   deathDate             DateTime?
+  motherTongueLangCode  String?
   latestSaveDate        DateTime?
   latestSavePersonnelId Int?
   extraData             Json?
@@ -73,6 +79,9 @@ model StgClient {
   createdAt             DateTime @default(now())
   updatedAt             DateTime @updatedAt
 
+  @@index([birthDate])
+  @@index([gender])
+  @@index([city])
   @@index([clientType])
   @@index([municipality])
   @@index([latestSaveDate])
@@ -83,11 +92,29 @@ model StgOrganisation {
   id                    String   @id @default(cuid())
   externalId            String   @unique
   orgId                 Int?
+  orgType               Int?
+  servStartDate         DateTime?
+  servEndDate           DateTime?
   parentOrgId           Int?
+  rootOrgId             Int?
   orgName               String?
+  orgClientStatus       Int?
+  respDoctorId          Int?
+  respNurseId           Int?
+  managerId             Int?
   streetCity            String?
-  busRegno              String?
+  streetCounty          String?
+  streetCountry         String?
+  streetCountryCode     String?
+  invPayerId            Int?
+  givenClientNbr        Int?
   latestSaveDate        DateTime?
+  oid                   String?
+  orgOid                String?
+  agreementDoneDate     DateTime?
+  invoicingStartDate    DateTime?
+  kelaSummaryAgreementStartDate DateTime?
+  kelaSummaryAgreementEndDate   DateTime?
   extraData             Json?
   sourceUpdatedAt       DateTime?
   checksum              String?
@@ -95,7 +122,9 @@ model StgOrganisation {
   updatedAt             DateTime @updatedAt
 
   @@index([orgId])
+  @@index([orgType])
   @@index([parentOrgId])
+  @@index([orgClientStatus])
   @@index([latestSaveDate])
   @@map("stg_organisation")
 }
@@ -106,9 +135,13 @@ model StgEmployer {
   employer                         String?
   clientId                         Int?
   orgId                            Int?
+  respNurseId                      String?
+  respDoctorId                     String?
   startDate                        DateTime?
   endDate                          DateTime?
   mainEmployer                     Boolean?
+  agreementLevel                   String?
+  orgRespUnit                      String?
   profDescr                        String?
   extraData                        Json?
   sourceUpdatedAt                  DateTime?
@@ -118,6 +151,8 @@ model StgEmployer {
 
   @@index([clientId])
   @@index([orgId])
+  @@index([startDate])
+  @@index([endDate])
   @@index([mainEmployer])
   @@map("stg_employer")
 }
@@ -126,6 +161,7 @@ model StgPersonnel {
   id                String   @id @default(cuid())
   externalId        String   @unique
   personnelId       Int?
+  professionTitleCode String?
   activated         Boolean?
   deleted           Boolean?
   personnelState    String?
@@ -155,8 +191,13 @@ model StgInvoice {
   unitId          Int?
   payerClientId   Int?
   payerOrgId      Int?
+  cashRounding    String?
   totalAmount     String?
+  totalVat        String?
+  vatDetails      Json?
   invoiceStatusId Int?
+  invoiceStatusDescr String?
+  dueDate         DateTime?
   extraData       Json?
   sourceUpdatedAt DateTime?
   checksum        String?
@@ -176,11 +217,32 @@ model StgInvoiceEvent {
   externalId   String   @unique
   eventPayerId Int?
   created      DateTime?
+  eventId      Int?
   payerOrgId   Int?
   clientId     Int?
   amountShare  String?
   invoiceId    Int?
+  originalClientId Int?
+  approvalStatusId Int?
+  belongsTo    Int?
+  eventStatus  Int?
+  itemId       Int?
+  orgId        Int?
+  kelaStatus   Int?
+  priceListPrice String?
+  defaultPrice String?
+  editedDefaultPrice String?
+  timeFactor   String?
+  nightFactor  String?
+  amountFactor String?
+  fractionFactor String?
+  lectureFactor String?
+  discountPct  String?
+  discountAmount String?
   price        String?
+  vatClass     Int?
+  readyDate    DateTime?
+  status4Date  DateTime?
   extraData    Json?
   sourceUpdatedAt DateTime?
   checksum     String?
@@ -189,8 +251,12 @@ model StgInvoiceEvent {
 
   @@index([eventPayerId])
   @@index([created])
+  @@index([eventId])
   @@index([invoiceId])
   @@index([clientId])
+  @@index([originalClientId])
+  @@index([orgId])
+  @@index([itemId])
   @@index([payerOrgId])
   @@map("stg_invoice_event")
 }

@@ -14,7 +14,7 @@
     "rangeWindowUnit": "day",
     "rangeWindowSize": 7,
     "rangeRetryWindowSizes": [4, 1],
-    "initialCursor": "2026-05-10T00:00:00",
+    "initialCursor": "2000-01-01T00:00:00",
     "notes": "Central person entity in Acute. Source identifier is the client URI, for example /clients/123. Reads are executed in 7-day windows. On retry, the same window start is retried with 4-day and then 1-day windows."
   },
   {
@@ -42,7 +42,7 @@
     "key": "invoice",
     "label": "Invoice",
     "endpoint": "/invoices",
-    "cron": "*/30 * * * *",
+    "cron": "0 * * * *",
     "mode": "incremental",
     "enabled": true,
     "derivedEntityKeys": ["invoiceEvent"],
@@ -53,9 +53,9 @@
     "rangeToParam": "endDate",
     "rangeWindowUnit": "day",
     "rangeDateFormat": "date",
-    "rangeWindowSize": 30,
-    "rangeRetryWindowSizes": [15, 5, 1],
-    "initialCursor": "2020-01-01T00:00:00",
+    "rangeWindowSize": 1,
+    "rangeRetryWindowSizes": [1, 1, 1],
+    "initialCursor": "2000-01-01T00:00:00",
     "staticParams": {
       "showEvents": true,
       "dateType": "invoiceDate"

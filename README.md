@@ -53,15 +53,24 @@ Confirmed Acute list endpoints from the current OpenAPI spec:
 Copy `.env.example` to `.env` and update:
 
 - `DATABASE_URL`
+- `APP_ENV`
 - `ACUTE_STAGE_BASE_URL`
 - `ACUTE_STAGE_LOGIN`
 - `ACUTE_STAGE_PASSWORD`
+- `ACUTE_PROD_BASE_URL`
+- `ACUTE_PROD_LOGIN`
+- `ACUTE_PROD_PASSWORD`
 - `DATA_SYNC_ENTITY_CONFIG_PATH`
 - `DATA_SYNC_IMPORTED_FIELDS_CONFIG_PATH`
 - `OPENAI_API_KEY`
 - `OPENAI_BASE_URL`
 - `OPENAI_REPORT_MODEL`
 - `OPENAI_TIMEOUT_MS`
+
+Acute environment selection is automatic:
+
+- `APP_ENV=production` uses `ACUTE_PROD_*`
+- any other `APP_ENV` value uses `ACUTE_STAGE_*`
 
 `config/entities.config.json` is the key project config. Each entity can define:
 

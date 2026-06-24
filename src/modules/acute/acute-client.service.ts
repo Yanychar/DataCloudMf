@@ -39,8 +39,8 @@ export class AcuteClientService {
     timeoutMs?: number;
   }): AcuteRequestPreview {
     const baseUrl = this.acuteConfigService.getBaseUrl();
-    const login = this.acuteConfigService.getStageLogin();
-    const password = this.acuteConfigService.getStagePassword();
+    const login = this.acuteConfigService.getLogin();
+    const password = this.acuteConfigService.getPassword();
     const url = options.path.startsWith('http') ? options.path : `${baseUrl}${options.path}`;
     const authHeader =
       login && password
@@ -99,7 +99,7 @@ export class AcuteClientService {
         Authorization:
           this.acuteConfigService.hasBasicAuthCredentials()
             ? `Basic ${Buffer.from(
-                `${this.acuteConfigService.getStageLogin()}:${this.acuteConfigService.getStagePassword()}`,
+                `${this.acuteConfigService.getLogin()}:${this.acuteConfigService.getPassword()}`,
               ).toString('base64')}`
             : undefined,
         Accept: preview.headers.Accept,

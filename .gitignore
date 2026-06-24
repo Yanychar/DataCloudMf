@@ -3,6 +3,7 @@ node_modules
 dist
 .env
 .env.local
+/.env.docker
 .DS_Store
 coverage
 *.log
@@ -10,3 +11,6 @@ prisma/dev.db
 /.run/
 .env.docker
 /reports/
+/docs/
+/outputs/
+/scripts/

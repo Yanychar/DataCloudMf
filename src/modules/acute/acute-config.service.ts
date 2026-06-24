@@ -13,20 +13,28 @@ import {
 export class AcuteConfigService {
   constructor(private readonly configService: ConfigService) {}
 
+  getAppEnv(): string {
+    return this.configService.get<string>('APP_ENV', 'development');
+  }
+
+  getAcuteEnvironment(): 'prod' | 'stage' {
+    return this.getAppEnv() === 'production' ? 'prod' : 'stage';
+  }
+
   getBaseUrl(): string {
-    return this.configService.get<string>('ACUTE_STAGE_BASE_URL', '');
+    return this.configService.get<string>(this.getAcuteEnvVarName('BASE_URL'), '');
   }
 
-  getStageLogin(): string {
-    return this.configService.get<string>('ACUTE_STAGE_LOGIN', '');
+  getLogin(): string {
+    return this.configService.get<string>(this.getAcuteEnvVarName('LOGIN'), '');
   }
 
-  getStagePassword(): string {
-    return this.configService.get<string>('ACUTE_STAGE_PASSWORD', '');
+  getPassword(): string {
+    return this.configService.get<string>(this.getAcuteEnvVarName('PASSWORD'), '');
   }
 
   hasBasicAuthCredentials(): boolean {
-    return Boolean(this.getStageLogin() && this.getStagePassword());
+    return Boolean(this.getLogin() && this.getPassword());
   }
 
   getTimeoutMs(): number {
@@ -84,7 +92,7 @@ export class AcuteConfigService {
         compositeExternalIdFields: item.compositeExternalIdFields,
         recordPath: item.recordPath,
         recordContextParentFields: item.recordContextParentFields,
-        readStrategy: this.normalizeReadStrategy(item.readStrategy),
+        readStrategy: AcuteConfigService.normalizeReadStrategy(item.readStrategy),
         rangeFromParam: item.rangeFromParam,
         rangeToParam: item.rangeToParam,
         rangeWindowUnit: item.rangeWindowUnit,
@@ -112,7 +120,7 @@ export class AcuteConfigService {
     return entity;
   }
 
-  private normalizeReadStrategy(value: unknown): ReadStrategy {
+  private static normalizeReadStrategy(value: unknown): ReadStrategy {
     return value === 'date_window' ? 'date_window' : 'single';
   }
 
@@ -136,7 +144,7 @@ export class AcuteConfigService {
         key: typeof item.key === 'string' ? item.key : '',
         sourcePath: typeof item.sourcePath === 'string' ? item.sourcePath : undefined,
         description: typeof item.description === 'string' ? item.description : '',
-        dataType: this.normalizeImportedFieldDataType(item.dataType),
+        dataType: AcuteConfigService.normalizeImportedFieldDataType(item.dataType),
         isColumn: item.isColumn === true,
         filterable: item.filterable === true,
         includeInAiContext: item.includeInAiContext !== false,
@@ -183,7 +191,7 @@ export class AcuteConfigService {
     }
   }
 
-  private normalizeImportedFieldDataType(value: unknown): ImportedFieldConfig['dataType'] {
+  private static normalizeImportedFieldDataType(value: unknown): ImportedFieldConfig['dataType'] {
     switch (value) {
       case 'string':
       case 'number':
@@ -195,5 +203,11 @@ export class AcuteConfigService {
       default:
         return undefined;
     }
+  }
+
+  private getAcuteEnvVarName(suffix: 'BASE_URL' | 'LOGIN' | 'PASSWORD'): string {
+    return this.getAcuteEnvironment() === 'prod'
+      ? `ACUTE_PROD_${suffix}`
+      : `ACUTE_STAGE_${suffix}`;
   }
 }
