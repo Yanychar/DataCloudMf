@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { Prisma, SyncMode } from '@prisma/client';
 import { AcuteClientService } from '../acute/acute-client.service';
 import { AcuteConfigService } from '../acute/acute-config.service';

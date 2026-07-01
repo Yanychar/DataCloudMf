@@ -4,6 +4,7 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: medfin-data-cloud-app
+    restart: unless-stopped
     env_file:
       - .env.docker
     ports:
